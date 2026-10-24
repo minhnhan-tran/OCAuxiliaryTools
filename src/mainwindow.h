@@ -1035,6 +1035,8 @@ class MainWindow : public QMainWindow {
   QString orgLabelStyle;
   QString orgCheckBoxStyle;
   void initRecentFilesForToolBar();
+  void openEfiBuilder();
+  QAction* actionBuildEfi = nullptr;
 
   QMenu* reFileMenu;
 

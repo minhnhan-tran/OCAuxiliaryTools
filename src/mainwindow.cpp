@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include "dlgefibuilder.h"
 #include "theme.h"
 
 #include <fstream>
@@ -149,6 +150,33 @@ void MainWindow::changeOpenCore(bool blDEV) {
   }
 }
 
+// True when `remote` is a newer semantic version than `local`. Legacy date-style
+// tags (a single number such as 20250002, used before the semver switch) are
+// never treated as newer, otherwise they would always beat "1.x.y".
+static bool isNewerVersion(const QString& remote, const QString& local) {
+  struct V { int n[3]; bool pre; bool ok; };
+  auto parse = [](QString s) {
+    V v = {{0, 0, 0}, false, false};
+    if (s.startsWith('v', Qt::CaseInsensitive)) s.remove(0, 1);
+    const int dash = s.indexOf('-');
+    if (dash >= 0) { v.pre = true; s = s.left(dash); }
+    const QStringList parts = s.split('.');
+    if (parts.size() < 2 || parts.size() > 3) return v;  // not semver (e.g. a date tag)
+    for (int i = 0; i < parts.size(); ++i) {
+      bool ok = false;
+      v.n[i] = parts[i].toInt(&ok);
+      if (!ok) return v;
+    }
+    v.ok = true;
+    return v;
+  };
+  const V r = parse(remote), l = parse(local);
+  if (!r.ok || !l.ok) return false;
+  for (int i = 0; i < 3; ++i)
+    if (r.n[i] != l.n[i]) return r.n[i] > l.n[i];
+  return !r.pre && l.pre;  // a release beats its own pre-release
+}
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
@@ -209,7 +237,27 @@ void MainWindow::setUIMargin() {
 
 void MainWindow::recentOpen(QString filename) { openFile(filename); }
 
+void MainWindow::openEfiBuilder() {
+  dlgEfiBuilder dlg(this);
+  dlg.exec();
+}
+
 void MainWindow::initRecentFilesForToolBar() {
+  // One-time: add the OpCore-Simplify style EFI builder to the Tools menu.
+  if (!ui->menuTools->findChild<QAction*>("actionEfiBuilder")) {
+    QAction* act = new QAction(tr("EFI Builder (OpCore Simplify)..."), ui->menuTools);
+    act->setObjectName("actionEfiBuilder");
+    ui->menuTools->insertAction(ui->actionGenerateEFI, act);
+    connect(act, &QAction::triggered, this, &MainWindow::openEfiBuilder);
+  }
+  if (!ui->menuHelp->findChild<QAction*>("actionPostInstall")) {
+    QAction* post = new QAction(tr("OpenCore Post-Install Guide"), ui->menuHelp);
+    post->setObjectName("actionPostInstall");
+    connect(post, &QAction::triggered, this, [] {
+      QDesktopServices::openUrl(QUrl(EfiBuilder::postInstallGuideUrl()));
+    });
+    ui->menuHelp->addAction(post);
+  }
   QStringList rfList = m_recentFiles->getRecentFiles();
   reFileMenu->clear();
   for (int i = 0; i < rfList.count(); i++) {
@@ -4899,6 +4947,7 @@ void MainWindow::init_ToolBarIcon() {
 
   if (Theme::isDark(red)) {
     btn0->setIcon(QIcon(":/icon/rp0.png"));
+    if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi0.png"));
     ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir0.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save0.png"));
     if (!blOCValidateError)
@@ -4914,6 +4963,7 @@ void MainWindow::init_ToolBarIcon() {
     btnClear->setIcon(QIcon(":/icon/c0.png"));
   } else {
     btn0->setIcon(QIcon(":/icon/rp.png"));
+    if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi.png"));
     ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save.png"));
     if (!blOCValidateError)
@@ -4989,6 +5039,14 @@ void MainWindow::init_FileMenu() {
 #ifdef Q_OS_MAC
   reFileMenu->setAsDockMenu();
 #endif
+
+  // Build EFI (sits just before Browse Catalog)
+  actionBuildEfi = new QAction(tr("Build EFI"), this);
+  actionBuildEfi->setToolTip(tr("Build EFI (OpCore Simplify)"));
+  actionBuildEfi->setIcon(QIcon(Theme::icon("efi", red)));
+  actionBuildEfi->setIconVisibleInMenu(false);
+  connect(actionBuildEfi, &QAction::triggered, this, &MainWindow::openEfiBuilder);
+  ui->toolBar->addAction(actionBuildEfi);
 
   // Open Dir
   if (mac || osx1012) ui->actionOpen_Directory->setIconVisibleInMenu(false);
@@ -5993,6 +6051,7 @@ int MainWindow::parse_UpdateJSON(QString str) {
     QString ReleaseNote = root_Obj.value("body").toString();
     // QJsonObject PulseValue = root_Obj.value("assets").toObject();
     QString Verison = root_Obj.value("tag_name").toString();
+    if (Verison.startsWith('v', Qt::CaseInsensitive)) Verison.remove(0, 1);
 
     this->setFocus();
     QStringList noteList = ReleaseNote.split("---");
@@ -6003,7 +6062,7 @@ int MainWindow::parse_UpdateJSON(QString str) {
         ReleaseNote = noteList.at(0) + noteList.at(2);
     }
 
-    if (Verison > CurVersion && Url != "") {
+    if (isNewerVersion(Verison, CurVersion) && Url != "") {
       QString warningStr = tr("New version detected!") + "\n" +
                            tr("Version: ") + "V" + Verison + "\n" +
                            tr("Published at: ") + UpdateTime + "\n" +

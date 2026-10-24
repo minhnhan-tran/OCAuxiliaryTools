@@ -4,6 +4,8 @@
         <file alias="theme/list-dark.qss">src/theme/list-dark.qss</file>
         <file alias="theme/list-light.qss">src/theme/list-light.qss</file>
         <file alias="theme/material.qss">src/theme/material.qss</file>
+        <file alias="efibuilder/efidata.json">src/efibuilder/efidata.json</file>
+        <file alias="efibuilder/postinstall.json">src/efibuilder/postinstall.json</file>
         <file>icon/m1.png</file>
         <file>icon/m2.png</file>
         <file>icon/m3.png</file>
@@ -18,6 +20,7 @@
         <file>icon/saveas.png</file>
         <file>icon/db.png</file>
         <file>icon/efi.png</file>
+        <file>icon/efi0.png</file>
         <file>icon/esp.png</file>
         <file>icon/ov.png</file>
         <file>icon/opendb.png</file>

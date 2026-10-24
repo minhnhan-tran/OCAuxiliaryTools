@@ -66,6 +66,9 @@ SOURCES += \
     src/dlgParameters.cpp \
     src/dlgPreset.cpp \
     src/dlgdatabase.cpp \
+    src/dlgefibuilder.cpp \
+    src/efibuilder/efibuilder.cpp \
+    src/efibuilder/kextfetch.cpp \
     src/dlgkernelpatch.cpp \
     src/dlgmisc.cpp \
     src/dlgnewkeyfield.cpp \
@@ -99,6 +102,9 @@ FORMS += \
 HEADERS += \
     src/BalloonTip.h \
     src/theme.h \
+    src/dlgefibuilder.h \
+    src/efibuilder/efibuilder.h \
+    src/efibuilder/kextfetch.h \
     src/Method.h \
     src/Plist.hpp \
     src/PlistDate.hpp \
