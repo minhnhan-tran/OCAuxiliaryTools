@@ -98,6 +98,7 @@ FORMS += \
 
 HEADERS += \
     src/BalloonTip.h \
+    src/theme.h \
     src/Method.h \
     src/Plist.hpp \
     src/PlistDate.hpp \

@@ -1,0 +1,48 @@
+/* Material-style app stylesheet. @{token} placeholders are substituted by
+   Theme::materialQss(). Widget-level setStyleSheet() calls in the code still
+   win over these rules, so existing per-widget styling keeps working. */
+
+QToolTip{background:@{surface};color:@{text};border:1px solid @{border};padding:4px 6px;}
+
+/* Buttons: flat, filled, rounded (dialog buttons only; tool buttons keep their own look) */
+QPushButton{background:@{accent};color:@{onAccent};border:none;border-radius:4px;padding:5px 14px;min-height:18px;}
+QPushButton:hover{background:@{accentHover};}
+QPushButton:pressed{background:@{accentPressed};}
+QPushButton:disabled{background:@{disabledBg};color:@{disabledText};}
+
+/* Tabs: underline indicator */
+QTabWidget::pane{border:none;border-top:1px solid @{border};}
+QTabBar::tab{background:transparent;color:@{textSecondary};padding:7px 16px;border:none;border-bottom:2px solid transparent;}
+QTabBar::tab:hover{background:@{hover};}
+QTabBar::tab:selected{color:@{accent};border-bottom:2px solid @{accent};}
+
+/* Group boxes: outlined card (untitled ones keep zero extra top margin) */
+QGroupBox{border:1px solid @{border};border-radius:6px;margin-top:12px;padding-top:6px;}
+QGroupBox[title=""]{margin-top:0px;padding-top:0px;}
+QGroupBox::title{subcontrol-origin:margin;subcontrol-position:top left;left:10px;padding:0 4px;color:@{textSecondary};}
+
+/* Tables */
+QTableView{gridline-color:@{border};selection-background-color:@{accent};selection-color:@{onAccent};}
+QHeaderView::section{background:@{surface};color:@{text};border:none;border-bottom:1px solid @{border};border-right:1px solid @{border};padding:4px 6px;}
+QTableCornerButton::section{background:@{surface};border:none;border-bottom:1px solid @{border};}
+
+/* Combo drop-down list and menus */
+QComboBox QAbstractItemView{background:@{surface};border:1px solid @{border};selection-background-color:@{accent};selection-color:@{onAccent};outline:0;}
+QMenu{background:@{surface};color:@{text};border:1px solid @{border};padding:4px 0;}
+QMenu::item{padding:6px 24px;margin:1px 4px;border-radius:4px;}
+QMenu::item:selected{background:@{accent};color:@{onAccent};}
+QMenu::item:disabled{color:@{disabledText};}
+QMenu::separator{height:1px;background:@{border};margin:4px 8px;}
+
+/* Slim overlay-style scroll bars */
+QScrollBar:vertical{background:transparent;width:10px;margin:0;}
+QScrollBar:horizontal{background:transparent;height:10px;margin:0;}
+QScrollBar::handle:vertical{background:@{scroll};border-radius:5px;min-height:28px;}
+QScrollBar::handle:horizontal{background:@{scroll};border-radius:5px;min-width:28px;}
+QScrollBar::handle:hover{background:@{textSecondary};}
+QScrollBar::add-line,QScrollBar::sub-line{width:0;height:0;border:none;background:none;}
+QScrollBar::add-page,QScrollBar::sub-page{background:none;}
+
+/* Progress bars */
+QProgressBar{border:none;border-radius:3px;background:@{border};text-align:center;color:@{text};}
+QProgressBar::chunk{background:@{accent};border-radius:3px;}

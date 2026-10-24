@@ -24,6 +24,7 @@ class Tooltip : public QDialog {
   void paintEvent(QPaintEvent* event) override;
 
  private:
+  void applyPalette();
   QTextEdit* edit;
   int thisWidth = 0;
   int thisHeight = 0;

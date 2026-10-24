@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#include "theme.h"
+
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -4895,7 +4897,7 @@ void MainWindow::init_ToolBarIcon() {
     iSize = 23;
   ui->toolBar->setIconSize(QSize(iSize, iSize));
 
-  if (red < 55) {
+  if (Theme::isDark(red)) {
     btn0->setIcon(QIcon(":/icon/rp0.png"));
     ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir0.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save0.png"));
@@ -4928,33 +4930,7 @@ void MainWindow::init_ToolBarIcon() {
     btnClear->setIcon(QIcon(":/icon/c.png"));
   }
 
-  QString listStyleMain, listStyle;
-  if (red < 55)
-    listStyleMain =
-
-        "QListWidget::item:hover{background-color:rgba(190,190,190,50);"
-        "margin:"
-        "1px,1px,1px,"
-        "1px;border-radius:6;"
-        "color:#e6e6e6}"
-
-        "QListWidget::item:selected{background:rgba(190,190,190,50); "
-        "border:0px "
-        "blue;margin:1px,1px,1px,1px;border-radius:6;"
-        "color:#07a4f6}"
-
-        "QListWidget::item{background-color:none;margin:1px,1px,1px,"
-        "1px;"
-        "color:#bfbfbf}";
-  else
-    listStyleMain =
-        "QListWidget::item:hover{background-color:#e6e6e6;margin:1px,1px,1px,"
-        "1px;border-radius:6;"
-        "color:black}"
-        "QListWidget::item:selected{background:#e6e6e6; border:0px "
-        "blue;margin:1px,1px,1px,1px;border-radius:6;"
-        "color:blue}";
-
+  QString listStyleMain = Theme::listStyle(red), listStyle;
   listStyle =
       "QListWidget::item:selected{background:lightblue; border:0px blue; "
       "color:black}";
@@ -7656,7 +7632,7 @@ void MainWindow::clearComboBoxMarker() {
   for (int i = 0; i < listOfComboBoxResults.count(); i++) {
     QComboBox* w = (QComboBox*)listOfComboBoxResults.at(i);
 
-    if (red < 55) {
+    if (Theme::isDark(red)) {
       setPalette(w, QColor(50, 50, 50), Qt::white);
 
     } else {
@@ -9208,10 +9184,7 @@ void MainWindow::oc_Validate(bool show) {
     str = tr("OK !");
     strMsg = result + "\n\n" + str;
 
-    if (red < 55)
-      ui->actionOcvalidate->setIcon(QIcon(":/icon/ov0.png"));
-    else
-      ui->actionOcvalidate->setIcon(QIcon(":/icon/ov.png"));
+    ui->actionOcvalidate->setIcon(QIcon(Theme::icon("ov", red)));
     ui->actionOcvalidate->setToolTip(ui->actionOcvalidate->text());
 
     dlgOCV->setGoEnabled(false);
@@ -9726,15 +9699,9 @@ void MainWindow::updateStatus() { mymethod->autoTip(); }
 
 void MainWindow::updateIconStatus() {
   if (isWindowModified()) {
-    if (red < 55)
-      ui->actionSave->setIcon(QIcon(":/icon/savetip0.png"));
-    else
-      ui->actionSave->setIcon(QIcon(":/icon/savetip.png"));
+    ui->actionSave->setIcon(QIcon(Theme::icon("savetip", red)));
   } else {
-    if (red < 55)
-      ui->actionSave->setIcon(QIcon(":/icon/save0.png"));
-    else
-      ui->actionSave->setIcon(QIcon(":/icon/save.png"));
+    ui->actionSave->setIcon(QIcon(Theme::icon("save", red)));
   }
 }
 

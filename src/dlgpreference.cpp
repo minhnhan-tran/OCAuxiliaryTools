@@ -1,11 +1,14 @@
 #include "dlgpreference.h"
 
+#include <QCheckBox>
 #include <QDir>
+#include <QGridLayout>
 #include <QKeyEvent>
 #include <QSettings>
 
 #include "Method.h"
 #include "mainwindow.h"
+#include "theme.h"
 #include "ui_dlgpreference.h"
 #include "ui_mainwindow.h"
 
@@ -26,6 +29,30 @@ dlgPreference::dlgPreference(QWidget *parent)
   for (int i = 0; i < ui->tableKextUrl->columnCount(); i++) {
     ui->tableKextUrl->horizontalHeader()->setSectionResizeMode(
         i, QHeaderView::ResizeToContents);
+  }
+
+  // Theme toggles, added next to the other appearance options.
+  {
+    QCheckBox* chkDark = new QCheckBox(tr("Dark theme"), this);
+    QCheckBox* chkMaterial = new QCheckBox(tr("Material design"), this);
+    chkDark->setChecked(Reg.value("DarkTheme", false).toBool());
+    chkMaterial->setChecked(Reg.value("MaterialTheme", true).toBool());
+    QLayout* lay = ui->chkHideToolbar->parentWidget()
+                       ? ui->chkHideToolbar->parentWidget()->layout()
+                       : nullptr;
+    for (QCheckBox* c : {chkMaterial, chkDark}) {
+      if (QGridLayout* grid = qobject_cast<QGridLayout*>(lay))
+        grid->addWidget(c, grid->rowCount(), 0, 1, qMax(1, grid->columnCount()));
+      else if (lay)
+        lay->addWidget(c);
+    }
+    auto update = [chkDark, chkMaterial]() {
+      Reg.setValue("DarkTheme", chkDark->isChecked());
+      Reg.setValue("MaterialTheme", chkMaterial->isChecked());
+      Theme::apply(chkDark->isChecked(), chkMaterial->isChecked());
+    };
+    connect(chkDark, &QCheckBox::toggled, this, update);
+    connect(chkMaterial, &QCheckBox::toggled, this, update);
   }
 
   // Kexts Urls

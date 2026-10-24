@@ -1,5 +1,7 @@
 #include "tooltip.h"
 
+#include "theme.h"
+
 #include <QAbstractTextDocumentLayout>
 #include <QDebug>
 #include <QEvent>
@@ -18,13 +20,7 @@ Tooltip::Tooltip(QWidget* parent) : QDialog(parent) {
   delay = 600;
 
   this->setAutoFillBackground(true);
-  QPalette palette = this->palette();
-  // palette.setColor(QPalette::Base, QColor(255, 255, 225, 255));
-  // palette.setColor(QPalette::Window, QColor(255, 255, 225, 255));
-  palette.setColor(QPalette::Base, QColor(236, 236, 236, 255));
-  palette.setColor(QPalette::Window, QColor(236, 236, 236, 255));
-  palette.setColor(QPalette::Text, QColor(0, 0, 0, 255));
-  this->setPalette(palette);
+  applyPalette();
 
   edit = new QTextEdit(this);
   edit->setWordWrapMode(QTextOption::WordWrap);
@@ -123,9 +119,26 @@ bool Tooltip::eventFilter(QObject* obj, QEvent* e) {
   return QWidget::eventFilter(obj, e);
 }
 
+// Evaluated on every popup (not just construction) so a live dark/light
+// switch is reflected; an explicit setPalette() doesn't track the app palette.
+void Tooltip::applyPalette() {
+  QPalette palette = this->palette();
+  if (Theme::isDark(qApp->palette().color(QPalette::Window).red())) {
+    palette.setColor(QPalette::Base, QColor(55, 55, 55, 255));
+    palette.setColor(QPalette::Window, QColor(55, 55, 55, 255));
+    palette.setColor(QPalette::Text, QColor(245, 245, 245, 255));
+  } else {
+    palette.setColor(QPalette::Base, QColor(236, 236, 236, 255));
+    palette.setColor(QPalette::Window, QColor(236, 236, 236, 255));
+    palette.setColor(QPalette::Text, QColor(0, 0, 0, 255));
+  }
+  this->setPalette(palette);
+}
+
 void Tooltip::popup(QPoint pos, QString strHead, const QString& text) {
   if (text.trimmed().length() == 0) return;
 
+  applyPalette();
   this->installEventFilter(this);
   this->setMyText(strHead, text);
 

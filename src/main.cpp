@@ -2,7 +2,10 @@
 #include <QObject>
 #include <QSplashScreen>
 
+#include <QSettings>
+
 #include "Method.h"
+#include "theme.h"
 #include "mainwindow.h"
 #include "myapp.h"
 
@@ -11,6 +14,7 @@ extern QVector<QString> filelist;
 QWidgetList wdlist;
 extern QString PlistFileName, CurVersion, ocVer;
 extern bool zh_cn;
+extern QSettings Reg;
 MainWindow *mw_one;
 
 int main(int argc, char *argv[]) {
@@ -24,6 +28,11 @@ int main(int argc, char *argv[]) {
 #endif
 
   MyApplication *a = new MyApplication(argc, argv);
+  {
+    const bool dark = Reg.value("DarkTheme", false).toBool();
+    const bool material = Reg.value("MaterialTheme", true).toBool();
+    if (dark || material) Theme::apply(dark, material);
+  }
 
 #ifdef Q_OS_MAC
   Method::init_MacVerInfo(CurVersion);
