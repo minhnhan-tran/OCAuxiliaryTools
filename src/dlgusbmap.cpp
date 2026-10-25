@@ -69,7 +69,7 @@ QString dlgUsbMap::stateDir() { return QDir::homePath() + "/.ocat/USBMap"; }
 
 dlgUsbMap::dlgUsbMap(QWidget* parent) : QDialog(parent) {
   setWindowTitle(tr("USB Mapping"));
-  resize(1120, 640);
+  resize(1160, 640);
   // The app's 12 px system font loses the space after "," and "." when kerning is
   // on (Qt 5.15 on macOS), so "A, B" renders as "A,B". Turn it off for this dialog.
   QFont noKern = font();
@@ -113,10 +113,10 @@ dlgUsbMap::dlgUsbMap(QWidget* parent) : QDialog(parent) {
   table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   table->horizontalHeader()->setStretchLastSection(true);
   table->setColumnWidth(ColOn, 40);
-  table->setColumnWidth(ColCtrl, 140);
+  table->setColumnWidth(ColCtrl, 125);
   table->setColumnWidth(ColPort, 90);
   table->setColumnWidth(ColType, 140);
-  table->setColumnWidth(ColConn, 170);
+  table->setColumnWidth(ColConn, 165);
   table->setColumnWidth(ColNick, 170);
   table->verticalHeader()->setVisible(false);
   table->setSelectionBehavior(QAbstractItemView::SelectRows);

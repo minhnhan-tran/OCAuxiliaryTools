@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.15.2] — 2026-10-25
+
+### Fixed
+- USB Mapping: at the default window size a horizontal scrollbar appeared because the columns were slightly wider than the table. The columns are a little narrower and the window a little wider, so everything fits.
+
 ## [1.15.1] — 2026-10-25
 
 ### Changed
