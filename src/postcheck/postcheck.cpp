@@ -46,6 +46,7 @@ QList<Check> loadChecks() {
       fx.cmd = fo["cmd"].toString();
       fx.why = fo["why"].toString();
       fx.note = fo["note"].toString();
+      fx.run = fo["run"].toString();
       c.fixes << fx;
     }
     if (!c.id.isEmpty() && !c.cmd.isEmpty()) out << c;
@@ -121,6 +122,20 @@ namespace {
 QString shQuote(const QString& s) { QString q = s; q.replace("'", "'\\''"); return "'" + q + "'"; }
 QString asQuote(const QString& s) { QString q = s; q.replace("\\", "\\\\").replace("\"", "\\\""); return "\"" + q + "\""; }
 }  // namespace
+
+bool canRunFix(const Fix& f) {
+  if (f.cmd.trimmed().isEmpty() || f.cmd.contains('\n') || f.cmd.contains('\r')) return false;
+  if (f.run == "admin")
+    return QRegularExpression("\\Asudo pmset -a [a-z]+ [0-9]+\\z").match(f.cmd).hasMatch();
+  if (f.run == "user") return !f.cmd.contains("sudo");
+  return false;
+}
+
+QString adminScript(const QString& cmd) {
+  QString c = cmd.trimmed();
+  if (c.startsWith("sudo ")) c = c.mid(5);
+  return "do shell script " + asQuote(c) + " with administrator privileges";
+}
 
 bool openInTerminal(const QString& cmd, QString* error) {
 #ifdef Q_OS_MAC

@@ -13,7 +13,8 @@
    "fixes": [
     {
      "cmd": "sudo pmset -a hibernatemode 0",
-     "why": "Turns hibernation off for all power sources."
+     "why": "Turns hibernation off for all power sources.",
+     "run": "admin"
     }
    ],
    "timeoutSec": 20,
@@ -32,7 +33,8 @@
    "fixes": [
     {
      "cmd": "sudo pmset -a standby 0",
-     "why": "Disables the delayed deep-sleep (standby) mode."
+     "why": "Disables the delayed deep-sleep (standby) mode.",
+     "run": "admin"
     }
    ],
    "timeoutSec": 20,
@@ -51,7 +53,8 @@
    "fixes": [
     {
      "cmd": "sudo pmset -a autopoweroff 0",
-     "why": "Disables auto power off."
+     "why": "Disables auto power off.",
+     "run": "admin"
     }
    ],
    "timeoutSec": 20,
@@ -70,7 +73,8 @@
    "fixes": [
     {
      "cmd": "sudo pmset -a powernap 0",
-     "why": "Disables Power Nap."
+     "why": "Disables Power Nap.",
+     "run": "admin"
     }
    ],
    "timeoutSec": 20,
@@ -89,7 +93,8 @@
    "fixes": [
     {
      "cmd": "sudo pmset -a proximitywake 0",
-     "why": "Disables wake when an iPhone / Apple Watch is nearby."
+     "why": "Disables wake when an iPhone / Apple Watch is nearby.",
+     "run": "admin"
     }
    ],
    "timeoutSec": 20,
@@ -108,7 +113,8 @@
    "fixes": [
     {
      "cmd": "sudo pmset -a tcpkeepalive 0",
-     "why": "Disables TCP keep-alive while sleeping."
+     "why": "Disables TCP keep-alive while sleeping.",
+     "run": "admin"
     }
    ],
    "timeoutSec": 20,
@@ -127,7 +133,8 @@
    "fixes": [
     {
      "cmd": "pmset -g log | grep -iE '(sleep|wake) failure|wake reason' | tail -20",
-     "why": "Read-only: shows the most recent failure and wake-reason lines so you can see what woke or blocked the Mac."
+     "why": "Read-only: shows the most recent failure and wake-reason lines so you can see what woke or blocked the Mac.",
+     "run": "user"
     },
     {
      "note": "Apply the power settings above first. Then work through the guide's main offenders: USB (map your ports), GPUs (make sure yours is supported), Thunderbolt, NICs, NVMe (NVMeFix.kext) and CPU power management. Also disable Wake on LAN in the BIOS, and add keepsyms=1 and swd_panic=1 to boot-args so a sleep panic leaves a readable log. Details are on the guide page. On Intel 300-series (Z3xx) boards, a \"BIOS Restarted in Safemode\" message at shutdown or restart is an RTC problem: fix AWAC and use DisableRtcChecksum, or AppleRtcRam with rtc-blacklist (see the RTC section). That can only be seen at shutdown, not checked from macOS."
@@ -149,7 +156,8 @@
    "fixes": [
     {
      "cmd": "pmset -g assertions | grep -B1 -A2 -E 'PreventSystemSleep|PreventUserIdleSystemSleep'",
-     "why": "Read-only: lists the processes holding the assertion."
+     "why": "Read-only: lists the processes holding the assertion.",
+     "run": "user"
     }
    ],
    "timeoutSec": 20,
@@ -312,7 +320,8 @@
    "fixes": [
     {
      "cmd": "kextstat | grep -E \"Lilu|WhateverGreen\"",
-     "why": "Read-only: shows whether both kexts are loaded (the command the guide uses)."
+     "why": "Read-only: shows whether both kexts are loaded (the command the guide uses).",
+     "run": "user"
     },
     {
      "note": "If either is missing, add Lilu.kext first and WhateverGreen.kext after it in Kernel > Add, then rebuild."

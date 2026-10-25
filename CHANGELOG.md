@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.11.0] — 2026-10-25
+
+### Added
+- Post-Install Check: a **Run** button on fixes that are safe to run from the window. It first shows the exact command (and, for power settings, the value they have now), asks you to confirm, and then runs it. Power-management fixes (`pmset -a <setting> <number>`) use macOS's own administrator password prompt, and the check is re-run afterwards so you can see whether it now passes. Read-only diagnostic fixes run without a password and show their output.
+- Nothing else can be run this way: the app only accepts `pmset -a <setting> <number>` as an admin command, whatever the data says (the unit tests cover shell tricks such as `;`, `&&`, `$()` and newlines). `trimforce`, which asks for confirmation and restarts, stays in Terminal.
+
 ## [1.10.2] — 2026-10-25
 
 ### Fixed

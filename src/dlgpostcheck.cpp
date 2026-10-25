@@ -8,6 +8,9 @@
 #include <QJsonObject>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QProcess>
+#include <QRegularExpression>
+#include <QTimer>
 #include <QScrollArea>
 #include <QSplitter>
 #include <QUrl>
@@ -102,7 +105,7 @@ dlgPostCheck::dlgPostCheck(QWidget* parent) : QDialog(parent) {
   } else {
     summary->setText(tr("Reads your system settings and is based on the Dortania "
                         "post-install guide (a few checks are general macOS advice and say so). "
-                        "Nothing is changed; fixes are only shown. "
+                        "Nothing is changed unless you click Run on a fix and confirm it. "
                         "Click \"Run checks\" (the sleep log check can take several seconds)."));
   }
 }
@@ -123,8 +126,9 @@ void dlgPostCheck::runAll() {
   QApplication::setOverrideCursor(Qt::WaitCursor);
 
   // Read the report once; a bad file only disables the checks that need it.
-  Context ctx;
-  QString reportNote;
+  ctx = Context();
+  reportNote.clear();
+  fixMsg.clear();
   const QString repPath = editReport->text().trimmed();
   if (!repPath.isEmpty()) {
     QJsonObject rep;
@@ -158,6 +162,15 @@ void dlgPostCheck::runAll() {
   }
   QApplication::restoreOverrideCursor();
 
+  refreshSummary();
+  running = false;
+  btnRun->setText(tr("Re-run checks"));
+  btnRun->setEnabled(true);
+  btnCopy->setEnabled(true);
+  showDetails();
+}
+
+void dlgPostCheck::refreshSummary() {
   int fail = 0, unk = 0;
   for (const Result& r : results) {
     if (r.status == Fail) ++fail;
@@ -167,10 +180,81 @@ void dlgPostCheck::runAll() {
                               : tr("%1 problem(s) found, %2 check(s) gave no verdict. Select a problem to see the fix.")
                                     .arg(fail).arg(unk)) +
                    (reportNote.isEmpty() ? QString() : "  " + reportNote));
-  running = false;
-  btnRun->setText(tr("Re-run checks"));
-  btnRun->setEnabled(true);
-  btnCopy->setEnabled(true);
+}
+
+QTreeWidgetItem* dlgPostCheck::itemFor(int idx) const {
+  for (int g = 0; g < tree->topLevelItemCount(); ++g)
+    for (int c = 0; c < tree->topLevelItem(g)->childCount(); ++c)
+      if (tree->topLevelItem(g)->child(c)->data(0, Qt::UserRole).toInt() == idx) return tree->topLevelItem(g)->child(c);
+  return nullptr;
+}
+
+void dlgPostCheck::runFix(int idx, int fixIdx) {
+  if (fixBusy || idx < 0 || idx >= results.size()) return;
+  const Fix f = results[idx].check.fixes.value(fixIdx);
+  if (!supported() || !canRunFix(f)) return;
+  const bool admin = f.run == "admin";
+
+  // Show what the setting is now, so it can be put back by hand.
+  QString current;
+  const QRegularExpressionMatch m = QRegularExpression("pmset -a ([a-z]+) ").match(f.cmd);
+  if (admin && m.hasMatch()) {
+    QProcess q;
+    q.start("/bin/sh", QStringList() << "-c" << "pmset -g custom | grep -iw " + m.captured(1));
+    if (q.waitForFinished(5000)) current = QString::fromUtf8(q.readAllStandardOutput()).trimmed();
+  }
+  QString text = tr("This will run:") + "\n\n" + f.cmd + "\n\n" + f.why;
+  if (admin) text += "\n\n" + tr("macOS will ask for your administrator password.");
+  if (admin && m.hasMatch())
+    text += "\n\n" + (current.isEmpty() ? tr("pmset does not list this setting on this Mac right now.")
+                                         : tr("Current value(s):") + "\n" + current);
+  QMessageBox box(QMessageBox::Question, tr("Run this fix?"), text, QMessageBox::Yes | QMessageBox::No, this);
+  box.setDefaultButton(QMessageBox::No);
+  if (box.exec() != QMessageBox::Yes) return;
+
+  QProcess* p = new QProcess(this);
+  fixBusy = true;
+  summary->setText(tr("Running the fix..."));
+  connect(p, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
+          [this, p, idx, admin](int code, QProcess::ExitStatus st) { finishFix(p, idx, admin, code, st == QProcess::NormalExit); });
+  connect(p, &QProcess::errorOccurred, this, [this, p, idx, admin](QProcess::ProcessError e) {
+    if (e == QProcess::FailedToStart) finishFix(p, idx, admin, -1, false);
+  });
+  if (admin) p->start("/usr/bin/osascript", QStringList() << "-e" << adminScript(f.cmd));
+  else p->start("/bin/sh", QStringList() << "-c" << f.cmd);
+  // The password prompt can stay open a while; a hung command must not hang the dialog.
+  QTimer::singleShot(admin ? 300000 : 60000, p, [p] {
+    if (p->state() != QProcess::NotRunning) p->kill();
+  });
+}
+
+void dlgPostCheck::finishFix(QProcess* p, int idx, bool admin, int code, bool normalExit) {
+  if (p->property("done").toBool()) return;
+  p->setProperty("done", true);
+  const QString out = QString::fromUtf8(p->readAllStandardOutput()).trimmed();
+  const QString err = QString::fromUtf8(p->readAllStandardError()).trimmed();
+  p->deleteLater();
+  fixBusy = false;
+
+  QString msg;
+  if (admin && code != 0 && err.contains("-128")) {  // the user dismissed macOS's password prompt
+    msg = tr("Cancelled. Nothing was changed.");
+  } else if (normalExit && code == 0) {
+    msg = tr("Ran successfully.");
+    if (!out.isEmpty()) msg += "\n" + out.left(1500);
+    if (admin && idx >= 0 && idx < results.size()) {
+      results[idx] = runCheck(results[idx].check, ctx);  // does the check pass now?
+      if (QTreeWidgetItem* it = itemFor(idx)) setStatus(it, results[idx]);
+      msg += "\n" + (results[idx].status == Pass ? tr("The check now passes.")
+                                                  : tr("The check still reports: %1").arg(statusText(results[idx].status)));
+    }
+  } else {
+    msg = tr("The command failed (exit code %1).").arg(code);
+    const QString detail = err.isEmpty() ? out : err;
+    if (!detail.isEmpty()) msg += "\n" + detail.left(1500);
+  }
+  fixMsg[idx] = msg;
+  refreshSummary();
   showDetails();
 }
 
@@ -185,11 +269,18 @@ void dlgPostCheck::showDetails() {
   clearDetails();
   const QList<QTreeWidgetItem*> sel = tree->selectedItems();
   if (sel.isEmpty() || sel.first()->parent() == nullptr) return;
-  const Result& r = results[sel.first()->data(0, Qt::UserRole).toInt()];
+  const int idx = sel.first()->data(0, Qt::UserRole).toInt();
+  const Result& r = results[idx];
 
   QLabel* head = new QLabel("<b>" + r.check.title.toHtmlEscaped() + "</b> - " + statusText(r.status));
   head->setWordWrap(true);
   detailsLay->addWidget(head);
+  if (fixMsg.contains(idx)) {
+    QLabel* fm = new QLabel("<b>" + tr("Last fix:") + "</b><pre>" + fixMsg.value(idx).toHtmlEscaped() + "</pre>");
+    fm->setWordWrap(true);
+    fm->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    detailsLay->addWidget(fm);
+  }
 
   if (r.status == Unknown && r.reason.isEmpty()) {
     detailsLay->addWidget(new QLabel(tr("Not run yet.")));
@@ -228,6 +319,14 @@ void dlgPostCheck::showDetails() {
       QHBoxLayout* row = new QHBoxLayout;
       row->addWidget(copy);
       row->addWidget(term);
+      if (!f.run.isEmpty()) {
+        QPushButton* runBtn = new QPushButton(f.run == "admin" ? tr("Run (asks for password)") : tr("Run here"));
+        runBtn->setToolTip(tr("Asks you to confirm the exact command first."));
+        runBtn->setEnabled(supported() && canRunFix(f) && !fixBusy);
+        const int fi = i;
+        connect(runBtn, &QPushButton::clicked, this, [this, idx, fi] { runFix(idx, fi); });
+        row->addWidget(runBtn);
+      }
       row->addStretch(1);
       QWidget* rw = new QWidget;
       rw->setLayout(row);
