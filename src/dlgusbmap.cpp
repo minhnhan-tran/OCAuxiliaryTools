@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QLabel>
 #include <QMessageBox>
 #include <QProcess>
 #include <QUrl>
@@ -19,6 +20,41 @@ namespace {
 enum Col { ColOn, ColCtrl, ColPort, ColType, ColConn, ColNick, ColDev, ColCount };
 const int RoleCtrl = Qt::UserRole;
 const int RoleKey = Qt::UserRole + 1;
+
+// Colour chips for the "Devices seen" column, by what the device looks like.
+// White text on a mid-tone fill reads well in both light and dark themes.
+struct Kind { const char* label; const char* color; };
+Kind deviceKind(const QString& name) {
+  const QString n = name.toLower();
+  if (n.contains("bluetooth")) return Kind{"Bluetooth", "#1e88e5"};
+  if (n.contains("hub")) return Kind{"Hub", "#78909c"};
+  if (n.contains("keyboard") || n.contains("mouse") || n.contains("trackpad") ||
+      n.contains("receiver") || n.contains("dongle") || n.contains("touch") || n.contains("pad"))
+    return Kind{"Input", "#8e24aa"};
+  if (n.contains("storage") || n.contains("disk") || n.contains("flash") || n.contains("drive") ||
+      n.contains("card reader") || n.contains("ssd") || n.contains("mass"))
+    return Kind{"Storage", "#ef6c00"};
+  if (n.contains("audio") || n.contains("camera") || n.contains("webcam") || n.contains("headset") ||
+      n.contains("headphone") || n.contains("speaker") || n.contains("mic"))
+    return Kind{"Media", "#00897b"};
+  return Kind{"Device", "#43a047"};
+}
+
+QWidget* deviceChips(const QStringList& items) {
+  QWidget* w = new QWidget;
+  QHBoxLayout* l = new QHBoxLayout(w);
+  l->setContentsMargins(6, 3, 6, 3);
+  l->setSpacing(6);
+  for (int i = 0; i < items.size(); ++i) {
+    const Kind k = deviceKind(items[i]);
+    QLabel* chip = new QLabel(items[i], w);
+    chip->setToolTip(QString("%1: %2").arg(k.label, items[i]));
+    chip->setStyleSheet(QString("QLabel { background: %1; color: white; border-radius: 9px; padding: 2px 9px; }").arg(k.color));
+    l->addWidget(chip);
+  }
+  l->addStretch();
+  return w;
+}
 
 bool onMac() {
 #ifdef Q_OS_MAC
@@ -33,7 +69,12 @@ QString dlgUsbMap::stateDir() { return QDir::homePath() + "/.ocat/USBMap"; }
 
 dlgUsbMap::dlgUsbMap(QWidget* parent) : QDialog(parent) {
   setWindowTitle(tr("USB Mapping"));
-  resize(980, 620);
+  resize(1120, 640);
+  // The app's 12 px system font loses the space after "," and "." when kerning is
+  // on (Qt 5.15 on macOS), so "A, B" renders as "A,B". Turn it off for this dialog.
+  QFont noKern = font();
+  noKern.setKerning(false);
+  setFont(noKern);
 
   hint = new QLabel(tr(
       "1. Click <b>Discover ports</b>. 2. Plug a USB 2 device, then a USB 3 device, into every "
@@ -74,9 +115,9 @@ dlgUsbMap::dlgUsbMap(QWidget* parent) : QDialog(parent) {
   table->setColumnWidth(ColOn, 40);
   table->setColumnWidth(ColCtrl, 140);
   table->setColumnWidth(ColPort, 90);
-  table->setColumnWidth(ColType, 150);
+  table->setColumnWidth(ColType, 140);
   table->setColumnWidth(ColConn, 170);
-  table->setColumnWidth(ColNick, 200);
+  table->setColumnWidth(ColNick, 170);
   table->verticalHeader()->setVisible(false);
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -180,11 +221,28 @@ void dlgUsbMap::fillTable() {
       });
       table->setCellWidget(row, ColConn, cb);
       table->setItem(row, ColNick, new QTableWidgetItem(p.comment));
-      QTableWidgetItem* dev = new QTableWidgetItem(p.items.join(", "));
+      QTableWidgetItem* dev = new QTableWidgetItem;
       dev->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+      dev->setData(Qt::AccessibleTextRole, p.items.join(", "));
       table->setItem(row, ColDev, dev);
+      if (!p.items.isEmpty()) {
+        table->setCellWidget(row, ColDev, deviceChips(p.items));
+        // rows with a device stand out: tinted cells and a bold port name
+        const QBrush tint(QColor(46, 160, 67, 40));
+        for (int col = 0; col < ColCount; ++col)
+          if (col != ColConn && table->item(row, col)) table->item(row, col)->setBackground(tint);
+        QFont bold = table->item(row, ColPort)->font();
+        bold.setBold(true);
+        table->item(row, ColPort)->setFont(bold);
+      }
     }
   }
+  // wide enough for the longest row of chips (scrolls sideways if the window is narrower)
+  int need = 240;
+  for (int r = 0; r < table->rowCount(); ++r)
+    if (QWidget* w = table->cellWidget(r, ColDev)) need = qMax(need, w->sizeHint().width() + 8);
+  table->setColumnWidth(ColDev, need);
+  table->horizontalHeader()->setStretchLastSection(true);
   filling = false;
 }
 

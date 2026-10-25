@@ -4,6 +4,14 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.15.1] — 2026-10-25
+
+### Changed
+- USB Mapping: the "Devices seen" column now shows each device as a coloured chip by kind (hub, Bluetooth, input, storage, media, other), and rows that have a device are tinted with a bold port name so the real ports stand out. The column is sized to fit the longest row.
+
+### Fixed
+- USB Mapping: text in this window lost the space after a comma or full stop ("1.Click", "controller(s),15 port(s)") because of kerning at the app's 12 px font. Kerning is now off for this window.
+
 ## [1.15.0] — 2026-10-25
 
 ### Added
