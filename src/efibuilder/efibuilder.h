@@ -116,16 +116,16 @@ Plan makePlan(const QJsonObject& report, const Compatibility& compat,
 // Applies a plan to a parsed template config (kernel kexts, boot-args, SMBIOS).
 // `availableKexts` are the kext bundle names present in the Database.
 // disableKexts: kexts the user removed from the default list; forced off.
-// Drops every disabled entry from ACPI > Add and Kernel > Add, so the generated
-// config lists (and the EFI folder copies) only what the build actually uses.
-// Returns how many entries were removed. Unrelated sections are untouched.
-int pruneUnused(QVariantMap* config);
-
 QVariantMap applyPlan(QVariantMap config, const Plan& plan,
                       const QStringList& availableKexts,
                       QStringList* missingKexts,
                       const QStringList& disableKexts = QStringList(),
                       const QString& kextDir = QString());
+
+// Drops every disabled entry from ACPI > Add and Kernel > Add, so the generated
+// config lists (and the EFI folder copies) only what the build actually uses.
+// Returns how many entries were removed. Unrelated sections are untouched.
+int pruneUnused(QVariantMap* config);
 
 // macOS releases (name, darwin major) usable within a compat range.
 QList<QPair<QString, int>> macosChoices(const Compatibility& compat);

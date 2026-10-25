@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.17.3] — 2026-10-25
+
+### Fixed
+- EFI Builder: the header comment for `applyPlan` had been replaced by the text for the new `pruneUnused`; each function now has its own comment again (no behaviour change).
+
 ## [1.17.2] — 2026-10-25
 
 ### Fixed
