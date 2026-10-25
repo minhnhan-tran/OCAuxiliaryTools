@@ -4,6 +4,15 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.9.0] — 2026-10-25
+
+### Added
+- Post-Install Check, three new groups from the Dortania guides:
+  - **CPU Power Management**: X86PlatformPlugin (XCPM) is loaded (Haswell and newer Intel; Sandy / Ivy Bridge and AMD give no verdict), and CPUFriend is not loaded without it.
+  - **Hardware Decoding / Encoding (VDA)**: H.264 hardware decoding, HEVC hardware decoding and H.264 hardware encoding, read through the VideoToolbox API (the guide's VDADecoderChecker tool tests the same thing). HEVC and encoding are informational since many GPUs lack them.
+  - **Trackpad and Keyboard**: a laptop input driver is loaded (VoodooPS2 / VoodooI2C / SPI), VoodooInput loads before VoodooPS2 / VoodooI2C (the guide's fix for "keyboard works but trackpad does not"), and a trackpad or pointing device is visible on a laptop.
+- Laptop detection uses the SMBIOS model or a battery, so the keyboard checks give no verdict on a desktop. A mouse plugged into a laptop hides a missing trackpad (no verdict). The keyboard / trackpad checks are not yet tested on real laptop hardware.
+
 ## [1.8.3] — 2026-10-25
 
 ### Fixed

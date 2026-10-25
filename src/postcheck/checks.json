@@ -529,6 +529,150 @@
    ],
    "timeoutSec": 30,
    "needsReport": false
+  },
+  {
+   "id": "cpu-xcpm",
+   "group": "CPU Power Management",
+   "title": "Apple CPU power management (X86PlatformPlugin) is loaded",
+   "cmd": "v=$(sysctl -n machdep.cpu.vendor 2>/dev/null); f=$(sysctl -n machdep.cpu.family 2>/dev/null); m=$(sysctl -n machdep.cpu.model 2>/dev/null); b=$(sysctl -n machdep.cpu.brand_string 2>/dev/null); c=$(ioreg -rc AppleACPICPU 2>/dev/null | grep -c '<class AppleACPICPU,'); p=$(ioreg -rc X86PlatformPlugin 2>/dev/null | grep -c '<class X86PlatformPlugin'); fr=$(kmutil showloaded --list-only 2>/dev/null | grep -ci 'CPUFriend'); if echo \"$b\" | grep -qi amd; then t=amd; elif [ \"$v\" = GenuineIntel ] && [ \"$f\" = 6 ]; then case \"$m\" in 42|45|58|62) t=sandy-ivy;; *) if [ \"$m\" -ge 60 ] 2>/dev/null; then t=xcpm; else t=old; fi;; esac; else t=other; fi; echo \"cpu=$t model=$m plugin=$p cpus=$c friend=$fr\"",
+   "pass": "^cpu=xcpm model=\\d+ plugin=[1-9]",
+   "fail": "^cpu=xcpm model=\\d+ plugin=0 cpus=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/pm.html",
+   "why": "X86PlatformPlugin is not attached to the CPUs, so Apple's XCPM power management is not running (the Dortania guide's test for it). Without it the CPU may not idle or boost properly. A no-verdict result is normal on Sandy / Ivy Bridge and AMD, which XCPM does not support (see their own sections in the guide).",
+   "fixes": [
+    {
+     "note": "Per the guide: make sure SSDT-PLUG is present and enabled in config.plist and EFI/OC/ACPI, and set to your first CPU thread (not needed on macOS 12.3 and newer). Haswell-E / Broadwell-E need a CPUID spoof (Kernel > Emulate) since XCPM does not support them natively. Rebuild and retest."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "cpu-friend",
+   "group": "CPU Power Management",
+   "title": "CPUFriend has X86PlatformPlugin to work with",
+   "cmd": "v=$(sysctl -n machdep.cpu.vendor 2>/dev/null); f=$(sysctl -n machdep.cpu.family 2>/dev/null); m=$(sysctl -n machdep.cpu.model 2>/dev/null); b=$(sysctl -n machdep.cpu.brand_string 2>/dev/null); c=$(ioreg -rc AppleACPICPU 2>/dev/null | grep -c '<class AppleACPICPU,'); p=$(ioreg -rc X86PlatformPlugin 2>/dev/null | grep -c '<class X86PlatformPlugin'); fr=$(kmutil showloaded --list-only 2>/dev/null | grep -ci 'CPUFriend'); if echo \"$b\" | grep -qi amd; then t=amd; elif [ \"$v\" = GenuineIntel ] && [ \"$f\" = 6 ]; then case \"$m\" in 42|45|58|62) t=sandy-ivy;; *) if [ \"$m\" -ge 60 ] 2>/dev/null; then t=xcpm; else t=old; fi;; esac; else t=other; fi; echo \"cpu=$t model=$m plugin=$p cpus=$c friend=$fr\"",
+   "pass": "plugin=[1-9]\\d* cpus=\\d+ friend=[1-9]",
+   "fail": "plugin=0 cpus=[1-9]\\d* friend=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/pm.html",
+   "why": "CPUFriend is loaded but X86PlatformPlugin is not. The guide lists X86PlatformPlugin as a requirement for CPUFriend (so Sandy Bridge and AMD CPUs are not supported), so the kext does nothing here.",
+   "fixes": [
+    {
+     "note": "Fix XCPM first (see the check above), or remove CPUFriend and its data provider if your CPU does not support it."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "vda-h264-decode",
+   "group": "Hardware Decoding / Encoding (VDA)",
+   "title": "H.264 hardware decoding works",
+   "cmd": "osascript -l JavaScript -e 'ObjC.import(\"VideoToolbox\"); var r=\"vt\"; try { r+=\" h264dec=\"+($.VTIsHardwareDecodeSupported(0x61766331)?1:0)+\" hevcdec=\"+($.VTIsHardwareDecodeSupported(0x68766331)?1:0); } catch(e) { r+=\" dec_error\"; } try { var ref=Ref(); var s=$.VTCopyVideoEncoderList(null, ref); var n=0,h=0; if (s===0) { var a=ObjC.castRefToObject(ref[0]); n=a.count; for (var i=0;i<n;i++) { var d=a.objectAtIndex(i); var acc=d.objectForKey(\"IsHardwareAccelerated\"); var ct=d.objectForKey(\"CodecType\"); if (acc && ct && Number(acc.js)==1 && Number(ct.js)==0x61766331) h++; } } r+=\" enc_status=\"+s+\" enc_total=\"+n+\" h264enc_hw=\"+h; } catch(e) { r+=\" enc_error\"; } r' 2>&1",
+   "pass": "\\bh264dec=1\\b",
+   "fail": "\\bh264dec=0\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "macOS reports no hardware H.264 decoder, so video decoding falls back to the CPU. This uses the VideoToolbox API; the guide tests the same thing with its VDADecoderChecker tool (a download), which you can also run. The guide's checklist: a supported GPU (GPU Buyers Guide), an SMBIOS that matches your hardware (no Mac mini SMBIOS on a desktop), the iGPU enabled in the BIOS with the right AAPL,ig-platform-id, no needless ACPI renames, Lilu and WhateverGreen loaded and no legacy graphics kexts.",
+   "fixes": [
+    {
+     "note": "Work through the list above; the GPU group of this window checks Lilu, WhateverGreen and legacy kexts for you."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "vda-hevc-decode",
+   "group": "Hardware Decoding / Encoding (VDA)",
+   "title": "HEVC (H.265) hardware decoding works",
+   "cmd": "osascript -l JavaScript -e 'ObjC.import(\"VideoToolbox\"); var r=\"vt\"; try { r+=\" h264dec=\"+($.VTIsHardwareDecodeSupported(0x61766331)?1:0)+\" hevcdec=\"+($.VTIsHardwareDecodeSupported(0x68766331)?1:0); } catch(e) { r+=\" dec_error\"; } try { var ref=Ref(); var s=$.VTCopyVideoEncoderList(null, ref); var n=0,h=0; if (s===0) { var a=ObjC.castRefToObject(ref[0]); n=a.count; for (var i=0;i<n;i++) { var d=a.objectAtIndex(i); var acc=d.objectForKey(\"IsHardwareAccelerated\"); var ct=d.objectForKey(\"CodecType\"); if (acc && ct && Number(acc.js)==1 && Number(ct.js)==0x61766331) h++; } } r+=\" enc_status=\"+s+\" enc_total=\"+n+\" h264enc_hw=\"+h; } catch(e) { r+=\" enc_error\"; } r' 2>&1",
+   "pass": "\\bhevcdec=1\\b",
+   "fail": "\\bhevcdec=0\\b",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "macOS reports no hardware HEVC decoder. Many GPUs simply do not have one (for example older Intel iGPUs), so this is only a problem if your GPU is known to support HEVC.",
+   "fixes": [
+    {
+     "note": "If your GPU supports HEVC, follow the H.264 checklist above. Otherwise this is expected."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "vda-h264-encode",
+   "group": "Hardware Decoding / Encoding (VDA)",
+   "title": "H.264 hardware encoding is available",
+   "cmd": "osascript -l JavaScript -e 'ObjC.import(\"VideoToolbox\"); var r=\"vt\"; try { r+=\" h264dec=\"+($.VTIsHardwareDecodeSupported(0x61766331)?1:0)+\" hevcdec=\"+($.VTIsHardwareDecodeSupported(0x68766331)?1:0); } catch(e) { r+=\" dec_error\"; } try { var ref=Ref(); var s=$.VTCopyVideoEncoderList(null, ref); var n=0,h=0; if (s===0) { var a=ObjC.castRefToObject(ref[0]); n=a.count; for (var i=0;i<n;i++) { var d=a.objectAtIndex(i); var acc=d.objectForKey(\"IsHardwareAccelerated\"); var ct=d.objectForKey(\"CodecType\"); if (acc && ct && Number(acc.js)==1 && Number(ct.js)==0x61766331) h++; } } r+=\" enc_status=\"+s+\" enc_total=\"+n+\" h264enc_hw=\"+h; } catch(e) { r+=\" enc_error\"; } r' 2>&1",
+   "pass": "\\bh264enc_hw=[1-9]",
+   "fail": "\\benc_status=0 enc_total=[1-9]\\d* h264enc_hw=0\\b",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "VideoToolbox lists no hardware-accelerated H.264 encoder (Quick Sync / VCE / NVENC). Apps such as video editors and screen recorders then encode on the CPU. Some GPUs do not expose an encoder on macOS, so this is informational.",
+   "fixes": [
+    {
+     "note": "Check the same GPU checklist as for decoding. If your GPU has no macOS-supported encoder, this is expected."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "kb-driver",
+   "group": "Trackpad and Keyboard",
+   "title": "A laptop keyboard / trackpad driver is loaded",
+   "cmd": "L=0; sysctl -n hw.model 2>/dev/null | grep -qi '^MacBook' && L=1; ioreg -rc AppleSmartBattery 2>/dev/null | grep -q '<class AppleSmartBattery' && L=1; k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); n=$(echo \"$k\" | grep -ciE 'voodoo|ps2controller|AppleHSSPI|AppleUSBTopCase'); echo \"laptop=$L driver=$n loaded=$l\"",
+   "pass": "laptop=1 driver=[1-9]",
+   "fail": "laptop=1 driver=0 loaded=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Install-Guide/troubleshooting/extended/kernel-issues.html",
+   "why": "This looks like a laptop but no input driver is loaded (VoodooPS2, VoodooI2C, VoodooRMI / SMBus, or Apple's SPI / top-case drivers), so the built-in keyboard and trackpad may not work. Ignore this if your laptop's keyboard and trackpad are USB devices. Laptop detection uses the SMBIOS model or a battery, so it cannot tell on a desktop.",
+   "fixes": [
+    {
+     "note": "Add VoodooPS2Controller (PS/2 keyboard and most trackpads) and/or VoodooI2C with its satellite kext (I2C trackpads), plus VoodooInput, then rebuild."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "kb-order",
+   "group": "Trackpad and Keyboard",
+   "title": "VoodooInput loads before VoodooPS2 / VoodooI2C",
+   "cmd": "k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); echo \"$k\" | awk -v l=\"$l\" '{ n=tolower($6) } n ~ /voodooinput/ { if(vi==\"\"||$1+0<vi) vi=$1+0 } n ~ /ps2controller/ { if(ps==\"\"||$1+0<ps) ps=$1+0 } n ~ /voodooi2c$/ { if(ic==\"\"||$1+0<ic) ic=$1+0 } END { o=\"none\"; if (ps!=\"\"||ic!=\"\") { if (vi==\"\") o=\"missing\"; else if ((ps!=\"\"&&vi>ps)||(ic!=\"\"&&vi>ic)) o=\"bad\"; else o=\"ok\" } printf \"order=%s input=%s ps2=%s i2c=%s loaded=%s\", o, (vi==\"\"?\"-\":vi), (ps==\"\"?\"-\":ps), (ic==\"\"?\"-\":ic), l }'",
+   "pass": "order=ok\\b",
+   "fail": "order=(bad|missing)\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Install-Guide/troubleshooting/extended/kernel-issues.html",
+   "why": "The guide's fix for \"keyboard works but trackpad does not\": VoodooInput must be listed before VoodooPS2 and VoodooI2C in config.plist. Here it is loaded after them, or not loaded at all. (For VoodooI2C the guide wants VoodooGPIO, VoodooInput and VoodooI2CServices in any order, then VoodooI2C, then satellite kexts.)",
+   "fixes": [
+    {
+     "note": "In Kernel > Add, move VoodooInput above VoodooPS2Controller and VoodooI2C, enable only one copy of VoodooInput, rebuild. For I2C also make sure SSDT-GPIO is in EFI/OC/ACPI and enabled."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "kb-trackpad",
+   "group": "Trackpad and Keyboard",
+   "title": "A trackpad is detected (laptops)",
+   "cmd": "L=0; sysctl -n hw.model 2>/dev/null | grep -qi '^MacBook' && L=1; ioreg -rc AppleSmartBattery 2>/dev/null | grep -q '<class AppleSmartBattery' && L=1; h=$(ioreg -c IOHIDDevice -r -l -d1 -w0 2>/dev/null | awk '/\\+-o /{ if(d) fl(); d=1; pg=-1; pu=-1; pr=\"\"; next } /\"PrimaryUsagePage\" = /{pg=$NF} /\"PrimaryUsage\" = /{pu=$NF} /\"Product\" = /{pr=tolower($0)} function fl(){ n++; if (pg==1&&pu==2) po++; if (pg==13 || pr ~ /track ?pad|touch ?pad/) tp++ } END{ if(d) fl(); printf \"hid=%d hidptr=%d trackpad=%d\", n, po, tp }'); q=$(ioreg -c IOHIPointing -r 2>/dev/null | grep -c '<class '); echo \"laptop=$L $h legacyptr=$q\"",
+   "pass": "laptop=1 .*trackpad=[1-9]",
+   "fail": "laptop=1 hid=[1-9]\\d* hidptr=0 trackpad=0 legacyptr=0",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Install-Guide/troubleshooting/extended/kernel-issues.html",
+   "why": "This looks like a laptop but no pointing device of any kind is visible to macOS. For a Synaptics PS/2 trackpad the guide suggests SSDT-Enable_DynamicEWMode (edit its ACPI path to your PS2K device) as the first fix; the trackpad may then be laggy. This check cannot tell a built-in trackpad from an external mouse, so a mouse hides the problem (no verdict).",
+   "fixes": [
+    {
+     "note": "Check the Keyboard-works-but-trackpad-doesnt item (VoodooInput order). For Synaptics PS/2 trackpads, try SSDT-Enable_DynamicEWMode from the VoodooPS2 docs, with your device's ACPI path."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
   }
  ]
 }
