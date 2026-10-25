@@ -4,6 +4,14 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.13.0] — 2026-10-25
+
+### Added
+- Post-Install Check: almost every problem now has a **Run here** script next to the link to the guide page, so the window no longer ends at "open the guide".
+  - **Serial number:** generates a valid serial / MLB for this Mac's SMBIOS model with the bundled macserial, plus a SmUUID.
+  - **Diagnostics:** the GPU, audio, USB (ports and map kexts), NVMe, CPU / XCPM, SIP, Wi-Fi, Bluetooth and keyboard / trackpad problems each get a script that lists the IDs and loaded kexts you need to choose the right fix. Wi-Fi, Bluetooth and the hardware lists say plainly when nothing is found.
+- These scripts only read information. Fixes that change your EFI or `config.plist` still have to be made there; the app does not edit them from this window. The sleep and power fixes that change settings keep asking for confirmation and your password.
+
 ## [1.12.1] — 2026-10-25
 
 ### Fixed

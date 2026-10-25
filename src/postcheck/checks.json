@@ -175,6 +175,11 @@
    "why": "An NVMe drive is using the generic driver. Per the Dortania sleep guide, Apple's power management only covers Apple-branded drives, so NVMeFix.kext is needed for proper NVMe power management (also keep the drive firmware up to date).",
    "fixes": [
     {
+     "cmd": "o=$(ioreg -rc IONVMeController -w0 2>/dev/null | grep -E '\\+-o |\"(Model Number|Vendor Name|Firmware Revision)\"' | sed 's/^[ |]*//'; echo \"--- NVMeFix kexts loaded: $(kmutil showloaded --list-only 2>/dev/null | grep -ci nvmefix) (0 = missing)\"); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No NVMe controller is visible.\"; fi",
+     "why": "Lists your NVMe drives and whether NVMeFix is loaded. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "Add NVMeFix.kext (acidanthera/NVMeFix) to EFI/OC/Kexts and to Kernel > Add, after Lilu. EFI Builder adds it when your report lists an NVMe drive. Rebuild and retest sleep."
     }
    ],
@@ -192,6 +197,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
    "why": "This is a hint, not a detected fault: the guide gives no way to measure it. Per the Dortania sleep guide, some firmware (mainly HEDT/Server boards and Asus laptops) does not write the TSC to all cores, which causes wake problems. This check only looks at server-class Xeons (E5/E7/W/Scalable) and X/XE Core CPUs; desktop Xeons (E3) and Asus laptops are not covered.",
    "fixes": [
+    {
+     "cmd": "sysctl -n machdep.cpu.brand_string; echo \"family=$(sysctl -n machdep.cpu.family) model=$(sysctl -n machdep.cpu.model) stepping=$(sysctl -n machdep.cpu.stepping) cores=$(sysctl -n hw.physicalcpu) threads=$(sysctl -n hw.logicalcpu)\"; echo \"XCPM mode: $(sysctl -n machdep.xcpm.mode 2>/dev/null || echo n/a)\"; echo \"SMBIOS: $(sysctl -n hw.model)\"",
+     "why": "Shows the CPU this Mac reports (server / HEDT CPUs are the ones that may need a TSC sync kext). Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Only if you have wake problems. Per the guide: VoodooTSCSync for most HEDT hardware, TSCAdjustReset for Skylake-X/W/SP and Cascade Lake-X/W/SP (its Info.plist needs your thread count), CpuTscSync for troublesome laptops. Add only one, then rebuild."
     }
@@ -212,6 +222,11 @@
    "why": "The CPU name macOS shows differs from the CPU in your Hardware Sniffer report. A CPU spoof, a wrong report, or a report taken from another machine would explain it; real hardware is the report. Compare the two names below.",
    "fixes": [
     {
+     "cmd": "sysctl -n machdep.cpu.brand_string; echo \"family=$(sysctl -n machdep.cpu.family) model=$(sysctl -n machdep.cpu.model) stepping=$(sysctl -n machdep.cpu.stepping) cores=$(sysctl -n hw.physicalcpu) threads=$(sysctl -n hw.logicalcpu)\"; echo \"XCPM mode: $(sysctl -n machdep.xcpm.mode 2>/dev/null || echo n/a)\"; echo \"SMBIOS: $(sysctl -n hw.model)\"",
+     "why": "Shows the CPU this Mac reports. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "Make sure the report is from this machine. If it is, check the CPU-related settings: Kernel > Emulate (CPUID spoof), ProvideCurrentCpuInfo and the CPU / SMBIOS choice, and the OpenCore config you built from it."
     }
    ],
@@ -229,6 +244,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/",
    "why": "macOS sees a different number of cores than the report, and it is not the hybrid-Intel pattern (P-cores with hyper-threading plus E-cores, which is reported as no verdict). On AMD this usually means a wrong core-count kernel patch.",
    "fixes": [
+    {
+     "cmd": "sysctl -n machdep.cpu.brand_string; echo \"family=$(sysctl -n machdep.cpu.family) model=$(sysctl -n machdep.cpu.model) stepping=$(sysctl -n machdep.cpu.stepping) cores=$(sysctl -n hw.physicalcpu) threads=$(sysctl -n hw.logicalcpu)\"; echo \"XCPM mode: $(sysctl -n machdep.xcpm.mode 2>/dev/null || echo n/a)\"; echo \"SMBIOS: $(sysctl -n hw.model)\"",
+     "why": "Shows the CPU this Mac reports. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "AMD: set the core-count (cpuid_cores_per_package) kernel patches to your physical core count. Intel hybrid CPUs: macOS cannot use E-cores, so a lower count is expected."
     }
@@ -248,6 +268,11 @@
    "why": "macOS reports an empty CPU name, or a name that states a core count (for example AMD '16-Core') that differs from the cores macOS sees. With AMD vanilla patches this usually means the core-count patches are wrong.",
    "fixes": [
     {
+     "cmd": "sysctl -n machdep.cpu.brand_string; echo \"family=$(sysctl -n machdep.cpu.family) model=$(sysctl -n machdep.cpu.model) stepping=$(sysctl -n machdep.cpu.stepping) cores=$(sysctl -n hw.physicalcpu) threads=$(sysctl -n hw.logicalcpu)\"; echo \"XCPM mode: $(sysctl -n machdep.xcpm.mode 2>/dev/null || echo n/a)\"; echo \"SMBIOS: $(sysctl -n hw.model)\"",
+     "why": "Shows the CPU this Mac reports. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "AMD: set the core-count kernel patches to your physical core count. Check the CPU name in About This Mac > System Report."
     }
    ],
@@ -264,6 +289,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/security.html",
    "why": "SIP is off or customised. This is not a Dortania post-install requirement: it is fine to leave it off while you need patches that require it, but re-enabling it once everything works is recommended.",
    "fixes": [
+    {
+     "cmd": "csrutil status 2>&1 | head -2; echo \"csr-active-config: $(nvram csr-active-config 2>/dev/null | cut -f2)\"",
+     "why": "Shows the current SIP state. Nothing is changed. SIP can only be changed from Recovery.",
+     "run": "user"
+    },
     {
      "note": "SIP can only be changed from Recovery (or the OpenCore picker's recovery entry): open Terminal there and run `csrutil enable`, then restart. Also review NVRAM csr-active-config."
     }
@@ -283,6 +313,11 @@
    "why": "The serial is missing. iMessage / FaceTime / iCloud need a valid, unused serial.",
    "fixes": [
     {
+     "cmd": "m=\"$HOME/.ocat/Database/mac/macserial\"; [ -x \"$m\" ] || m=\"$HOME/.ocat/devDatabase/mac/macserial\"; [ -x \"$m\" ] || { echo \"macserial was not found in ~/.ocat/Database/mac (open Database once, or run Sync OpenCore)\"; exit 1; }; \"$m\" -m \"$(sysctl -n hw.model)\" -n 1; echo \"SmUUID | $(uuidgen)\"",
+     "run": "user",
+     "why": "Generates one valid serial for this Mac's SMBIOS model, plus a SmUUID. Output is `Serial | MLB`. Nothing is changed: copy Serial into PlatformInfo > SystemSerialNumber, MLB into MLB and the SmUUID into SmUUID (ROM is usually your built-in Ethernet MAC address without colons)."
+    },
+    {
      "note": "Generate a serial with macserial for your SMBIOS model and put Serial / MLB / SmUUID / ROM into PlatformInfo. Verify the serial at checkcoverage.apple.com: it should say it cannot be found / is not valid, not that it belongs to a real Mac."
     }
    ],
@@ -300,6 +335,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
    "why": "macOS lists no graphics device. Without a working GPU driver the display runs unaccelerated.",
    "fixes": [
+    {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/) print b; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/) print b }' | grep -E '\\+-o |\"model\"|\"vendor-id\"|\"device-id\"|\"AAPL,ig-platform-id\"' | sed 's/^[ |]*//'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No graphics device is visible on the PCI bus. Check the GPU is seated and enabled in the BIOS (iGPU: also check Above 4G / DVMT settings).\"; fi",
+     "why": "Lists the graphics devices on the PCI bus with vendor / device IDs (and AAPL,ig-platform-id for an Intel iGPU). Nothing is changed. Use the IDs to find your card in the GPU Buyers Guide.",
+     "run": "user"
+    },
     {
      "note": "Check that the GPU is supported by this macOS version (GPU Buyers Guide), that the iGPU is enabled in the BIOS if you rely on it, and that Lilu and WhateverGreen are loaded."
     }
@@ -342,6 +382,11 @@
    "why": "IntelGraphicsFixup, NvidiaGraphicsFixup or Shiki is loaded. The guide says these patches were absorbed into WhateverGreen and must not be present alongside it.",
    "fixes": [
     {
+     "cmd": "echo \"Legacy graphics kexts currently loaded (should be none):\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'IntelGraphicsFixup|NvidiaGraphicsFixup|Shiki' | awk '{print $6}' | grep . || echo 'none loaded (remove the files from EFI/OC/Kexts if they are still there)'; :",
+     "why": "Shows which legacy graphics kexts are loaded. Nothing is changed. Remove them from your EFI yourself.",
+     "run": "user"
+    },
+    {
      "note": "Remove IntelGraphicsFixup.kext, NvidiaGraphicsFixup.kext and Shiki.kext from EFI/OC/Kexts and Kernel > Add, then rebuild."
     }
    ],
@@ -359,6 +404,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
    "why": "An integrated GPU is listed without Metal support, so it is not accelerated. The guide's checklist for this: the SMBIOS must match your hardware (no Mac mini SMBIOS on a desktop, since a Mac mini has mobile hardware), the iGPU must be enabled in the BIOS and have the right AAPL,ig-platform-id (and device-id if needed), avoid unnecessary ACPI renames, and Lilu and WhateverGreen must be loaded.",
    "fixes": [
+    {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/) print b; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/) print b }' | grep -E '\\+-o |\"model\"|\"vendor-id\"|\"device-id\"|\"AAPL,ig-platform-id\"' | sed 's/^[ |]*//'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No graphics device is visible on the PCI bus. Check the GPU is seated and enabled in the BIOS (iGPU: also check Above 4G / DVMT settings).\"; fi",
+     "why": "Lists the graphics devices with vendor / device IDs and AAPL,ig-platform-id. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Work through the guide's list above. The WhateverGreen Intel HD FAQ covers the platform-id and device-id values for your CPU."
     }
@@ -378,6 +428,11 @@
    "why": "A discrete GPU is listed without Metal support, so it is not accelerated. The guide's checklist: make sure the GPU is supported (GPU Buyers Guide), the SMBIOS matches your hardware, and Lilu and WhateverGreen are loaded with no legacy graphics kexts.",
    "fixes": [
     {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/) print b; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/) print b }' | grep -E '\\+-o |\"model\"|\"vendor-id\"|\"device-id\"|\"AAPL,ig-platform-id\"' | sed 's/^[ |]*//'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No graphics device is visible on the PCI bus. Check the GPU is seated and enabled in the BIOS (iGPU: also check Above 4G / DVMT settings).\"; fi",
+     "why": "Lists the graphics devices with vendor / device IDs. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "Check the GPU Buyers Guide for your card and macOS version, and see the GPU patching pages of the Dortania guide."
     }
    ],
@@ -395,6 +450,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
    "why": "This is a limitation, not a fault. Per the Dortania DRM page, hardware DRM (FairPlay 2.x / 3.x, as used by Netflix and Prime Video in Safari) needs a supported AMD discrete GPU (Polaris or newer), and it is broken on iGPU-only systems. A pass here only means an accelerated AMD card exists, not that it is Polaris or newer. Browsers using software DRM, such as Firefox or Chrome / Edge, work either way.",
    "fixes": [
+    {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/) print b; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/) print b }' | grep -E '\\+-o |\"model\"|\"vendor-id\"|\"device-id\"|\"AAPL,ig-platform-id\"' | sed 's/^[ |]*//'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No graphics device is visible on the PCI bus. Check the GPU is seated and enabled in the BIOS (iGPU: also check Above 4G / DVMT settings).\"; fi",
+     "why": "Lists the graphics devices with vendor / device IDs (AMD = vendor 1002). Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Use Firefox or a Chromium browser for streaming, or add a supported AMD GPU. If you do have one, follow the guide's shikigva steps (inject it on one GPU only) and test with VDADecoderChecker."
     }
@@ -414,6 +474,11 @@
    "why": "No audio output device was found. AppleALC is probably missing or the layout-id does not match your codec.",
    "fixes": [
     {
+     "cmd": "o=$(ioreg -rxn HDEF -w0 2>/dev/null | grep -E '\"(layout-id|alc-layout-id|codec-id|vendor-id|device-id|model)\"' | sed 's/^[ |]*//'; echo \"--- audio kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'AppleALC|AppleHDA|VoodooHDA' | awk '{print $6}'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No audio controller (HDEF) is visible. Make sure AppleALC is in your EFI and the audio device is enabled in the BIOS.\"; fi",
+     "why": "Shows the audio controller's codec / vendor IDs, the layout-id injected now, and whether AppleALC is loaded. Nothing is changed. Pick the layout-id for your codec from AppleALC's supported-codecs list.",
+     "run": "user"
+    },
+    {
      "note": "Make sure AppleALC is in your EFI and set a layout-id for your codec (EFI Builder > Customize > Audio lists the options), or use the alcid= boot-arg. Rebuild and retest."
     }
    ],
@@ -430,7 +495,16 @@
    "severity": "info",
    "guide": "https://dortania.github.io/OpenCore-Post-Install/",
    "why": "No Bluetooth controller was found. That is fine if the machine has none; otherwise the firmware / kexts (BlueToolFixup, BrcmPatchRAM) may be missing.",
-   "fixes": [],
+   "fixes": [
+    {
+     "cmd": "o=$(system_profiler SPUSBDataType SPPCIDataType 2>/dev/null | grep -iE -B3 -A10 \"bluetooth|wireless controller\" | head -60); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"macOS does not see any Bluetooth or wireless controller on the PCI or USB buses. Check it is enabled in the BIOS and that your USB ports are mapped.\"; fi",
+     "run": "user",
+     "why": "Lists the Bluetooth / wireless controller devices macOS can see, with their vendor / device IDs. Use it to pick the right kext. Nothing is changed."
+    },
+    {
+     "note": "Broadcom cards on macOS 12+: BlueToolFixup (from BrcmPatchRAM) plus BrcmFirmwareData / BrcmPatchRAM3; Intel Bluetooth: IntelBluetoothFirmware plus IntelBTPatcher. Add them after Lilu, then rebuild. USB Bluetooth also needs a correct USB port map."
+    }
+   ],
    "timeoutSec": 20,
    "needsReport": false
   },
@@ -444,7 +518,16 @@
    "severity": "info",
    "guide": "https://dortania.github.io/OpenCore-Post-Install/",
    "why": "No Wi-Fi interface was found. That is fine if you have no Wi-Fi card; otherwise check the card is supported (itlwm / AirportItlwm, or a native Broadcom card).",
-   "fixes": [],
+   "fixes": [
+    {
+     "cmd": "o=$(system_profiler SPPCIDataType SPUSBDataType 2>/dev/null | grep -iE -B3 -A10 \"network controller|ethernet controller|wi-?fi|wireless|802\\.11\" | head -60); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"macOS does not see any network / wireless device on the PCI or USB buses. Check the card is seated and enabled in the BIOS.\"; fi",
+     "run": "user",
+     "why": "Lists the network and wireless devices macOS can see, with their vendor / device IDs. Use the ID to pick the right kext: Intel cards need itlwm / AirportItlwm, Broadcom cards work natively when supported (see the Wi-Fi buyers guide). Nothing is changed."
+    },
+    {
+     "note": "Add the kext that matches your card to EFI/OC/Kexts and Kernel > Add (after Lilu), then rebuild and retest. If nothing is listed above, the card is not seen by the firmware (check it is seated / enabled in the BIOS)."
+    }
+   ],
    "timeoutSec": 20,
    "needsReport": false
   },
@@ -459,6 +542,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/usb/",
    "why": "No USB port map was found: no map is injected into the USB controllers (no ports table) and no map kext (USBToolBox/UTBMap/USBMap) is loaded. Per the Dortania USB guide, an unmapped system is limited to 15 ports per controller, which causes missing ports and sleep/wake problems. (Port types alone are not enough: macOS also reads them from the board's ACPI.)",
    "fixes": [
+    {
+     "cmd": "o=$(ioreg -rc AppleUSBXHCI -w0 2>/dev/null | grep -E '\\+-o |\"(IOName|model|UsbPortCount|kUSBPortCount)\"' | sed 's/^[ |]*//'; echo \"--- USB map kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'USBMap|USBToolBox|UTBMap|USBInjectAll' | awk '{print $6}'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No USB controller was found.\"; fi",
+     "why": "Lists the USB controllers, their port counts and which USB map / USBInjectAll kexts are loaded. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Map your ports with USBToolBox (or the manual method in the guide), add the generated map kext (UTBMap.kext, with USBToolBox.kext) to EFI/OC/Kexts and Kernel > Add, then rebuild."
     }
@@ -497,6 +585,11 @@
    "why": "A controller exposes 15 or more ports and no port map is applied. macOS has a strict limit of 15 ports per controller, so extra ports may not work. The common stop-gap, XhciPortLimit, is a hack that can corrupt data and should be removed once a proper map is in place.",
    "fixes": [
     {
+     "cmd": "o=$(ioreg -rc AppleUSBXHCI -w0 2>/dev/null | grep -E '\\+-o |\"(IOName|model|UsbPortCount|kUSBPortCount)\"' | sed 's/^[ |]*//'; echo \"--- USB map kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'USBMap|USBToolBox|UTBMap|USBInjectAll' | awk '{print $6}'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No USB controller was found.\"; fi",
+     "why": "Lists the USB controllers, their port counts and which USB map kexts are loaded. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "Finish the USB map so each controller has 15 or fewer ports, then set Kernel > Quirks > XhciPortLimit to false. See the USB mapping pages of the guide."
     }
    ],
@@ -514,6 +607,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/usb/",
    "why": "USBInjectAll.kext is loaded. The Dortania guide says to remove it after mapping because it breaks how Apple builds port maps, and it can break your final map.",
    "fixes": [
+    {
+     "cmd": "echo \"USBInjectAll loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -i USBInjectAll | awk '{print $6}' | grep . || echo 'not loaded - good'; echo \"--- USB map kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'USBMap|USBToolBox|UTBMap' | awk '{print $6}' | grep . || echo 'none loaded'; :",
+     "why": "Shows whether USBInjectAll is still loaded and which USB map kexts are. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Once your map works, remove USBInjectAll.kext from EFI/OC/Kexts and from Kernel > Add, and set XhciPortLimit to false. Keep it only while you are still building the map."
     }
@@ -533,6 +631,11 @@
    "why": "A Bluetooth (wireless controller) device is on a USB port that is not marked internal (UsbConnector 255). The guide notes that Bluetooth runs over USB internally, and mapping it as a normal port can break Handoff and other Continuity features. (Any USB wireless controller counts, not only Bluetooth.)",
    "fixes": [
     {
+     "cmd": "o=$(system_profiler SPUSBDataType SPPCIDataType 2>/dev/null | grep -iE -B3 -A10 \"bluetooth|wireless controller\" | head -60); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"macOS does not see any Bluetooth or wireless controller on the PCI or USB buses. Check it is enabled in the BIOS and that your USB ports are mapped.\"; fi",
+     "why": "Lists the Bluetooth / wireless controllers macOS can see. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "In your USB map, set the Bluetooth port's connector type to 255 (internal), then rebuild. Not a fault if your Bluetooth is not connected over USB."
     }
    ],
@@ -550,6 +653,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/pm.html",
    "why": "X86PlatformPlugin is not attached to the CPUs, so Apple's XCPM power management is not running (the Dortania guide's test for it). Without it the CPU may not idle or boost properly. A no-verdict result is normal on Sandy / Ivy Bridge and AMD, which XCPM does not support (see their own sections in the guide).",
    "fixes": [
+    {
+     "cmd": "sysctl -n machdep.cpu.brand_string; echo \"family=$(sysctl -n machdep.cpu.family) model=$(sysctl -n machdep.cpu.model) stepping=$(sysctl -n machdep.cpu.stepping) cores=$(sysctl -n hw.physicalcpu) threads=$(sysctl -n hw.logicalcpu)\"; echo \"XCPM mode: $(sysctl -n machdep.xcpm.mode 2>/dev/null || echo n/a)\"; echo \"SMBIOS: $(sysctl -n hw.model)\"; echo \"--- power-management kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'X86PlatformPlugin|CPUFriend|AppleIntelCPUPowerManagement|SMCProcessor' | awk '{print $6}'; echo \"--- X86PlatformPlugin:\"; ioreg -rc X86PlatformPlugin -w0 2>/dev/null | grep -E 'plugin-type|IOClass' | head -3; :",
+     "why": "Shows the CPU model, XCPM mode and which power-management kexts are loaded. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Per the guide: make sure SSDT-PLUG is present and enabled in config.plist and EFI/OC/ACPI, and set to your first CPU thread (not needed on macOS 12.3 and newer). Haswell-E / Broadwell-E need a CPUID spoof (Kernel > Emulate) since XCPM does not support them natively. Rebuild and retest."
     }
@@ -569,6 +677,11 @@
    "why": "CPUFriend is loaded but X86PlatformPlugin is not. The guide lists X86PlatformPlugin as a requirement for CPUFriend (so Sandy Bridge and AMD CPUs are not supported), so the kext does nothing here.",
    "fixes": [
     {
+     "cmd": "sysctl -n machdep.cpu.brand_string; echo \"family=$(sysctl -n machdep.cpu.family) model=$(sysctl -n machdep.cpu.model) stepping=$(sysctl -n machdep.cpu.stepping) cores=$(sysctl -n hw.physicalcpu) threads=$(sysctl -n hw.logicalcpu)\"; echo \"XCPM mode: $(sysctl -n machdep.xcpm.mode 2>/dev/null || echo n/a)\"; echo \"SMBIOS: $(sysctl -n hw.model)\"; echo \"--- power-management kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'X86PlatformPlugin|CPUFriend|AppleIntelCPUPowerManagement|SMCProcessor' | awk '{print $6}'; echo \"--- X86PlatformPlugin:\"; ioreg -rc X86PlatformPlugin -w0 2>/dev/null | grep -E 'plugin-type|IOClass' | head -3; :",
+     "why": "Shows the CPU model, XCPM mode and which power-management kexts are loaded. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "Fix XCPM first (see the check above), or remove CPUFriend and its data provider if your CPU does not support it."
     }
    ],
@@ -586,6 +699,11 @@
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
    "why": "macOS reports no hardware H.264 decoder, so video decoding falls back to the CPU. This uses the VideoToolbox API; the guide tests the same thing with its VDADecoderChecker tool (a download), which you can also run. The guide's checklist: a supported GPU (GPU Buyers Guide), an SMBIOS that matches your hardware (no Mac mini SMBIOS on a desktop), the iGPU enabled in the BIOS with the right AAPL,ig-platform-id, no needless ACPI renames, Lilu and WhateverGreen loaded and no legacy graphics kexts.",
    "fixes": [
+    {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/) print b; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/) print b }' | grep -E '\\+-o |\"model\"|\"vendor-id\"|\"device-id\"|\"AAPL,ig-platform-id\"' | sed 's/^[ |]*//'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No graphics device is visible on the PCI bus. Check the GPU is seated and enabled in the BIOS (iGPU: also check Above 4G / DVMT settings).\"; fi",
+     "why": "Lists the graphics devices with vendor / device IDs. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Work through the list above; the GPU group of this window checks Lilu, WhateverGreen and legacy kexts for you."
     }
@@ -605,6 +723,11 @@
    "why": "macOS reports no hardware HEVC decoder. Many GPUs simply do not have one (for example older Intel iGPUs), so this is only a problem if your GPU is known to support HEVC.",
    "fixes": [
     {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/) print b; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/) print b }' | grep -E '\\+-o |\"model\"|\"vendor-id\"|\"device-id\"|\"AAPL,ig-platform-id\"' | sed 's/^[ |]*//'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No graphics device is visible on the PCI bus. Check the GPU is seated and enabled in the BIOS (iGPU: also check Above 4G / DVMT settings).\"; fi",
+     "why": "Lists the graphics devices with vendor / device IDs. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "If your GPU supports HEVC, follow the H.264 checklist above. Otherwise this is expected."
     }
    ],
@@ -623,6 +746,11 @@
    "why": "VideoToolbox lists no hardware-accelerated H.264 encoder (Quick Sync / VCE / NVENC). Apps such as video editors and screen recorders then encode on the CPU. Some GPUs do not expose an encoder on macOS, so this is informational.",
    "fixes": [
     {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/) print b; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/) print b }' | grep -E '\\+-o |\"model\"|\"vendor-id\"|\"device-id\"|\"AAPL,ig-platform-id\"' | sed 's/^[ |]*//'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No graphics device is visible on the PCI bus. Check the GPU is seated and enabled in the BIOS (iGPU: also check Above 4G / DVMT settings).\"; fi",
+     "why": "Lists the graphics devices with vendor / device IDs. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "Check the same GPU checklist as for decoding. If your GPU has no macOS-supported encoder, this is expected."
     }
    ],
@@ -640,6 +768,11 @@
    "guide": "https://dortania.github.io/OpenCore-Install-Guide/troubleshooting/extended/kernel-issues.html",
    "why": "This looks like a laptop but no input driver is loaded (VoodooPS2, VoodooI2C, VoodooRMI / SMBus, or Apple's SPI / top-case drivers), so the built-in keyboard and trackpad may not work. Ignore this if your laptop's keyboard and trackpad are USB devices. Laptop detection uses the SMBIOS model or a battery, so it cannot tell on a desktop.",
    "fixes": [
+    {
+     "cmd": "echo \"Keyboard / trackpad kexts in load order (VoodooInput must come before VoodooPS2 / VoodooI2C):\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'voodoo|ps2|AppleHSSPI|AppleUSBTopCase|AppleUSBMultitouch' | awk '{print $1\"  \"$6}' | grep . || echo 'none loaded (no VoodooPS2, VoodooI2C, VoodooInput or Apple SPI driver)'; :",
+     "why": "Lists the keyboard / trackpad kexts that are loaded, in load order. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Add VoodooPS2Controller (PS/2 keyboard and most trackpads) and/or VoodooI2C with its satellite kext (I2C trackpads), plus VoodooInput, then rebuild."
     }
@@ -661,6 +794,11 @@
    "why": "The guide's fix for \"keyboard works but trackpad does not\": VoodooInput must be listed before VoodooPS2 and VoodooI2C in config.plist. Here it is loaded after them, or not loaded at all. (For VoodooI2C the guide wants VoodooGPIO, VoodooInput and VoodooI2CServices in any order, then VoodooI2C, then satellite kexts.)",
    "fixes": [
     {
+     "cmd": "echo \"Keyboard / trackpad kexts in load order (VoodooInput must come before VoodooPS2 / VoodooI2C):\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'voodoo|ps2|AppleHSSPI|AppleUSBTopCase|AppleUSBMultitouch' | awk '{print $1\"  \"$6}' | grep . || echo 'none loaded (no VoodooPS2, VoodooI2C, VoodooInput or Apple SPI driver)'; :",
+     "why": "Lists the keyboard / trackpad kexts that are loaded, in load order. Nothing is changed.",
+     "run": "user"
+    },
+    {
      "note": "In Kernel > Add, move VoodooInput above VoodooPS2Controller and VoodooI2C, enable only one copy of VoodooInput, rebuild. For I2C also make sure SSDT-GPIO is in EFI/OC/ACPI and enabled."
     }
    ],
@@ -680,6 +818,11 @@
    "guide": "https://dortania.github.io/OpenCore-Install-Guide/troubleshooting/extended/kernel-issues.html",
    "why": "This looks like a laptop but no pointing device of any kind is visible to macOS. For a Synaptics PS/2 trackpad the guide suggests SSDT-Enable_DynamicEWMode (adjusted to your trackpad's ACPI device name, as the guide describes) as the first thing to try. This check cannot tell a built-in trackpad from an external mouse, so a mouse hides the problem (no verdict).",
    "fixes": [
+    {
+     "cmd": "echo \"Keyboard / trackpad kexts in load order (VoodooInput must come before VoodooPS2 / VoodooI2C):\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'voodoo|ps2|AppleHSSPI|AppleUSBTopCase|AppleUSBMultitouch' | awk '{print $1\"  \"$6}' | grep . || echo 'none loaded (no VoodooPS2, VoodooI2C, VoodooInput or Apple SPI driver)'; :",
+     "why": "Lists the keyboard / trackpad kexts that are loaded, in load order. Nothing is changed.",
+     "run": "user"
+    },
     {
      "note": "Check the Keyboard-works-but-trackpad-doesnt item (VoodooInput order). For Synaptics PS/2 trackpads, try SSDT-Enable_DynamicEWMode from the VoodooPS2 repository, adjusted to your device's ACPI name."
     }
