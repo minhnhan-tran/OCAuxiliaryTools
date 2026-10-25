@@ -4973,6 +4973,7 @@ void MainWindow::init_ToolBarIcon() {
     btn0->setIcon(QIcon(":/icon/rp0.png"));
     if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi0.png"));
     if (actionPostCheck) actionPostCheck->setIcon(QIcon(":/icon/postcheck0.png"));
+    if (actionUsbMapBtn) actionUsbMapBtn->setIcon(QIcon(":/icon/usbmap0.png"));
     ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir0.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save0.png"));
     if (!blOCValidateError)
@@ -4990,6 +4991,7 @@ void MainWindow::init_ToolBarIcon() {
     btn0->setIcon(QIcon(":/icon/rp.png"));
     if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi.png"));
     if (actionPostCheck) actionPostCheck->setIcon(QIcon(":/icon/postcheck.png"));
+    if (actionUsbMapBtn) actionUsbMapBtn->setIcon(QIcon(":/icon/usbmap.png"));
     ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save.png"));
     if (!blOCValidateError)
@@ -5081,6 +5083,14 @@ void MainWindow::init_FileMenu() {
   actionPostCheck->setIconVisibleInMenu(false);
   connect(actionPostCheck, &QAction::triggered, this, &MainWindow::openPostCheck);
   ui->toolBar->addAction(actionPostCheck);
+
+  // USB Mapping (right after Post-Install Check)
+  actionUsbMapBtn = new QAction(tr("USB Mapping"), this);
+  actionUsbMapBtn->setToolTip(tr("USB Mapping (macOS only: run it on the Hackintosh)"));
+  actionUsbMapBtn->setIcon(QIcon(Theme::icon("usbmap", red)));
+  actionUsbMapBtn->setIconVisibleInMenu(false);
+  connect(actionUsbMapBtn, &QAction::triggered, this, &MainWindow::openUsbMap);
+  ui->toolBar->addAction(actionUsbMapBtn);
 
   // Open Dir
   if (mac || osx1012) ui->actionOpen_Directory->setIconVisibleInMenu(false);

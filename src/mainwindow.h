@@ -1040,6 +1040,7 @@ class MainWindow : public QMainWindow {
   void openUsbMap();
   QAction* actionBuildEfi = nullptr;
   QAction* actionPostCheck = nullptr;
+  QAction* actionUsbMapBtn = nullptr;
 
   QMenu* reFileMenu;
 

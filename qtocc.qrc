@@ -24,6 +24,8 @@
         <file>icon/efi0.png</file>
         <file>icon/postcheck.png</file>
         <file>icon/postcheck0.png</file>
+        <file>icon/usbmap.png</file>
+        <file>icon/usbmap0.png</file>
         <file>icon/esp.png</file>
         <file>icon/ov.png</file>
         <file>icon/opendb.png</file>
