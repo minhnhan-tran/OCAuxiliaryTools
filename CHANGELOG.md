@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.10.2] — 2026-10-25
+
+### Fixed
+- Post-Install Check: the Windows time-sync command shipped in 1.10.1 had a broken shell quote and failed to run (it showed no verdict). Fixed; it is now tested against 9 registry fixtures, including stale copies of the record, and against the real Windows volume.
+
 ## [1.10.1] — 2026-10-25
 
 ### Fixed
