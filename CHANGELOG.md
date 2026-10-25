@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.11.2] — 2026-10-25
+
+### Changed
+- New app icon (a blue-to-teal ring) on every platform: `Icon.icns` (macOS, all sizes from 16 to 1024), `my.ico` (Windows, 16 to 256) and `icon.png` (Linux, and the About / splash image). The background is transparent.
+
 ## [1.11.1] — 2026-10-25
 
 ### Fixed
