@@ -175,7 +175,7 @@
    "why": "An NVMe drive is using the generic driver. Per the Dortania sleep guide, Apple's power management only covers Apple-branded drives, so NVMeFix.kext is needed for proper NVMe power management (also keep the drive firmware up to date).",
    "fixes": [
     {
-     "cmd": "o=$(ioreg -rc IONVMeController -w0 2>/dev/null | grep -E '\\+-o |\"(Model Number|Vendor Name|Firmware Revision)\"' | sed 's/^[ |]*//'; echo \"--- NVMeFix kexts loaded: $(kmutil showloaded --list-only 2>/dev/null | grep -ci nvmefix) (0 = missing)\"); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No NVMe controller is visible.\"; fi",
+     "cmd": "o=$(ioreg -rc IONVMeController -w0 2>/dev/null | grep -E '\"(Model Number|Vendor Name|Firmware Revision)\"' | sed 's/^[ |]*//'); if [ -z \"$o\" ]; then echo \"No NVMe controller is visible.\"; else echo \"$o\"; echo \"--- NVMeFix kexts loaded: $(kmutil showloaded --list-only 2>/dev/null | grep -ci nvmefix) (0 = missing)\"; fi",
      "why": "Lists your NVMe drives and whether NVMeFix is loaded. Nothing is changed.",
      "run": "user"
     },
@@ -543,7 +543,7 @@
    "why": "No USB port map was found: no map is injected into the USB controllers (no ports table) and no map kext (USBToolBox/UTBMap/USBMap) is loaded. Per the Dortania USB guide, an unmapped system is limited to 15 ports per controller, which causes missing ports and sleep/wake problems. (Port types alone are not enough: macOS also reads them from the board's ACPI.)",
    "fixes": [
     {
-     "cmd": "o=$(ioreg -rc AppleUSBXHCI -w0 2>/dev/null | grep -E '\\+-o |\"(IOName|model|UsbPortCount|kUSBPortCount)\"' | sed 's/^[ |]*//'; echo \"--- USB map kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'USBMap|USBToolBox|UTBMap|USBInjectAll' | awk '{print $6}'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No USB controller was found.\"; fi",
+     "cmd": "o=$(ioreg -rc AppleUSBXHCI -d1 -w0 2>/dev/null | grep '+-o ' | sed 's/^[ |]*+-o //; s/  <class.*//'); if [ -z \"$o\" ]; then echo \"No USB controller was found.\"; else echo \"USB controllers:\"; echo \"$o\"; echo \"USB 2.0 ports: $(ioreg -rc AppleUSB20XHCIPort -w0 2>/dev/null | grep -c '<class AppleUSB20XHCIPort')   USB 3.x ports: $(ioreg -rc AppleUSB30XHCIPort -w0 2>/dev/null | grep -c '<class AppleUSB30XHCIPort')\"; echo \"--- USB map kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'USBMap|USBToolBox|UTBMap|USBInjectAll' | awk '{print $6}' | grep . || echo 'none'; fi",
      "why": "Lists the USB controllers, their port counts and which USB map / USBInjectAll kexts are loaded. Nothing is changed.",
      "run": "user"
     },
@@ -585,7 +585,7 @@
    "why": "A controller exposes 15 or more ports and no port map is applied. macOS has a strict limit of 15 ports per controller, so extra ports may not work. The common stop-gap, XhciPortLimit, is a hack that can corrupt data and should be removed once a proper map is in place.",
    "fixes": [
     {
-     "cmd": "o=$(ioreg -rc AppleUSBXHCI -w0 2>/dev/null | grep -E '\\+-o |\"(IOName|model|UsbPortCount|kUSBPortCount)\"' | sed 's/^[ |]*//'; echo \"--- USB map kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'USBMap|USBToolBox|UTBMap|USBInjectAll' | awk '{print $6}'); if [ -n \"$o\" ]; then echo \"$o\"; else echo \"No USB controller was found.\"; fi",
+     "cmd": "o=$(ioreg -rc AppleUSBXHCI -d1 -w0 2>/dev/null | grep '+-o ' | sed 's/^[ |]*+-o //; s/  <class.*//'); if [ -z \"$o\" ]; then echo \"No USB controller was found.\"; else echo \"USB controllers:\"; echo \"$o\"; echo \"USB 2.0 ports: $(ioreg -rc AppleUSB20XHCIPort -w0 2>/dev/null | grep -c '<class AppleUSB20XHCIPort')   USB 3.x ports: $(ioreg -rc AppleUSB30XHCIPort -w0 2>/dev/null | grep -c '<class AppleUSB30XHCIPort')\"; echo \"--- USB map kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE 'USBMap|USBToolBox|UTBMap|USBInjectAll' | awk '{print $6}' | grep . || echo 'none'; fi",
      "why": "Lists the USB controllers, their port counts and which USB map kexts are loaded. Nothing is changed.",
      "run": "user"
     },
