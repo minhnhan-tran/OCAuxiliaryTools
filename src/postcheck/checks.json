@@ -282,21 +282,115 @@
    "needsReport": false
   },
   {
-   "id": "gpu",
-   "group": "Graphics",
-   "title": "GPU acceleration (Metal) is available",
-   "cmd": "system_profiler SPDisplaysDataType 2>&1",
-   "pass": "Metal[^\\n:]*:[ \\t]*(Supported|Metal)",
-   "fail": "\\A(?=[\\s\\S]*Chipset Model)(?![\\s\\S]*\\bMetal\\b)",
+   "id": "gpu-present",
+   "group": "GPU",
+   "title": "A graphics card is detected",
+   "cmd": "s=$(system_profiler SPDisplaysDataType 2>/dev/null | awk 'function flush(){ if(n>0){ gpus++; ig = vi || (!vo && bi); if(ig){ igc++; if(!me) igb++ } else { dg++; if(!me) dgb++; else if(amd) am++ } } n=0 } /Graphics\\/Displays:/ { hdr=1 } /^    [^ ].*:[ \\t]*$/ { flush(); n=1; bi=0; me=0; amd=0; vi=0; vo=0; next } n && /Bus:/ { if ($0 ~ /Built-In/) bi=1 } n && /Vendor:/ { if ($0 ~ /Intel|0x8086/) vi=1; else vo=1; if ($0 ~ /AMD|ATI|0x1002/) amd=1 } n && /Metal/ { if ($0 !~ /Unsupported/) me=1 } END{ flush(); printf \"hdr=%d gpus=%d igpu=%d igpu_bad=%d dgpu=%d dgpu_bad=%d amd=%d\", hdr, gpus, igc, igb, dg, dgb, am }'); echo \"$s\"",
+   "pass": "gpus=[1-9]",
+   "fail": "hdr=1 gpus=0\\b",
    "severity": "warn",
-   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
-   "why": "A GPU is detected but Metal is not reported. Usually the GPU is unsupported or WhateverGreen / the required boot-args or device properties are missing.",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "macOS lists no graphics device. Without a working GPU driver the display runs unaccelerated.",
    "fixes": [
     {
-     "note": "Check that Lilu and WhateverGreen are installed and loaded, that the GPU is supported by your macOS version, and see the GPU patching pages of the guide."
+     "note": "Check that the GPU is supported by this macOS version (GPU Buyers Guide), that the iGPU is enabled in the BIOS if you rely on it, and that Lilu and WhateverGreen are loaded."
     }
    ],
-   "timeoutSec": 20,
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "gpu-kexts",
+   "group": "GPU",
+   "title": "Lilu and WhateverGreen are loaded",
+   "cmd": "s=$(system_profiler SPDisplaysDataType 2>/dev/null | awk 'function flush(){ if(n>0){ gpus++; ig = vi || (!vo && bi); if(ig){ igc++; if(!me) igb++ } else { dg++; if(!me) dgb++; else if(amd) am++ } } n=0 } /Graphics\\/Displays:/ { hdr=1 } /^    [^ ].*:[ \\t]*$/ { flush(); n=1; bi=0; me=0; amd=0; vi=0; vo=0; next } n && /Bus:/ { if ($0 ~ /Built-In/) bi=1 } n && /Vendor:/ { if ($0 ~ /Intel|0x8086/) vi=1; else vo=1; if ($0 ~ /AMD|ATI|0x1002/) amd=1 } n && /Metal/ { if ($0 !~ /Unsupported/) me=1 } END{ flush(); printf \"hdr=%d gpus=%d igpu=%d igpu_bad=%d dgpu=%d dgpu_bad=%d amd=%d\", hdr, gpus, igc, igb, dg, dgb, am }'); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); a=$(echo \"$k\" | grep -ciE 'as\\.vit9696\\.Lilu|Lilu\\.kext'); w=$(echo \"$k\" | grep -ci 'WhateverGreen'); f=$(echo \"$k\" | grep -ciE 'IntelGraphicsFixup|NvidiaGraphicsFixup|Shiki'); echo \"$s lilu=$a weg=$w legacy=$f loaded=$l\"",
+   "pass": "lilu=[1-9]\\d* weg=[1-9]",
+   "fail": "gpus=[1-9]\\d* .*(lilu=0 |weg=0 ).*loaded=[1-9]",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "A GPU is present but Lilu or WhateverGreen is not loaded. The Dortania DRM / hardware acceleration page lists this as the first thing to verify when acceleration or decoding fails.",
+   "fixes": [
+    {
+     "cmd": "kextstat | grep -E \"Lilu|WhateverGreen\"",
+     "why": "Read-only: shows whether both kexts are loaded (the command the guide uses)."
+    },
+    {
+     "note": "If either is missing, add Lilu.kext first and WhateverGreen.kext after it in Kernel > Add, then rebuild."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "gpu-legacy",
+   "group": "GPU",
+   "title": "No legacy graphics kexts are installed",
+   "cmd": "s=$(system_profiler SPDisplaysDataType 2>/dev/null | awk 'function flush(){ if(n>0){ gpus++; ig = vi || (!vo && bi); if(ig){ igc++; if(!me) igb++ } else { dg++; if(!me) dgb++; else if(amd) am++ } } n=0 } /Graphics\\/Displays:/ { hdr=1 } /^    [^ ].*:[ \\t]*$/ { flush(); n=1; bi=0; me=0; amd=0; vi=0; vo=0; next } n && /Bus:/ { if ($0 ~ /Built-In/) bi=1 } n && /Vendor:/ { if ($0 ~ /Intel|0x8086/) vi=1; else vo=1; if ($0 ~ /AMD|ATI|0x1002/) amd=1 } n && /Metal/ { if ($0 !~ /Unsupported/) me=1 } END{ flush(); printf \"hdr=%d gpus=%d igpu=%d igpu_bad=%d dgpu=%d dgpu_bad=%d amd=%d\", hdr, gpus, igc, igb, dg, dgb, am }'); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); a=$(echo \"$k\" | grep -ciE 'as\\.vit9696\\.Lilu|Lilu\\.kext'); w=$(echo \"$k\" | grep -ci 'WhateverGreen'); f=$(echo \"$k\" | grep -ciE 'IntelGraphicsFixup|NvidiaGraphicsFixup|Shiki'); echo \"$s lilu=$a weg=$w legacy=$f loaded=$l\"",
+   "pass": "legacy=0 loaded=[1-9]",
+   "fail": "legacy=[1-9]\\d* loaded=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "IntelGraphicsFixup, NvidiaGraphicsFixup or Shiki is loaded. The guide says these patches were absorbed into WhateverGreen and must not be present alongside it.",
+   "fixes": [
+    {
+     "note": "Remove IntelGraphicsFixup.kext, NvidiaGraphicsFixup.kext and Shiki.kext from EFI/OC/Kexts and Kernel > Add, then rebuild."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "igpu-metal",
+   "group": "GPU",
+   "title": "iGPU has graphics acceleration (Metal)",
+   "cmd": "s=$(system_profiler SPDisplaysDataType 2>/dev/null | awk 'function flush(){ if(n>0){ gpus++; ig = vi || (!vo && bi); if(ig){ igc++; if(!me) igb++ } else { dg++; if(!me) dgb++; else if(amd) am++ } } n=0 } /Graphics\\/Displays:/ { hdr=1 } /^    [^ ].*:[ \\t]*$/ { flush(); n=1; bi=0; me=0; amd=0; vi=0; vo=0; next } n && /Bus:/ { if ($0 ~ /Built-In/) bi=1 } n && /Vendor:/ { if ($0 ~ /Intel|0x8086/) vi=1; else vo=1; if ($0 ~ /AMD|ATI|0x1002/) amd=1 } n && /Metal/ { if ($0 !~ /Unsupported/) me=1 } END{ flush(); printf \"hdr=%d gpus=%d igpu=%d igpu_bad=%d dgpu=%d dgpu_bad=%d amd=%d\", hdr, gpus, igc, igb, dg, dgb, am }'); echo \"$s\"",
+   "pass": "\\bigpu=[1-9]\\d* igpu_bad=0\\b",
+   "fail": "\\bigpu=[1-9]\\d* igpu_bad=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "An integrated GPU is listed without Metal support, so it is not accelerated. The guide's checklist for this: the SMBIOS must match your hardware (no Mac mini SMBIOS on a desktop, since a Mac mini has mobile hardware), the iGPU must be enabled in the BIOS and have the right AAPL,ig-platform-id (and device-id if needed), avoid unnecessary ACPI renames, and Lilu and WhateverGreen must be loaded.",
+   "fixes": [
+    {
+     "note": "Work through the guide's list above. The WhateverGreen Intel HD FAQ covers the platform-id and device-id values for your CPU."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "dgpu-metal",
+   "group": "GPU",
+   "title": "Discrete GPU has graphics acceleration (Metal)",
+   "cmd": "s=$(system_profiler SPDisplaysDataType 2>/dev/null | awk 'function flush(){ if(n>0){ gpus++; ig = vi || (!vo && bi); if(ig){ igc++; if(!me) igb++ } else { dg++; if(!me) dgb++; else if(amd) am++ } } n=0 } /Graphics\\/Displays:/ { hdr=1 } /^    [^ ].*:[ \\t]*$/ { flush(); n=1; bi=0; me=0; amd=0; vi=0; vo=0; next } n && /Bus:/ { if ($0 ~ /Built-In/) bi=1 } n && /Vendor:/ { if ($0 ~ /Intel|0x8086/) vi=1; else vo=1; if ($0 ~ /AMD|ATI|0x1002/) amd=1 } n && /Metal/ { if ($0 !~ /Unsupported/) me=1 } END{ flush(); printf \"hdr=%d gpus=%d igpu=%d igpu_bad=%d dgpu=%d dgpu_bad=%d amd=%d\", hdr, gpus, igc, igb, dg, dgb, am }'); echo \"$s\"",
+   "pass": "\\bdgpu=[1-9]\\d* dgpu_bad=0\\b",
+   "fail": "\\bdgpu=[1-9]\\d* dgpu_bad=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "A discrete GPU is listed without Metal support, so it is not accelerated. The guide's checklist: make sure the GPU is supported (GPU Buyers Guide), the SMBIOS matches your hardware, and Lilu and WhateverGreen are loaded with no legacy graphics kexts.",
+   "fixes": [
+    {
+     "note": "Check the GPU Buyers Guide for your card and macOS version, and see the GPU patching pages of the Dortania guide."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "gpu-drm",
+   "group": "GPU",
+   "title": "An AMD discrete GPU is present (needed for hardware DRM)",
+   "cmd": "s=$(system_profiler SPDisplaysDataType 2>/dev/null | awk 'function flush(){ if(n>0){ gpus++; ig = vi || (!vo && bi); if(ig){ igc++; if(!me) igb++ } else { dg++; if(!me) dgb++; else if(amd) am++ } } n=0 } /Graphics\\/Displays:/ { hdr=1 } /^    [^ ].*:[ \\t]*$/ { flush(); n=1; bi=0; me=0; amd=0; vi=0; vo=0; next } n && /Bus:/ { if ($0 ~ /Built-In/) bi=1 } n && /Vendor:/ { if ($0 ~ /Intel|0x8086/) vi=1; else vo=1; if ($0 ~ /AMD|ATI|0x1002/) amd=1 } n && /Metal/ { if ($0 !~ /Unsupported/) me=1 } END{ flush(); printf \"hdr=%d gpus=%d igpu=%d igpu_bad=%d dgpu=%d dgpu_bad=%d amd=%d\", hdr, gpus, igc, igb, dg, dgb, am }'); echo \"$s\"",
+   "pass": "\\bamd=[1-9]",
+   "fail": "gpus=[1-9]\\d* .*\\bamd=0\\b",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/drm.html",
+   "why": "This is a limitation, not a fault. Per the Dortania DRM page, hardware DRM (FairPlay 2.x / 3.x, as used by Netflix and Prime Video in Safari) needs a supported AMD discrete GPU (Polaris or newer), and it is broken on iGPU-only systems. A pass here only means an accelerated AMD card exists, not that it is Polaris or newer. Browsers using software DRM, such as Firefox or Chrome / Edge, work either way.",
+   "fixes": [
+    {
+     "note": "Use Firefox or a Chromium browser for streaming, or add a supported AMD GPU. If you do have one, follow the guide's shikigva steps (inject it on one GPU only) and test with VDADecoderChecker."
+    }
+   ],
+   "timeoutSec": 30,
    "needsReport": false
   },
   {

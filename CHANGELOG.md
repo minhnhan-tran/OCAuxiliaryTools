@@ -4,6 +4,13 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.8.0] — 2026-10-24
+
+### Added
+- Post-Install Check: a GPU checklist covering iGPU and dGPU, from the Dortania DRM / hardware-acceleration page. **Graphics card detected**, **Lilu and WhateverGreen loaded**, **no legacy graphics kexts** (IntelGraphicsFixup, NvidiaGraphicsFixup, Shiki), **iGPU accelerated (Metal)**, **discrete GPU accelerated (Metal)** and **an AMD discrete GPU for hardware DRM** (a limitation, not a fault). The iGPU is told apart from the dGPU by vendor first, so it does not depend on the bus line.
+- The iGPU / dGPU checks give no verdict when that kind of GPU is not present, and the explanations repeat the guide's checklist (matching SMBIOS, platform-id, no needless ACPI renames).
+- Replaces the single "GPU acceleration" check.
+
 ## [1.7.1] — 2026-10-24
 
 ### Fixed
