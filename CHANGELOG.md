@@ -4,6 +4,13 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.8.1] — 2026-10-25
+
+### Fixed
+- CI: the macOS workflows now run on the Intel `macos-13` runner, since the Qt 5 `clang_64` builds are x86_64-only and failed to build on the arm64 `macos-latest`.
+- CI: the MinGW workflow uses `windows-2022` instead of the retired `windows-2019` image, which left the job queued forever.
+- CI: replaced the invalid `cached` input of install-qt-action with `cache`, and updated `actions/checkout` to v4.
+
 ## [1.8.0] — 2026-10-24
 
 ### Added
