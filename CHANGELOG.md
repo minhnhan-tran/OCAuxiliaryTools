@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.8.3] — 2026-10-25
+
+### Fixed
+- CI: macOS workflows use the `macos-15-intel` runner, because `macos-13` has been retired and its jobs stayed queued.
+- CI: MinGW workflow uses the valid `cache` input and an unpinned MinGW tool version for aqt.
+
 ## [1.8.2] — 2026-10-25
 
 ### Fixed
