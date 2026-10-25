@@ -336,6 +336,8 @@ void dlgEfiBuilder::build() {
 
   QStringList missing;
   config = EfiBuilder::applyPlan(config, plan, available, &missing, disableKexts, kextDir);
+  // Keep the config and the EFI folder to what this build uses: no disabled sample rows.
+  EfiBuilder::pruneUnused(&config);
   const bool serials = applySerials(&config, plan.smbios, dbDir);
 
   EfiBuilder::Finalize fin;

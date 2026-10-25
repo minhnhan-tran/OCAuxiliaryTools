@@ -1034,4 +1034,23 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan, const QStringList& a
   return config;
 }
 
+int pruneUnused(QVariantMap* config) {
+  int removed = 0;
+  auto prune = [&](const QString& section) {
+    QVariantMap sec = config->value(section).toMap();
+    const QVariantList add = sec.value("Add").toList();
+    QVariantList keep;
+    for (const QVariant& v : add) {
+      if (v.toMap().value("Enabled").toBool()) keep << v;
+      else ++removed;
+    }
+    if (keep.size() == add.size()) return;
+    sec["Add"] = keep;
+    config->insert(section, sec);
+  };
+  prune("ACPI");
+  prune("Kernel");
+  return removed;
+}
+
 }  // namespace EfiBuilder

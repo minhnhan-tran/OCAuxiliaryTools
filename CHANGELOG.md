@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.17.2] — 2026-10-25
+
+### Fixed
+- EFI Builder: the generated config.plist and EFI folder no longer carry unused entries. Disabled rows left over from the base template (sample DSDT/SSDT rows, IntelMausi, Legacy_USB3, Voodoo, Broadcom and other kexts, unused SSDTs) are removed, so ACPI > Add and Kernel > Add list only what the build uses and only those SSDT files are copied.
+
 ## [1.17.1] — 2026-10-25
 
 ### Fixed
