@@ -1047,15 +1047,15 @@
   {
    "id": "mem-restrictevents",
    "group": "System",
-   "title": "RestrictEvents is loaded on a Mac Pro SMBIOS",
-   "cmd": "m=$(sysctl -n hw.model 2>/dev/null); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); r=$(echo \"$k\" | awk '{print $6}' | grep -ci '^as\\.vit9696\\.RestrictEvents$'); case \"$m\" in MacPro*) if [ \"$l\" -eq 0 ]; then st=unknown; elif [ \"$r\" -gt 0 ]; then st=ok; else st=missing; fi;; *) st=na;; esac; echo \"mem=$st model=$m\"",
+   "title": "RestrictEvents is loaded on a MacPro7,1 SMBIOS",
+   "cmd": "m=$(sysctl -n hw.model 2>/dev/null); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); r=$(echo \"$k\" | awk '{print $6}' | grep -ci '^as\\.vit9696\\.RestrictEvents$'); case \"$m\" in MacPro7,1) if [ \"$l\" -eq 0 ]; then st=unknown; elif [ \"$r\" -gt 0 ]; then st=ok; else st=missing; fi;; *) st=na;; esac; echo \"mem=$st model=$m\"",
    "pass": "mem=ok\\b",
    "fail": "mem=missing\\b",
    "skip": "mem=na\\b",
-   "skipWhy": "This Mac does not use a Mac Pro SMBIOS, so the memory notification does not apply.",
+   "skipWhy": "This Mac does not use the MacPro7,1 SMBIOS, so the memory notification does not apply.",
    "severity": "info",
    "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/memory.html",
-   "why": "A Mac Pro SMBIOS can show a memory error notification and a wrong About This Mac memory list. The Dortania memory page says RestrictEvents is the most common fix and encourages everyone to use it instead of mapping each DIMM by hand.",
+   "why": "The MacPro7,1 SMBIOS can show a memory error notification and a wrong About This Mac memory list. The Dortania memory page says RestrictEvents is the most common fix and encourages everyone to use it instead of mapping each DIMM by hand.",
    "fixes": [
     {
      "cmd": "system_profiler SPMemoryDataType 2>&1 | head -20",
