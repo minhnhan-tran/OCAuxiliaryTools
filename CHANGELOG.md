@@ -4,11 +4,17 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.7.1] — 2026-10-24
+
+### Fixed
+- Post-Install Check: the USB map and 15-port checks treated any port with a connector type as "mapped", but macOS fills that in from the board's ACPI even without a map. They now look for an injected ports table or a loaded map kext, so an unmapped system is flagged.
+
 ## [1.7.0] — 2026-10-24
 
 ### Added
 - Post-Install Check: more USB checks, based on the Dortania USB guide. **Port map** now looks at the ports themselves (a codeless map kext does not appear in the kext list), **15-port limit** (a controller with 15+ ports where some are unmapped), **USBInjectAll left in** after mapping, and **Bluetooth on an internal port** (connector 255, so Handoff and Continuity keep working).
 - Every USB check reports "Unknown" when no USB data could be read, instead of passing.
+- A port counts as mapped only if a port map is applied to the controller (a ports table) or a map kext is loaded. Connector types alone are not enough, since macOS also reads them from the board's ACPI.
 
 ## [1.6.1] — 2026-10-24
 
