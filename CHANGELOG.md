@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.7.0] — 2026-10-24
+
+### Added
+- Post-Install Check: more USB checks, based on the Dortania USB guide. **Port map** now looks at the ports themselves (a codeless map kext does not appear in the kext list), **15-port limit** (a controller with 15+ ports where some are unmapped), **USBInjectAll left in** after mapping, and **Bluetooth on an internal port** (connector 255, so Handoff and Continuity keep working).
+- Every USB check reports "Unknown" when no USB data could be read, instead of passing.
+
 ## [1.6.1] — 2026-10-24
 
 ### Fixed

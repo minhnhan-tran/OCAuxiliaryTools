@@ -348,19 +348,19 @@
   {
    "id": "usbmap",
    "group": "USB",
-   "title": "A USB port map kext is loaded",
-   "cmd": "l=$(kmutil showloaded --list-only 2>/dev/null | wc -l | tr -d ' '); n=$(kmutil showloaded --list-only 2>/dev/null | grep -ciE 'USBToolBox|UTBMap|USBMap|USBPorts'); echo \"loaded=$l usbmap=$n\"",
-   "pass": "usbmap=[1-9]",
-   "fail": "loaded=[1-9]\\d* usbmap=0",
+   "title": "USB ports have a port map applied",
+   "cmd": "s=$(ioreg -c AppleUSBHostController -r -l -w0 2>/dev/null | awk 'function flush(){ if(inport){ ports++; per[ctl]++; if(!hasc) un++; if(b) { bt++; if(hasc && conn==255) bt255++ } } inport=0 } { i=index($0,\"+-o\") } i==1 { flush(); ctl++; next } i>0 { if(inport && i<=pind) flush(); if($0 ~ /<class AppleUSB[0-9]*(XHCI|EHCI)Port,/){ inport=1; pind=i; hasc=0; conn=\"\"; b=0 } next } inport && /\"UsbConnector\" = / { hasc=1; conn=$NF } inport && /\"bDeviceClass\" = 224/ { b=1 } END{ flush(); mx=0; for(c in per) if(per[c]>mx) mx=per[c]; printf \"ports=%d unmapped=%d max=%d bt=%d bt255=%d\", ports, un, mx, bt, bt255 }'); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); u=$(echo \"$k\" | grep -ciE 'USBToolBox|UTBMap|USBMap|USBPorts'); j=$(echo \"$k\" | grep -ci 'USBInjectAll'); echo \"$s kext=$u inject=$j loaded=$l\"",
+   "pass": "ports=[1-9]\\d* unmapped=0 |kext=[1-9]",
+   "fail": "ports=[1-9]\\d* unmapped=[1-9]\\d* max=\\d+ bt=\\d+ bt255=\\d+ kext=0 .*loaded=[1-9]",
    "severity": "warn",
    "guide": "https://dortania.github.io/OpenCore-Post-Install/usb/",
-   "why": "No USB map kext is loaded. Without a port map you can hit the 15-port limit and get unreliable USB, Bluetooth and sleep/wake.",
+   "why": "Some USB ports have no UsbConnector property and no map kext (USBToolBox/UTBMap/USBMap) is loaded. Per the Dortania USB guide, an unmapped system is limited to 15 ports per controller, which causes missing ports and sleep/wake problems. (A map kext can be codeless and then does not appear in the kext list, so the ports are checked too.)",
    "fixes": [
     {
-     "note": "Build a map with USBToolBox (Windows or macOS), add UTBMap.kext and USBToolBox.kext to your EFI, then rebuild."
+     "note": "Map your ports with USBToolBox (or the manual method in the guide), add the generated map kext (UTBMap.kext, with USBToolBox.kext) to EFI/OC/Kexts and Kernel > Add, then rebuild."
     }
    ],
-   "timeoutSec": 20,
+   "timeoutSec": 30,
    "needsReport": false
   },
   {
@@ -380,6 +380,60 @@
     }
    ],
    "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "usb-port-limit",
+   "group": "USB",
+   "title": "USB ports are not stuck at the 15-port limit",
+   "cmd": "s=$(ioreg -c AppleUSBHostController -r -l -w0 2>/dev/null | awk 'function flush(){ if(inport){ ports++; per[ctl]++; if(!hasc) un++; if(b) { bt++; if(hasc && conn==255) bt255++ } } inport=0 } { i=index($0,\"+-o\") } i==1 { flush(); ctl++; next } i>0 { if(inport && i<=pind) flush(); if($0 ~ /<class AppleUSB[0-9]*(XHCI|EHCI)Port,/){ inport=1; pind=i; hasc=0; conn=\"\"; b=0 } next } inport && /\"UsbConnector\" = / { hasc=1; conn=$NF } inport && /\"bDeviceClass\" = 224/ { b=1 } END{ flush(); mx=0; for(c in per) if(per[c]>mx) mx=per[c]; printf \"ports=%d unmapped=%d max=%d bt=%d bt255=%d\", ports, un, mx, bt, bt255 }'); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); u=$(echo \"$k\" | grep -ciE 'USBToolBox|UTBMap|USBMap|USBPorts'); j=$(echo \"$k\" | grep -ci 'USBInjectAll'); echo \"$s kext=$u inject=$j loaded=$l\"",
+   "pass": "ports=[1-9]\\d* unmapped=0 |ports=[1-9]\\d* unmapped=\\d+ max=([0-9]|1[0-4]) ",
+   "fail": "ports=[1-9]\\d* unmapped=[1-9]\\d* max=(1[5-9]|[2-9]\\d) ",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/usb/",
+   "why": "A controller exposes 15 or more ports and some of them are not mapped. macOS has a strict limit of 15 ports per controller, so extra ports may not work. The common stop-gap, XhciPortLimit, is a hack that can corrupt data and should be removed once a proper map is in place.",
+   "fixes": [
+    {
+     "note": "Finish the USB map so each controller has 15 or fewer ports, then set Kernel > Quirks > XhciPortLimit to false. See the USB mapping pages of the guide."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "usb-injectall",
+   "group": "USB",
+   "title": "USBInjectAll is not left in after mapping",
+   "cmd": "s=$(ioreg -c AppleUSBHostController -r -l -w0 2>/dev/null | awk 'function flush(){ if(inport){ ports++; per[ctl]++; if(!hasc) un++; if(b) { bt++; if(hasc && conn==255) bt255++ } } inport=0 } { i=index($0,\"+-o\") } i==1 { flush(); ctl++; next } i>0 { if(inport && i<=pind) flush(); if($0 ~ /<class AppleUSB[0-9]*(XHCI|EHCI)Port,/){ inport=1; pind=i; hasc=0; conn=\"\"; b=0 } next } inport && /\"UsbConnector\" = / { hasc=1; conn=$NF } inport && /\"bDeviceClass\" = 224/ { b=1 } END{ flush(); mx=0; for(c in per) if(per[c]>mx) mx=per[c]; printf \"ports=%d unmapped=%d max=%d bt=%d bt255=%d\", ports, un, mx, bt, bt255 }'); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); u=$(echo \"$k\" | grep -ciE 'USBToolBox|UTBMap|USBMap|USBPorts'); j=$(echo \"$k\" | grep -ci 'USBInjectAll'); echo \"$s kext=$u inject=$j loaded=$l\"",
+   "pass": "inject=0 kext=\\d+ loaded=[1-9]|inject=0 loaded=[1-9]",
+   "fail": "inject=[1-9]\\d* loaded=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/usb/",
+   "why": "USBInjectAll.kext is loaded. The Dortania guide says to remove it after mapping because it breaks how Apple builds port maps, and it can break your final map.",
+   "fixes": [
+    {
+     "note": "Once your map works, remove USBInjectAll.kext from EFI/OC/Kexts and from Kernel > Add, and set XhciPortLimit to false. Keep it only while you are still building the map."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "usb-bluetooth",
+   "group": "USB",
+   "title": "Bluetooth is on an internal USB port",
+   "cmd": "s=$(ioreg -c AppleUSBHostController -r -l -w0 2>/dev/null | awk 'function flush(){ if(inport){ ports++; per[ctl]++; if(!hasc) un++; if(b) { bt++; if(hasc && conn==255) bt255++ } } inport=0 } { i=index($0,\"+-o\") } i==1 { flush(); ctl++; next } i>0 { if(inport && i<=pind) flush(); if($0 ~ /<class AppleUSB[0-9]*(XHCI|EHCI)Port,/){ inport=1; pind=i; hasc=0; conn=\"\"; b=0 } next } inport && /\"UsbConnector\" = / { hasc=1; conn=$NF } inport && /\"bDeviceClass\" = 224/ { b=1 } END{ flush(); mx=0; for(c in per) if(per[c]>mx) mx=per[c]; printf \"ports=%d unmapped=%d max=%d bt=%d bt255=%d\", ports, un, mx, bt, bt255 }'); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); u=$(echo \"$k\" | grep -ciE 'USBToolBox|UTBMap|USBMap|USBPorts'); j=$(echo \"$k\" | grep -ci 'USBInjectAll'); echo \"$s kext=$u inject=$j loaded=$l\"",
+   "pass": "bt=[1-9]\\d* bt255=[1-9]",
+   "fail": "bt=[1-9]\\d* bt255=0 ",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/usb/",
+   "why": "A Bluetooth (wireless controller) device is on a USB port that is not marked internal (UsbConnector 255). The guide notes that Bluetooth runs over USB internally, and mapping it as a normal port can break Handoff and other Continuity features. (Any USB wireless controller counts, not only Bluetooth.)",
+   "fixes": [
+    {
+     "note": "In your USB map, set the Bluetooth port's connector type to 255 (internal), then rebuild. Not a fault if your Bluetooth is not connected over USB."
+    }
+   ],
+   "timeoutSec": 30,
    "needsReport": false
   }
  ]
