@@ -4,6 +4,13 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.9.1] — 2026-10-25
+
+### Fixed
+- Post-Install Check: the laptop input-driver check counted VoodooInput (or only VoodooI2CServices) alone as a working driver; it now needs VoodooPS2, the VoodooI2C core, VoodooRMI / SMBus or an Apple SPI / top-case driver.
+- The trackpad check treated any digitizer (touchscreen, pen tablet) as a trackpad; only a Touch Pad digitizer or a device named trackpad / touchpad counts now.
+- Removed a claim about trackpad lag that I could not confirm in the guide.
+
 ## [1.9.0] — 2026-10-25
 
 ### Added
