@@ -970,6 +970,104 @@
    ],
    "timeoutSec": 30,
    "needsReport": false
+  },
+  {
+   "id": "clover-leftovers",
+   "group": "Boot and NVRAM",
+   "title": "No Clover NVRAM scripts left on this Mac",
+   "cmd": "f=0; for p in /etc/rc.clover.lib /etc/rc.boot.d/10.save_and_rotate_boot_log.local /etc/rc.boot.d/20.mount_ESP.local /etc/rc.boot.d/70.disable_sleep_proxy_client.local.disabled /etc/rc.shutdown.d/80.save_nvram_plist.local; do if [ -e \"$p\" ]; then f=$((f+1)); echo \"found $p\"; fi; done; echo \"clover=$f\"",
+   "pass": "clover=0\\b",
+   "fail": "clover=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/misc/nvram.html",
+   "why": "Files from Clover's emulated-NVRAM scripts are still installed. The Dortania NVRAM page lists them as leftovers to remove once you use OpenCore, because they can overwrite or fight with OpenCore's own NVRAM handling.",
+   "fixes": [
+    {
+     "cmd": "ls -l /etc/rc.clover.lib /etc/rc.boot.d /etc/rc.shutdown.d 2>&1 | head -30",
+     "why": "Lists the Clover files and folders so you can see exactly what is installed.",
+     "run": "user"
+    },
+    {
+     "note": "Remove the Clover files listed on the Dortania NVRAM page (rc.clover.lib and the Clover scripts in /etc/rc.boot.d and /etc/rc.shutdown.d). Check each one first; keep any script that is not from Clover."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "rom-en0",
+   "group": "iServices",
+   "title": "NVRAM ROM matches the en0 MAC address",
+   "cmd": "E=4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14; e=$(ifconfig en0 2>/dev/null | awk '/ether/{print $2}' | tr -d ':' | tr 'A-Z' 'a-z'); r=$(nvram -x $E:ROM 2>/dev/null | sed -n '/<data>/{n;p;}' | tr -d ' \\t\\n' | base64 -D 2>/dev/null | xxd -p | tr -d '\\n'); if [ -z \"$e\" ]; then s=noen0; elif [ -z \"$r\" ]; then s=norom; elif [ \"$e\" = \"$r\" ]; then s=match; else s=mismatch; fi; echo \"rom=$s en0=${e:--} nvram=${r:--}\"",
+   "pass": "rom=match\\b",
+   "fail": "rom=mismatch\\b",
+   "skip": "rom=(noen0|norom)\\b",
+   "skipWhy": "There is no en0 interface or no ROM value in NVRAM, so there is nothing to compare.",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/iservices.html",
+   "why": "The ROM that OpenCore sets does not equal the MAC address of en0. The Dortania iServices guide says iMessage and FaceTime are more reliable when ROM is your real en0 MAC address, written as 6 bytes without colons.",
+   "fixes": [
+    {
+     "cmd": "E=4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14; echo \"en0: $(ifconfig en0 2>/dev/null | awk '/ether/{print $2}')\"; echo \"ROM: $(nvram -x $E:ROM 2>/dev/null | sed -n '/<data>/{n;p;}' | tr -d ' \\t\\n' | base64 -D 2>/dev/null | xxd -p)\"",
+     "why": "Shows both values side by side so you can copy the en0 address into PlatformInfo > Generic > ROM.",
+     "run": "user"
+    },
+    {
+     "note": "In config.plist set PlatformInfo > Generic > ROM to your en0 MAC address (12 hex digits, no colons), then reboot."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "battery-driver",
+   "group": "Laptop",
+   "title": "Battery is recognised by macOS",
+   "cmd": "a=$(ioreg -rc IOACPIPlatformDevice -w0 2>/dev/null | grep -cE '\"PNP0C0A\"'); s=$(ioreg -rc AppleSmartBattery 2>/dev/null | grep -c '<class AppleSmartBattery'); k=$(kmutil showloaded --list-only 2>/dev/null | awk '{print $6}'); ec=$(echo \"$k\" | grep -ci 'ECEnabler'); sm=$(echo \"$k\" | grep -ci 'SMCBatteryManager'); if [ \"$s\" -gt 0 ]; then st=ok; elif [ \"$a\" -gt 0 ]; then st=missing; else st=none; fi; echo \"battery=$st acpi=$a ecenabler=$ec smcbattery=$sm\"",
+   "pass": "battery=ok\\b",
+   "fail": "battery=missing\\b",
+   "skip": "battery=none\\b",
+   "skipWhy": "This Mac has no ACPI battery device, so there is no battery to check.",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/laptop-specific/battery.html",
+   "why": "The firmware reports a battery, but macOS has no AppleSmartBattery. The Dortania battery page says ECEnabler.kext gives battery percentage without ACPI patches, and that SMCBatteryManager (a VirtualSMC plugin) must be enabled if status still does not work.",
+   "fixes": [
+    {
+     "cmd": "echo \"AppleSmartBattery nodes: $(ioreg -rc AppleSmartBattery 2>/dev/null | grep -c '<class AppleSmartBattery')\"; kmutil showloaded --list-only 2>/dev/null | awk '{print $6}' | grep -iE 'ECEnabler|SMCBatteryManager|VirtualSMC' || echo 'ECEnabler / SMCBatteryManager / VirtualSMC: not loaded'",
+     "why": "Shows whether the kexts the guide asks for are loaded.",
+     "run": "user"
+    },
+    {
+     "note": "Add ECEnabler.kext and make sure SMCBatteryManager.kext (inside VirtualSMC) is enabled and loads after VirtualSMC. Devices with a proprietary embedded controller, such as Surface models, need device-specific kexts."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "mem-restrictevents",
+   "group": "System",
+   "title": "RestrictEvents is loaded on a Mac Pro SMBIOS",
+   "cmd": "m=$(sysctl -n hw.model 2>/dev/null); k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); r=$(echo \"$k\" | awk '{print $6}' | grep -ci '^as\\.vit9696\\.RestrictEvents$'); case \"$m\" in MacPro*) if [ \"$l\" -eq 0 ]; then st=unknown; elif [ \"$r\" -gt 0 ]; then st=ok; else st=missing; fi;; *) st=na;; esac; echo \"mem=$st model=$m\"",
+   "pass": "mem=ok\\b",
+   "fail": "mem=missing\\b",
+   "skip": "mem=na\\b",
+   "skipWhy": "This Mac does not use a Mac Pro SMBIOS, so the memory notification does not apply.",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/memory.html",
+   "why": "A Mac Pro SMBIOS can show a memory error notification and a wrong About This Mac memory list. The Dortania memory page says RestrictEvents is the most common fix and encourages everyone to use it instead of mapping each DIMM by hand.",
+   "fixes": [
+    {
+     "cmd": "system_profiler SPMemoryDataType 2>&1 | head -20",
+     "why": "Shows the memory list that About This Mac reads.",
+     "run": "user"
+    },
+    {
+     "note": "Add RestrictEvents.kext (it needs Lilu) and reboot. Mapping every DIMM by hand is the legacy method and takes much longer."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
   }
  ]
 }

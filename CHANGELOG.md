@@ -4,6 +4,15 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.17.0] — 2026-10-25
+
+### Added
+- Post-Install Check: 4 new checks taken from the Dortania OpenCore Post-Install guide.
+  - Clover leftovers: Clover's NVRAM scripts (rc.clover.lib and the rc.boot.d / rc.shutdown.d files) are still installed (NVRAM page).
+  - ROM matches en0: the NVRAM ROM equals the en0 MAC address, which iMessage/FaceTime prefer (iServices page). Skipped when there is no en0 or no ROM.
+  - Battery recognised: the firmware has an ACPI battery but macOS has no AppleSmartBattery; points to ECEnabler and SMCBatteryManager (battery page). Skipped on Macs without a battery.
+  - RestrictEvents on a Mac Pro SMBIOS: the memory notification fix (memory page). Skipped on other models.
+
 ## [1.16.1] — 2026-10-25
 
 ### Fixed
