@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QHash>
+#include <QPointer>
 #include <QProcess>
 #include <QLineEdit>
 #include <QLabel>
@@ -20,6 +21,7 @@ class dlgPostCheck : public QDialog {
   Q_OBJECT
  public:
   explicit dlgPostCheck(QWidget* parent = nullptr);
+  ~dlgPostCheck() override;
 
  private slots:
   void runAll();
@@ -47,6 +49,7 @@ class dlgPostCheck : public QDialog {
   QString reportNote;
   QHash<int, QString> fixMsg;  // result index -> outcome of a fix run here
   bool fixBusy = false;
+  QPointer<QProcess> fixProc;  // fix still running, stopped if the window closes
 };
 
 #endif

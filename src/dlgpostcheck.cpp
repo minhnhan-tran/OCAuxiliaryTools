@@ -170,6 +170,15 @@ void dlgPostCheck::runAll() {
   showDetails();
 }
 
+dlgPostCheck::~dlgPostCheck() {
+  // Closing the window mid-fix must not let finished() reach a half-destroyed dialog.
+  if (fixProc) {
+    fixProc->disconnect(this);
+    fixProc->kill();
+    fixProc->waitForFinished(2000);
+  }
+}
+
 void dlgPostCheck::refreshSummary() {
   int fail = 0, unk = 0;
   for (const Result& r : results) {
@@ -213,6 +222,7 @@ void dlgPostCheck::runFix(int idx, int fixIdx) {
   if (box.exec() != QMessageBox::Yes) return;
 
   QProcess* p = new QProcess(this);
+  fixProc = p;
   fixBusy = true;
   summary->setText(tr("Running the fix..."));
   connect(p, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
