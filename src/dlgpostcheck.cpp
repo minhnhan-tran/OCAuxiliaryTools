@@ -21,7 +21,7 @@ using namespace PostCheck;
 
 namespace {
 QString statusText(Status s) {
-  return s == Pass ? QObject::tr("OK") : s == Fail ? QObject::tr("Problem") : QObject::tr("Unknown");
+  return s == Pass ? QObject::tr("OK") : s == Fail ? QObject::tr("Problem") : s == Skipped ? QObject::tr("Skipped") : QObject::tr("Unknown");
 }
 }  // namespace
 
@@ -114,7 +114,7 @@ void dlgPostCheck::setStatus(QTreeWidgetItem* it, const Result& r) {
   it->setText(1, statusText(r.status));
   QColor c = r.status == Pass ? QColor("#2e7d32")
              : r.status == Fail ? (r.check.severity == "warn" ? QColor("#d32f2f") : QColor("#ef6c00"))
-                                : QColor("#757575");
+                                : r.status == Skipped ? QColor("#9e9e9e") : QColor("#757575");
   it->setForeground(1, c);
 }
 
@@ -180,14 +180,16 @@ dlgPostCheck::~dlgPostCheck() {
 }
 
 void dlgPostCheck::refreshSummary() {
-  int fail = 0, unk = 0;
+  int fail = 0, unk = 0, skipped = 0;
   for (const Result& r : results) {
     if (r.status == Fail) ++fail;
     if (r.status == Unknown) ++unk;
+    if (r.status == Skipped) ++skipped;
   }
   summary->setText((fail == 0 ? tr("No problems found (%1 check(s) gave no verdict).").arg(unk)
                               : tr("%1 problem(s) found, %2 check(s) gave no verdict. Select a problem to see the fix.")
                                     .arg(fail).arg(unk)) +
+                   (skipped ? "  " + tr("%1 skipped (not applicable to this Mac).").arg(skipped) : QString()) +
                    (reportNote.isEmpty() ? QString() : "  " + reportNote));
 }
 

@@ -12,7 +12,8 @@
 // the user confirms it; everything else is only shown, copied or opened in Terminal.
 namespace PostCheck {
 
-enum Status { Pass, Fail, Unknown };
+// Skipped = the check does not apply to this Mac (e.g. no laptop keyboard/trackpad).
+enum Status { Pass, Fail, Unknown, Skipped };
 
 struct Fix {
   QString cmd;   // shell command to show/copy (may need sudo)
@@ -22,7 +23,7 @@ struct Fix {
 };
 
 struct Check {
-  QString id, group, title, cmd, passRx, failRx, severity, guide, why;
+  QString id, group, title, cmd, passRx, failRx, skipRx, skipWhy, severity, guide, why;
   QList<Fix> fixes;
   int timeoutSec = 20;
   bool needsReport = false;  // uses OCAT_REPORT_* from a Hardware Sniffer report

@@ -35,6 +35,8 @@ QList<Check> loadChecks() {
     c.cmd = o["cmd"].toString();
     c.passRx = o["pass"].toString();
     c.failRx = o["fail"].toString();
+    c.skipRx = o["skip"].toString();
+    c.skipWhy = o["skipWhy"].toString();
     c.severity = o["severity"].toString("info");
     c.guide = o["guide"].toString();
     c.why = o["why"].toString();
@@ -57,6 +59,13 @@ QList<Check> loadChecks() {
 Status evaluate(const Check& c, const QString& output, bool ran, QString* reason) {
   auto say = [&](const QString& s) { if (reason) *reason = s; };
   if (!ran) { say("The command could not be run or timed out."); return Unknown; }
+  if (!c.skipRx.isEmpty()) {  // not applicable to this Mac: say so instead of "unknown"
+    const QRegularExpression sre(c.skipRx);
+    if (sre.isValid() && sre.match(output).hasMatch()) {
+      say(c.skipWhy.isEmpty() ? "Not applicable to this Mac." : c.skipWhy);
+      return Skipped;
+    }
+  }
   const QRegularExpression::PatternOption mo = QRegularExpression::MultilineOption;
   if (!c.failRx.isEmpty()) {
     QRegularExpression re(c.failRx, mo);
@@ -102,7 +111,7 @@ Result runCheck(const Check& c, const Context& ctx) {
 }
 
 QString reportText(const QList<Result>& rs) {
-  static const char* names[] = {"PASS", "FAIL", "UNKNOWN"};
+  static const char* names[] = {"PASS", "FAIL", "UNKNOWN", "SKIPPED"};
   QString t = QString("OCAT post-install check (%1, macOS %2)\n\n")
                   .arg(QSysInfo::machineHostName().isEmpty() ? "mac" : "this Mac", QSysInfo::productVersion());
   for (const Result& r : rs)

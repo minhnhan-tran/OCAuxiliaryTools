@@ -4,6 +4,14 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.12.0] — 2026-10-25
+
+### Added
+- Post-Install Check: a new **Skipped** result (grey) for checks that do not apply to this Mac, instead of "Unknown". The summary counts them separately ("N skipped").
+
+### Changed
+- Trackpad and Keyboard: "A laptop keyboard / trackpad driver is loaded" and "A trackpad is detected" are now Skipped on a desktop (no battery or laptop model), and "VoodooInput loads before VoodooPS2 / VoodooI2C" is Skipped when neither of those is loaded. Each one shows why it was skipped.
+
 ## [1.11.2] — 2026-10-25
 
 ### Changed

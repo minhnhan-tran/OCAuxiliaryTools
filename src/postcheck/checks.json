@@ -645,7 +645,9 @@
     }
    ],
    "timeoutSec": 30,
-   "needsReport": false
+   "needsReport": false,
+   "skip": "laptop=0\\b",
+   "skipWhy": "This Mac is not a laptop (no built-in keyboard or trackpad), so there is nothing to check."
   },
   {
    "id": "kb-order",
@@ -663,7 +665,9 @@
     }
    ],
    "timeoutSec": 30,
-   "needsReport": false
+   "needsReport": false,
+   "skip": "order=none\\b",
+   "skipWhy": "Neither VoodooPS2 nor VoodooI2C is loaded, so there is no keyboard/trackpad load order to check."
   },
   {
    "id": "kb-trackpad",
@@ -681,7 +685,9 @@
     }
    ],
    "timeoutSec": 30,
-   "needsReport": false
+   "needsReport": false,
+   "skip": "laptop=0\\b",
+   "skipWhy": "This Mac is not a laptop (no built-in keyboard or trackpad), so there is nothing to check."
   },
   {
    "id": "windows-time",
