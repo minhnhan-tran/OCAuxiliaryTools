@@ -68,6 +68,8 @@ SOURCES += \
     src/dlgdatabase.cpp \
     src/dlgefibuilder.cpp \
     src/dlgpostcheck.cpp \
+    src/dlgusbmap.cpp \
+    src/usbmap/usbmap.cpp \
     src/postcheck/postcheck.cpp \
     src/efibuilder/efibuilder.cpp \
     src/efibuilder/kextfetch.cpp \
@@ -106,6 +108,8 @@ HEADERS += \
     src/theme.h \
     src/dlgefibuilder.h \
     src/dlgpostcheck.h \
+    src/dlgusbmap.h \
+    src/usbmap/usbmap.h \
     src/postcheck/postcheck.h \
     src/efibuilder/efibuilder.h \
     src/efibuilder/kextfetch.h \

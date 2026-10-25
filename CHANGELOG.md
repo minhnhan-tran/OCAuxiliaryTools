@@ -4,6 +4,18 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.15.0] — 2026-10-25
+
+### Added
+- **Tools > USB Mapping**: a native C++/Qt port of [corpnewt/USBMap](https://github.com/corpnewt/USBMap) (MIT, licence in `src/usbmap/LICENSE-USBMap.txt`), so no Python or Terminal is needed.
+  - **Discover ports** reads `ioreg` and lists every USB controller and port, with its class, detected connector type and the devices plugged into it. Run it again after plugging a device into another port: ports with a device are remembered across runs.
+  - Tick the ports to keep (a warning appears above 15 per controller, macOS's limit), pick a connector type (USB 2/3 Type-A, Type-C variants, Internal) and give each port a nickname.
+  - **Build USBMap.kext** writes the kext (`AppleUSBHostMergeProperties`, or the legacy `AppleUSBMergeNub` for macOS 10.11 - 10.14). The choices are saved to `~/.ocat/USBMap/map.json` and reloaded next time. **Load ioreg dump** works from a saved dump on any OS.
+- The generated `Info.plist` was checked against USBMap's own output on the same `ioreg` data and is identical, including with a port nickname, a connector override and a disabled port.
+
+### Not included yet
+- Adding the kext to `EFI/OC/Kexts` and `config.plist` for you (the dialog tells you the steps), and hub mapping on old EHCI machines (written but untested without hardware).
+
 ## [1.14.1] — 2026-10-25
 
 ### Fixed

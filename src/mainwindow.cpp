@@ -2,6 +2,7 @@
 
 #include "dlgefibuilder.h"
 #include "dlgpostcheck.h"
+#include "dlgusbmap.h"
 #include "theme.h"
 
 #include <fstream>
@@ -248,6 +249,11 @@ void MainWindow::openPostCheck() {
   dlg.exec();
 }
 
+void MainWindow::openUsbMap() {
+  dlgUsbMap dlg(this);
+  dlg.exec();
+}
+
 void MainWindow::initRecentFilesForToolBar() {
   // One-time: add the OpCore-Simplify style EFI builder to the Tools menu.
   if (!ui->menuTools->findChild<QAction*>("actionEfiBuilder")) {
@@ -261,6 +267,12 @@ void MainWindow::initRecentFilesForToolBar() {
     chk->setObjectName("actionPostCheck");
     ui->menuTools->insertAction(ui->actionGenerateEFI, chk);
     connect(chk, &QAction::triggered, this, &MainWindow::openPostCheck);
+  }
+  if (!ui->menuTools->findChild<QAction*>("actionUsbMap")) {
+    QAction* usb = new QAction(tr("USB Mapping..."), ui->menuTools);
+    usb->setObjectName("actionUsbMap");
+    ui->menuTools->insertAction(ui->actionGenerateEFI, usb);
+    connect(usb, &QAction::triggered, this, &MainWindow::openUsbMap);
   }
   if (!ui->menuHelp->findChild<QAction*>("actionPostInstall")) {
     QAction* post = new QAction(tr("OpenCore Post-Install Guide"), ui->menuHelp);

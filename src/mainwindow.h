@@ -1037,6 +1037,7 @@ class MainWindow : public QMainWindow {
   void initRecentFilesForToolBar();
   void openEfiBuilder();
   void openPostCheck();
+  void openUsbMap();
   QAction* actionBuildEfi = nullptr;
   QAction* actionPostCheck = nullptr;
 
