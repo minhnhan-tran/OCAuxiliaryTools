@@ -213,13 +213,13 @@
    "id": "cpu-cores",
    "group": "System",
    "title": "CPU core count matches the report (needs a Hardware Sniffer report)",
-   "cmd": "p=$(sysctl -n hw.physicalcpu 2>/dev/null); l=$(sysctl -n hw.logicalcpu 2>/dev/null); r=\"$OCAT_REPORT_CORES\"; case \"$r\" in ''|*[!0-9]*) echo \"report=none\";; *) if [ -z \"$p\" ] || [ -z \"$l\" ]; then echo \"mac=unreadable\"; elif [ \"$r\" = \"$p\" ] || [ \"$r\" = \"$l\" ]; then echo \"cores=same\"; else echo \"cores=different report=$r mac_physical=$p mac_logical=$l\"; fi;; esac",
+   "cmd": "p=$(sysctl -n hw.physicalcpu 2>/dev/null); l=$(sysctl -n hw.logicalcpu 2>/dev/null); r=\"$OCAT_REPORT_CORES\"; case \"$r\" in ''|*[!0-9]*) echo \"report=none\";; *) if [ -z \"$p\" ] || [ -z \"$l\" ]; then echo \"mac=unreadable\"; elif [ \"$r\" = \"$p\" ] || [ \"$r\" = \"$l\" ]; then echo \"cores=same\"; elif [ \"$r\" -gt \"$p\" ] && [ \"$r\" -lt \"$l\" ] && sysctl -n machdep.cpu.brand_string 2>/dev/null | grep -q Intel; then echo \"cores=hybrid report=$r mac_physical=$p mac_logical=$l\"; else echo \"cores=different report=$r mac_physical=$p mac_logical=$l\"; fi;; esac",
    "needsReport": true,
    "pass": "^cores=same",
    "fail": "^cores=different",
    "severity": "info",
    "guide": "https://dortania.github.io/OpenCore-Post-Install/",
-   "why": "macOS sees a different number of cores or threads than the report. That is normal on hybrid Intel CPUs (12th gen and newer) where macOS may be limited to P-cores, and on AMD with a wrong core-count kernel patch. Only worth acting on if the number looks wrong for your CPU.",
+   "why": "macOS sees a different number of cores than the report, and it is not the hybrid-Intel pattern (P-cores with hyper-threading plus E-cores, which is reported as no verdict). On AMD this usually means a wrong core-count kernel patch.",
    "fixes": [
     {
      "note": "AMD: set the core-count (cpuid_cores_per_package) kernel patches to your physical core count. Intel hybrid CPUs: macOS cannot use E-cores, so a lower count is expected."

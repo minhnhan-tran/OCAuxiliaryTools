@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.6.1] — 2026-10-24
+
+### Fixed
+- Post-Install Check: the CPU core-count check no longer reports a problem on hybrid Intel CPUs. A report count between macOS's physical and logical counts (for example 16 cores against 8 physical / 24 logical on an i7-13700F) now gives no verdict. AMD and clearly wrong counts are still flagged.
+
 ## [1.6.0] — 2026-10-24
 
 ### Added
