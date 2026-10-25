@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.16.1] — 2026-10-25
+
+### Fixed
+- The USB Mapping toolbar icon was a wide, thin shape that looked small next to the other icons. It is now an upright, bolder USB symbol that fills the icon and stays readable at toolbar size.
+
 ## [1.16.0] — 2026-10-25
 
 ### Added
