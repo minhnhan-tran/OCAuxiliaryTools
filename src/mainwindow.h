@@ -1036,7 +1036,9 @@ class MainWindow : public QMainWindow {
   QString orgCheckBoxStyle;
   void initRecentFilesForToolBar();
   void openEfiBuilder();
+  void openPostCheck();
   QAction* actionBuildEfi = nullptr;
+  QAction* actionPostCheck = nullptr;
 
   QMenu* reFileMenu;
 

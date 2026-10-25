@@ -1,0 +1,386 @@
+{
+ "checks": [
+  {
+   "id": "sleep-hibernatemode",
+   "group": "Sleep / wake",
+   "title": "hibernatemode is off",
+   "cmd": "pmset -g custom",
+   "pass": "^[ \\t]*hibernatemode[ \\t]+0\\b",
+   "fail": "^[ \\t]*hibernatemode[ \\t]+[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "Hibernation (S4) writes RAM to disk and resumes from it. The Dortania guide avoids it by setting Misc > Boot > HibernateMode to None in config.plist; this pmset value is the macOS-side equivalent and is community advice, not a command from the guide.",
+   "fixes": [
+    {
+     "cmd": "sudo pmset -a hibernatemode 0",
+     "why": "Turns hibernation off for all power sources."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-standby",
+   "group": "Sleep / wake",
+   "title": "standby is off",
+   "cmd": "pmset -g custom",
+   "pass": "^[ \\t]*standby[ \\t]+0\\b",
+   "fail": "^[ \\t]*standby[ \\t]+[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "Standby is the delay between sleep and going into hibernation. The Dortania sleep guide turns it off.",
+   "fixes": [
+    {
+     "cmd": "sudo pmset -a standby 0",
+     "why": "Disables the delayed deep-sleep (standby) mode."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-autopoweroff",
+   "group": "Sleep / wake",
+   "title": "autopoweroff is off",
+   "cmd": "pmset -g custom",
+   "pass": "^[ \\t]*autopoweroff[ \\t]+0\\b",
+   "fail": "^[ \\t]*autopoweroff[ \\t]+[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "Auto power off is a form of hibernation. The Dortania sleep guide turns it off.",
+   "fixes": [
+    {
+     "cmd": "sudo pmset -a autopoweroff 0",
+     "why": "Disables auto power off."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-powernap",
+   "group": "Sleep / wake",
+   "title": "powernap is off",
+   "cmd": "pmset -g custom",
+   "pass": "^[ \\t]*powernap[ \\t]+0\\b",
+   "fail": "^[ \\t]*powernap[ \\t]+[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "Power Nap periodically wakes the machine for network access and updates. The Dortania sleep guide turns it off.",
+   "fixes": [
+    {
+     "cmd": "sudo pmset -a powernap 0",
+     "why": "Disables Power Nap."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-proximitywake",
+   "group": "Sleep / wake",
+   "title": "proximitywake is off",
+   "cmd": "pmset -g custom",
+   "pass": "^[ \\t]*proximitywake[ \\t]+0\\b",
+   "fail": "^[ \\t]*proximitywake[ \\t]+[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "The machine wakes when your iPhone or Apple Watch comes near. The Dortania sleep guide turns it off.",
+   "fixes": [
+    {
+     "cmd": "sudo pmset -a proximitywake 0",
+     "why": "Disables wake when an iPhone / Apple Watch is nearby."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-tcpkeepalive",
+   "group": "Sleep / wake",
+   "title": "tcpkeepalive is off",
+   "cmd": "pmset -g custom",
+   "pass": "^[ \\t]*tcpkeepalive[ \\t]+0\\b",
+   "fail": "^[ \\t]*tcpkeepalive[ \\t]+[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "The TCP keep-alive mechanism wakes the machine about every 2 hours. The Dortania sleep guide turns it off.",
+   "fixes": [
+    {
+     "cmd": "sudo pmset -a tcpkeepalive 0",
+     "why": "Disables TCP keep-alive while sleeping."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-failures",
+   "group": "Sleep / wake",
+   "title": "No sleep or wake failures in the last 7 days",
+   "cmd": "since=$(date -v-7d +%Y-%m-%d); n=$(pmset -g log 2>/dev/null | wc -l | tr -d ' '); f=$(pmset -g log 2>/dev/null | awk -v s=\"$since\" '$1>=s' | grep -ciE '(sleep|wake) failure'); echo \"lines=$n failures=$f\"",
+   "pass": "lines=[1-9]\\d* failures=0$",
+   "fail": "failures=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "macOS logged failed sleeps or wakes. Per the Dortania sleep guide these are most commonly caused by incorrectly managed devices, mainly PCIe-based ones. The guide's main offenders are USB controllers and devices, GPUs, Thunderbolt, NICs, NVMe drives and CPU power management.",
+   "fixes": [
+    {
+     "cmd": "pmset -g log | grep -iE '(sleep|wake) failure|wake reason' | tail -20",
+     "why": "Read-only: shows the most recent failure and wake-reason lines so you can see what woke or blocked the Mac."
+    },
+    {
+     "note": "Apply the power settings above first. Then work through the guide's main offenders: USB (map your ports), GPUs (make sure yours is supported), Thunderbolt, NICs, NVMe (NVMeFix.kext) and CPU power management. Also disable Wake on LAN in the BIOS, and add keepsyms=1 and swd_panic=1 to boot-args so a sleep panic leaves a readable log. Details are on the guide page. On Intel 300-series (Z3xx) boards, a \"BIOS Restarted in Safemode\" message at shutdown or restart is an RTC problem: fix AWAC and use DisableRtcChecksum, or AppleRtcRam with rtc-blacklist (see the RTC section). That can only be seen at shutdown, not checked from macOS."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-assertions",
+   "group": "Sleep / wake",
+   "title": "Nothing is preventing sleep right now",
+   "cmd": "pmset -g assertions",
+   "pass": "^[ \\t]*PreventSystemSleep[ \\t]+0\\b",
+   "fail": "^[ \\t]*(PreventSystemSleep|PreventUserIdleSystemSleep)[ \\t]+[1-9]",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "Something is holding the Mac awake right now, often playing audio or video, a download, or a USB device. This is only a problem if it persists when you are idle.",
+   "fixes": [
+    {
+     "cmd": "pmset -g assertions | grep -B1 -A2 -E 'PreventSystemSleep|PreventUserIdleSystemSleep'",
+     "why": "Read-only: lists the processes holding the assertion."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-nvmefix",
+   "group": "Sleep / wake",
+   "title": "NVMeFix is loaded for NVMe drives",
+   "cmd": "k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); m=$(echo \"$k\" | grep -ci nvmefix); n=$(ioreg -rc IONVMeController 2>/dev/null | grep -c 'class IONVMeController,'); echo \"nvme=$n nvmefix=$m loaded=$l\"",
+   "pass": "nvme=[1-9]\\d* nvmefix=[1-9]",
+   "fail": "nvme=[1-9]\\d* nvmefix=0 loaded=[1-9]",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "An NVMe drive is using the generic driver. Per the Dortania sleep guide, Apple's power management only covers Apple-branded drives, so NVMeFix.kext is needed for proper NVMe power management (also keep the drive firmware up to date).",
+   "fixes": [
+    {
+     "note": "Add NVMeFix.kext (acidanthera/NVMeFix) to EFI/OC/Kexts and to Kernel > Add, after Lilu. EFI Builder adds it when your report lists an NVMe drive. Rebuild and retest sleep."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "sleep-tsc",
+   "group": "Sleep / wake",
+   "title": "TSC sync kext on server / HEDT CPUs (hint)",
+   "cmd": "b=$(sysctl -n machdep.cpu.brand_string 2>/dev/null); if echo \"$b\" | grep -qiE 'Xeon.R. (CPU E[57]-|W-|Gold|Silver|Platinum|Bronze)|i[3579]-[0-9]{4,5}XE? CPU'; then c=hedt; else c=other; fi; k=$(kmutil showloaded --list-only 2>/dev/null); l=$(echo \"$k\" | grep -c .); n=$(echo \"$k\" | grep -ciE 'CpuTscSync|TSCAdjustReset|VoodooTSCSync'); echo \"cpu=$c tsc=$n loaded=$l\"",
+   "pass": "tsc=[1-9]",
+   "fail": "cpu=hedt tsc=0 loaded=[1-9]",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/sleep.html",
+   "why": "This is a hint, not a detected fault: the guide gives no way to measure it. Per the Dortania sleep guide, some firmware (mainly HEDT/Server boards and Asus laptops) does not write the TSC to all cores, which causes wake problems. This check only looks at server-class Xeons (E5/E7/W/Scalable) and X/XE Core CPUs; desktop Xeons (E3) and Asus laptops are not covered.",
+   "fixes": [
+    {
+     "note": "Only if you have wake problems. Per the guide: VoodooTSCSync for most HEDT hardware, TSCAdjustReset for Skylake-X/W/SP and Cascade Lake-X/W/SP (its Info.plist needs your thread count), CpuTscSync for troublesome laptops. Add only one, then rebuild."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "cpu-name",
+   "group": "System",
+   "title": "CPU name matches the physical CPU (needs a Hardware Sniffer report)",
+   "cmd": "norm(){ printf '%s' \"$1\" | tr 'A-Z' 'a-z' | sed -E 's/\\((r|tm)\\)//g; s/@.*//; s/[0-9]+(st|nd|rd|th) gen//g; s/[0-9]+-core//g; s/(cpu|processor)//g; s/[^a-z0-9]+//g'; }; m=$(sysctl -n machdep.cpu.brand_string 2>/dev/null); a=$(norm \"$m\"); b=$(norm \"$OCAT_REPORT_CPU\"); if [ -z \"$a\" ]; then echo \"mac=unreadable\"; elif [ -z \"$b\" ]; then echo \"report=empty\"; elif [ \"$a\" = \"$b\" ]; then echo \"name=same\"; else echo \"name=different report=[$OCAT_REPORT_CPU] mac=[$m]\"; fi",
+   "needsReport": true,
+   "pass": "^name=same",
+   "fail": "^name=different",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
+   "why": "The CPU name macOS shows differs from the CPU in your Hardware Sniffer report. A CPU spoof, a wrong report, or a report taken from another machine would explain it; real hardware is the report. Compare the two names below.",
+   "fixes": [
+    {
+     "note": "Make sure the report is from this machine. If it is, check the CPU-related settings: Kernel > Emulate (CPUID spoof), ProvideCurrentCpuInfo and the CPU / SMBIOS choice, and the OpenCore config you built from it."
+    }
+   ],
+   "timeoutSec": 20
+  },
+  {
+   "id": "cpu-cores",
+   "group": "System",
+   "title": "CPU core count matches the report (needs a Hardware Sniffer report)",
+   "cmd": "p=$(sysctl -n hw.physicalcpu 2>/dev/null); l=$(sysctl -n hw.logicalcpu 2>/dev/null); r=\"$OCAT_REPORT_CORES\"; case \"$r\" in ''|*[!0-9]*) echo \"report=none\";; *) if [ -z \"$p\" ] || [ -z \"$l\" ]; then echo \"mac=unreadable\"; elif [ \"$r\" = \"$p\" ] || [ \"$r\" = \"$l\" ]; then echo \"cores=same\"; else echo \"cores=different report=$r mac_physical=$p mac_logical=$l\"; fi;; esac",
+   "needsReport": true,
+   "pass": "^cores=same",
+   "fail": "^cores=different",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
+   "why": "macOS sees a different number of cores or threads than the report. That is normal on hybrid Intel CPUs (12th gen and newer) where macOS may be limited to P-cores, and on AMD with a wrong core-count kernel patch. Only worth acting on if the number looks wrong for your CPU.",
+   "fixes": [
+    {
+     "note": "AMD: set the core-count (cpuid_cores_per_package) kernel patches to your physical core count. Intel hybrid CPUs: macOS cannot use E-cores, so a lower count is expected."
+    }
+   ],
+   "timeoutSec": 20
+  },
+  {
+   "id": "cpu-sanity",
+   "group": "System",
+   "title": "CPU name is complete and its core count is consistent",
+   "cmd": "m=$(sysctl -n machdep.cpu.brand_string 2>/dev/null); p=$(sysctl -n hw.physicalcpu 2>/dev/null); n=$(printf '%s' \"$m\" | sed -nE 's/.*[^0-9]([0-9]+)-Core.*/\\1/p'); if [ -z \"$m\" ]; then echo \"name=empty\"; elif [ -z \"$n\" ] || [ -z \"$p\" ]; then echo \"name=ok nocount\"; elif [ \"$n\" = \"$p\" ]; then echo \"name=ok count=match\"; else echo \"name=ok count=different name_cores=$n mac_cores=$p\"; fi",
+   "needsReport": false,
+   "pass": "^name=ok( nocount| count=match)",
+   "fail": "^name=(empty|ok count=different)",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
+   "why": "macOS reports an empty CPU name, or a name that states a core count (for example AMD '16-Core') that differs from the cores macOS sees. With AMD vanilla patches this usually means the core-count patches are wrong.",
+   "fixes": [
+    {
+     "note": "AMD: set the core-count kernel patches to your physical core count. Check the CPU name in About This Mac > System Report."
+    }
+   ],
+   "timeoutSec": 20
+  },
+  {
+   "id": "sip",
+   "group": "Security",
+   "title": "System Integrity Protection is enabled",
+   "cmd": "csrutil status",
+   "pass": "status: enabled\\.",
+   "fail": "status: (disabled|unknown)",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/security.html",
+   "why": "SIP is off or customised. This is not a Dortania post-install requirement: it is fine to leave it off while you need patches that require it, but re-enabling it once everything works is recommended.",
+   "fixes": [
+    {
+     "note": "SIP can only be changed from Recovery (or the OpenCore picker's recovery entry): open Terminal there and run `csrutil enable`, then restart. Also review NVRAM csr-active-config."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "serial",
+   "group": "System",
+   "title": "SMBIOS serial number (iServices)",
+   "cmd": "system_profiler SPHardwareDataType 2>&1 | grep -E 'Model Identifier|Serial Number'",
+   "pass": "Serial Number[^\\n]*:[ \\t]*(?!Not Available)\\S+",
+   "fail": "Serial Number[^\\n]*:[ \\t]*(Not Available)?[ \\t]*$",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/iservices.html",
+   "why": "The serial is missing. iMessage / FaceTime / iCloud need a valid, unused serial.",
+   "fixes": [
+    {
+     "note": "Generate a serial with macserial for your SMBIOS model and put Serial / MLB / SmUUID / ROM into PlatformInfo. Verify the serial at checkcoverage.apple.com: it should say it cannot be found / is not valid, not that it belongs to a real Mac."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "gpu",
+   "group": "Graphics",
+   "title": "GPU acceleration (Metal) is available",
+   "cmd": "system_profiler SPDisplaysDataType 2>&1",
+   "pass": "Metal[^\\n:]*:[ \\t]*(Supported|Metal)",
+   "fail": "\\A(?=[\\s\\S]*Chipset Model)(?![\\s\\S]*\\bMetal\\b)",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
+   "why": "A GPU is detected but Metal is not reported. Usually the GPU is unsupported or WhateverGreen / the required boot-args or device properties are missing.",
+   "fixes": [
+    {
+     "note": "Check that Lilu and WhateverGreen are installed and loaded, that the GPU is supported by your macOS version, and see the GPU patching pages of the guide."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "audio",
+   "group": "Audio",
+   "title": "An audio output device is present",
+   "cmd": "system_profiler SPAudioDataType 2>&1",
+   "pass": "Output Channels",
+   "fail": "\\A(?=[\\s\\S]*^Audio:)(?![\\s\\S]*Output)",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/audio.html",
+   "why": "No audio output device was found. AppleALC is probably missing or the layout-id does not match your codec.",
+   "fixes": [
+    {
+     "note": "Make sure AppleALC is in your EFI and set a layout-id for your codec (EFI Builder > Customize > Audio lists the options), or use the alcid= boot-arg. Rebuild and retest."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "bluetooth",
+   "group": "Wireless",
+   "title": "Bluetooth controller is detected",
+   "cmd": "system_profiler SPBluetoothDataType 2>&1",
+   "pass": "Chipset:|Address:",
+   "fail": "\\A(?=[\\s\\S]*^Bluetooth:)(?![\\s\\S]*(Chipset|Address))",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
+   "why": "No Bluetooth controller was found. That is fine if the machine has none; otherwise the firmware / kexts (BlueToolFixup, BrcmPatchRAM) may be missing.",
+   "fixes": [],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "wifi",
+   "group": "Wireless",
+   "title": "A Wi-Fi interface is present",
+   "cmd": "networksetup -listallhardwareports 2>&1",
+   "pass": "Hardware Port: (Wi-Fi|AirPort)",
+   "fail": "\\A(?=[\\s\\S]*Hardware Port:)(?![\\s\\S]*Hardware Port: (Wi-Fi|AirPort))",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
+   "why": "No Wi-Fi interface was found. That is fine if you have no Wi-Fi card; otherwise check the card is supported (itlwm / AirportItlwm, or a native Broadcom card).",
+   "fixes": [],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "usbmap",
+   "group": "USB",
+   "title": "A USB port map kext is loaded",
+   "cmd": "l=$(kmutil showloaded --list-only 2>/dev/null | wc -l | tr -d ' '); n=$(kmutil showloaded --list-only 2>/dev/null | grep -ciE 'USBToolBox|UTBMap|USBMap|USBPorts'); echo \"loaded=$l usbmap=$n\"",
+   "pass": "usbmap=[1-9]",
+   "fail": "loaded=[1-9]\\d* usbmap=0",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/usb/",
+   "why": "No USB map kext is loaded. Without a port map you can hit the 15-port limit and get unreliable USB, Bluetooth and sleep/wake.",
+   "fixes": [
+    {
+     "note": "Build a map with USBToolBox (Windows or macOS), add UTBMap.kext and USBToolBox.kext to your EFI, then rebuild."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "trim",
+   "group": "Storage",
+   "title": "TRIM is enabled on SSDs",
+   "cmd": "system_profiler SPNVMeDataType SPSerialATADataType 2>&1",
+   "pass": "TRIM Support:[ \\t]*Yes",
+   "fail": "TRIM Support:[ \\t]*No",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
+   "why": "A drive reports TRIM as off. Not covered by the Dortania guide; enabling TRIM on third-party SATA SSDs is common community advice and does not apply to hard disks.",
+   "fixes": [
+    {
+     "cmd": "sudo trimforce enable",
+     "why": "Enables TRIM for non-Apple SSDs. macOS warns about it and restarts."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  }
+ ]
+}

@@ -4,6 +4,38 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.6.0] — 2026-10-24
+
+### Added
+- Post-Install Check: CPU checks. Pick a Hardware Sniffer `Report.json` at the top of the window and two checks compare it with what macOS reports: **CPU name** (ignores the "13th Gen", "@ 3.6GHz", "n-Core" and "(R)/(TM)" decorations; variants such as i7-8700 vs i7-8700K are different CPUs) and **core count** (matches either physical cores or threads, since hybrid Intel CPUs differ). Without a report they say so instead of guessing.
+- A third check needs no report: the CPU name must not be empty, and where the name states a core count (for example AMD "16-Core") it must match the cores macOS sees, which catches wrong AMD core-count patches.
+- This cannot detect a CPU spoofed at the CPUID level; the explanation says so.
+
+## [1.5.1] — 2026-10-24
+
+### Added
+- A **Post-Install Check** button on the toolbar, right after **Build EFI**, with light and dark icons that follow the theme. It opens the same dialog as Tools ▸ Post-Install Check... (macOS only; on other systems the dialog explains that it must run on the Hackintosh).
+
+## [1.5.0] — 2026-10-24
+
+### Added
+- Post-Install Check: two more sleep/wake checks from the Dortania sleep guide. **NVMeFix** (an NVMe drive is present but NVMeFix.kext is not loaded) and **TSC sync** (a hint for server-class Xeon E5/E7/W/Scalable and X/XE Core CPUs without CpuTscSync, VoodooTSCSync or TSCAdjustReset; desktop Xeon E3 and Asus laptops are not covered).
+- The failed-sleep advice now mentions the guide's RTC section ("BIOS Restarted in Safemode" on Z3xx boards). That error only appears at shutdown, so it cannot be checked from a running system and is not a separate check.
+
+## [1.4.1] — 2026-10-24
+
+### Fixed
+- Post-Install Check: explanations now follow the Dortania sleep guide, which I read from its GitHub source. Before, several were written from memory (powernap, proximitywake, tcpkeepalive, standby), and the failed-sleep advice now lists the guide's main offenders (USB, GPUs, Thunderbolt, NICs, NVMe, CPU power management). `hibernatemode`, SIP and TRIM are not in the guide, so their text says so; for hibernation the guide uses `HibernateMode = None` in config.plist.
+- The "Dual-boot other systems" step in Next steps linked to a page that returns 404; it now opens the Dortania OpenCore Multiboot guide.
+
+## [1.4.0] — 2026-10-24
+
+### Added
+- Tools ▸ "Post-Install Check..." (macOS only): inspects the running Hackintosh against the Dortania post-install guide and lists what needs attention. Sleep/wake comes first (hibernatemode, standby, autopoweroff, powernap, proximitywake, tcpkeepalive, failed sleep/wake in the last 7 days, assertions blocking sleep), then SIP, GPU/Metal, audio, Bluetooth, Wi-Fi, USB map kext, TRIM and the SMBIOS serial.
+- A failing check shows why it matters and the exact fix commands, each with **Copy** and **Run in Terminal**. Run in Terminal opens Terminal.app with the command shown and waits for Return, so you review it and enter any sudo password yourself; the app never runs a fix on its own.
+- Checks are data (`src/postcheck/checks.json`), all read-only and sudo-free. A check whose output is missing or unexpected reports "Unknown" instead of guessing. "Copy report" puts the results on the clipboard for forum help.
+- On Windows/Linux the dialog explains that the check must run on the Hackintosh itself.
+
 ## [1.3.0] — 2026-10-24
 
 ### Added

@@ -67,6 +67,8 @@ SOURCES += \
     src/dlgPreset.cpp \
     src/dlgdatabase.cpp \
     src/dlgefibuilder.cpp \
+    src/dlgpostcheck.cpp \
+    src/postcheck/postcheck.cpp \
     src/efibuilder/efibuilder.cpp \
     src/efibuilder/kextfetch.cpp \
     src/dlgkernelpatch.cpp \
@@ -103,6 +105,8 @@ HEADERS += \
     src/BalloonTip.h \
     src/theme.h \
     src/dlgefibuilder.h \
+    src/dlgpostcheck.h \
+    src/postcheck/postcheck.h \
     src/efibuilder/efibuilder.h \
     src/efibuilder/kextfetch.h \
     src/Method.h \

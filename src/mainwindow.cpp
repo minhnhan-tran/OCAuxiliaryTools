@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include "dlgefibuilder.h"
+#include "dlgpostcheck.h"
 #include "theme.h"
 
 #include <fstream>
@@ -242,6 +243,11 @@ void MainWindow::openEfiBuilder() {
   dlg.exec();
 }
 
+void MainWindow::openPostCheck() {
+  dlgPostCheck dlg(this);
+  dlg.exec();
+}
+
 void MainWindow::initRecentFilesForToolBar() {
   // One-time: add the OpCore-Simplify style EFI builder to the Tools menu.
   if (!ui->menuTools->findChild<QAction*>("actionEfiBuilder")) {
@@ -249,6 +255,12 @@ void MainWindow::initRecentFilesForToolBar() {
     act->setObjectName("actionEfiBuilder");
     ui->menuTools->insertAction(ui->actionGenerateEFI, act);
     connect(act, &QAction::triggered, this, &MainWindow::openEfiBuilder);
+  }
+  if (!ui->menuTools->findChild<QAction*>("actionPostCheck")) {
+    QAction* chk = new QAction(tr("Post-Install Check..."), ui->menuTools);
+    chk->setObjectName("actionPostCheck");
+    ui->menuTools->insertAction(ui->actionGenerateEFI, chk);
+    connect(chk, &QAction::triggered, this, &MainWindow::openPostCheck);
   }
   if (!ui->menuHelp->findChild<QAction*>("actionPostInstall")) {
     QAction* post = new QAction(tr("OpenCore Post-Install Guide"), ui->menuHelp);
@@ -4948,6 +4960,7 @@ void MainWindow::init_ToolBarIcon() {
   if (Theme::isDark(red)) {
     btn0->setIcon(QIcon(":/icon/rp0.png"));
     if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi0.png"));
+    if (actionPostCheck) actionPostCheck->setIcon(QIcon(":/icon/postcheck0.png"));
     ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir0.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save0.png"));
     if (!blOCValidateError)
@@ -4964,6 +4977,7 @@ void MainWindow::init_ToolBarIcon() {
   } else {
     btn0->setIcon(QIcon(":/icon/rp.png"));
     if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi.png"));
+    if (actionPostCheck) actionPostCheck->setIcon(QIcon(":/icon/postcheck.png"));
     ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save.png"));
     if (!blOCValidateError)
@@ -5047,6 +5061,14 @@ void MainWindow::init_FileMenu() {
   actionBuildEfi->setIconVisibleInMenu(false);
   connect(actionBuildEfi, &QAction::triggered, this, &MainWindow::openEfiBuilder);
   ui->toolBar->addAction(actionBuildEfi);
+
+  // Post-Install Check (right after Build EFI)
+  actionPostCheck = new QAction(tr("Post-Install Check"), this);
+  actionPostCheck->setToolTip(tr("Post-Install Check (macOS only: run it on the Hackintosh)"));
+  actionPostCheck->setIcon(QIcon(Theme::icon("postcheck", red)));
+  actionPostCheck->setIconVisibleInMenu(false);
+  connect(actionPostCheck, &QAction::triggered, this, &MainWindow::openPostCheck);
+  ui->toolBar->addAction(actionPostCheck);
 
   // Open Dir
   if (mac || osx1012) ui->actionOpen_Directory->setIconVisibleInMenu(false);

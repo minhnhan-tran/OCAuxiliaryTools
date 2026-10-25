@@ -6,6 +6,7 @@
         <file alias="theme/material.qss">src/theme/material.qss</file>
         <file alias="efibuilder/efidata.json">src/efibuilder/efidata.json</file>
         <file alias="efibuilder/postinstall.json">src/efibuilder/postinstall.json</file>
+        <file alias="postcheck/checks.json">src/postcheck/checks.json</file>
         <file>icon/m1.png</file>
         <file>icon/m2.png</file>
         <file>icon/m3.png</file>
@@ -21,6 +22,8 @@
         <file>icon/db.png</file>
         <file>icon/efi.png</file>
         <file>icon/efi0.png</file>
+        <file>icon/postcheck.png</file>
+        <file>icon/postcheck0.png</file>
         <file>icon/esp.png</file>
         <file>icon/ov.png</file>
         <file>icon/opendb.png</file>

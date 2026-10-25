@@ -17,7 +17,7 @@
      "text": "Hide verbose boot and the boot picker once everything works. The Finalize options in EFI Builder do this for you."},
     {"title": "Harden security (SIP / Secure Boot / Vault)", "when": [], "url": "https://dortania.github.io/OpenCore-Post-Install/universal/security.html",
      "text": "Only after everything works: consider SecureBootModel and Vault. Keep a working EFI backup first."},
-    {"title": "Dual-boot other systems", "when": [], "url": "https://dortania.github.io/OpenCore-Post-Install/multiboot/",
+    {"title": "Dual-boot other systems", "when": [], "url": "https://dortania.github.io/OpenCore-Multiboot/",
      "text": "If you also run Windows or Linux, set up the boot entries and the clock fix."},
     {"title": "Plan updates", "when": [], "url": "https://dortania.github.io/OpenCore-Post-Install/universal/update.html",
      "text": "Back up your EFI before updating OpenCore, kexts or macOS."}
