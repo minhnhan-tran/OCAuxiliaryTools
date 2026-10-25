@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.14.1] — 2026-10-25
+
+### Fixed
+- Post-Install Check: the LAN router and internet checks asked macOS for "the" default route, which with some VPNs is a tunnel that has no gateway address, so a working network was reported as "not connected" (or the internet check was skipped). They now use the first IPv4 default route that has a real gateway.
+- The Ethernet-driver explanation said Aquantia controllers are supported natively; the kext guide lists AppleEthernetAquantiaAqtion.kext for them, so it now says that.
+
 ## [1.14.0] — 2026-10-25
 
 ### Added

@@ -542,7 +542,7 @@
    "skipWhy": "No wired Ethernet controller is on the PCI bus (a Wi-Fi-only Mac, or a USB / Thunderbolt adapter), so there is nothing to check.",
    "severity": "warn",
    "guide": "https://dortania.github.io/OpenCore-Install-Guide/ktext.html#ethernet",
-   "why": "macOS can see an Ethernet controller on the PCI bus, but no network interface was created for it, which means no driver is attached. Most Ethernet controllers need a third-party kext that the Dortania kext guide lists by controller (IntelMausi, AppleIGB, AtherosE2200Ethernet, RealtekRTL8111, LucyRTL8125Ethernet, AppleIGC); a few, such as Aquantia, are supported natively. Add the kext that matches your controller's vendor:device ID to EFI/OC/Kexts and Kernel > Add, then rebuild.",
+   "why": "macOS can see an Ethernet controller on the PCI bus, but no network interface was created for it, which means no driver is attached. Most Ethernet controllers need a third-party kext that the Dortania kext guide lists by controller (IntelMausi, AppleIGB, AtherosE2200Ethernet, RealtekRTL8111, LucyRTL8125Ethernet, AppleIGC); Aquantia controllers use Apple's own AppleEthernetAquantiaAqtion.kext. Add the kext that matches your controller's vendor:device ID to EFI/OC/Kexts and Kernel > Add, then rebuild.",
    "fixes": [
     {
      "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk 'function hx(s,  h){ if (match(s,/<[0-9a-f]+>/)) { h=substr(s,RSTART+1,4); return substr(h,3,2) substr(h,1,2) } return \"?\" } function flush(){ if (pci && cc==\"00000200\") { n++; if (hasif) w++; ids=ids \" \" vid \":\" did; lst=lst vid \":\" did (hasif ? \"\" : \" (no network interface)\") \"\\n\" } } /\\+-o .*<class /{ if ($0 ~ /<class IOPCIDevice,/) { flush(); pci=1; cc=\"\"; hasif=0; vid=\"?\"; did=\"?\" } else if ($0 ~ /<class IOEthernetInterface,/) { if (pci && cc==\"00000200\") hasif=1 } else { sub_=1 } ; next } pci && cc==\"\" && /\"class-code\" = </{ if (match($0,/<[0-9a-f]+>/)) cc=substr($0,RSTART+1,8) } pci && vid==\"?\" && /\"vendor-id\" = </{ vid=hx($0) } pci && did==\"?\" && /\"device-id\" = </{ did=hx($0) } END{ flush(); printf \"%s\", lst }'); if [ -z \"$o\" ]; then echo \"No wired Ethernet controller is visible on the PCI bus.\"; else echo \"Ethernet controllers (vendor:device):\"; echo \"$o\" | while read -r id rest; do v=${id%%:*}; case $v in 8086) n=Intel;; 10ec) n=Realtek;; 14e4) n=Broadcom;; 1969) n=Atheros/Killer;; 1d6a) n=Aquantia;; 11ab) n=Marvell;; *) n=\"vendor $v\";; esac; echo \"  $id  $n $rest\"; done; echo \"--- Ethernet kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE \"ethernet|mausi|rtl81|igb|igc|e1000\" | awk '{print $6}' | grep . || echo none; fi",
@@ -608,7 +608,7 @@
    "id": "lan-gateway",
    "group": "LAN",
    "title": "The router (default gateway) answers",
-   "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"gw=none\"; else i=$(route -n get default 2>/dev/null | awk '/interface:/{print $2; exit}'); l=$(ping -c 4 -W 1000 -q \"$g\" 2>&1 | sed -nE 's/.* ([0-9.]+)% packet loss.*/\\1/p'); a=$(arp -n \"$g\" 2>/dev/null | grep -cE ' at ([0-9a-f]{1,2}:){5}[0-9a-f]{1,2} '); echo \"gw=$g iface=$i loss=${l%%.*} arp=$a\"; fi",
+   "cmd": "g=$(netstat -rn -f inet 2>/dev/null | awk '$1==\"default\" && $2 ~ /^[0-9]+\\./ {print $2; exit}'); if [ -z \"$g\" ]; then echo \"gw=none\"; else i=$(netstat -rn -f inet 2>/dev/null | awk '$1==\"default\" && $2 ~ /^[0-9]+\\./ {print $4; exit}'); l=$(ping -c 4 -W 1000 -q \"$g\" 2>&1 | sed -nE 's/.* ([0-9.]+)% packet loss.*/\\1/p'); a=$(arp -n \"$g\" 2>/dev/null | grep -cE ' at ([0-9a-f]{1,2}:){5}[0-9a-f]{1,2} '); echo \"gw=$g iface=$i loss=${l%%.*} arp=$a\"; fi",
    "pass": "loss=0 arp=[1-9]",
    "fail": "gw=none|arp=0\\b|loss=(?!100\\b)[1-9]\\d*\\b",
    "severity": "warn",
@@ -616,7 +616,7 @@
    "why": "General advice, not from the Dortania guide: this pings the router macOS uses for its default route and checks that its hardware (ARP) address resolved. No default route means this Mac is not connected to any network; no ARP entry or lost packets point to a cable, driver, or switch problem. A router that ignores pings but resolves via ARP gives no verdict.",
    "fixes": [
     {
-     "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"No default route: this Mac is not connected to any network.\"; else i=$(route -n get default 2>/dev/null | awk '/interface:/{print $2; exit}'); echo \"Router (default gateway): $g via $i\"; echo \"This Mac: $(ipconfig getifaddr $i 2>/dev/null)\"; echo \"DNS servers: $(scutil --dns 2>/dev/null | awk '/nameserver\\[[0-9]+\\]/{print $3}' | sort -u | tr '\\n' ' ')\"; ping -c 4 -W 1000 -q \"$g\" 2>&1 | tail -2; fi",
+     "cmd": "g=$(netstat -rn -f inet 2>/dev/null | awk '$1==\"default\" && $2 ~ /^[0-9]+\\./ {print $2; exit}'); if [ -z \"$g\" ]; then echo \"No default route: this Mac is not connected to any network.\"; else i=$(netstat -rn -f inet 2>/dev/null | awk '$1==\"default\" && $2 ~ /^[0-9]+\\./ {print $4; exit}'); echo \"Router (default gateway): $g via $i\"; echo \"This Mac: $(ipconfig getifaddr $i 2>/dev/null)\"; echo \"DNS servers: $(scutil --dns 2>/dev/null | awk '/nameserver\\[[0-9]+\\]/{print $3}' | sort -u | tr '\\n' ' ')\"; ping -c 4 -W 1000 -q \"$g\" 2>&1 | tail -2; fi",
      "why": "Shows the router, this Mac's address, the DNS servers and the ping result. Nothing is changed.",
      "run": "user"
     },
@@ -631,7 +631,7 @@
    "id": "lan-internet",
    "group": "LAN",
    "title": "DNS works and the internet is reachable",
-   "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"gw=none\"; else d=$(dscacheutil -q host -a name apple.com 2>/dev/null | grep -c \"^ip_address\"); if [ \"$d\" -gt 0 ]; then D=ok; else D=fail; fi; h=$(curl -s --max-time 6 http://captive.apple.com/hotspot-detect.html 2>/dev/null | grep -c Success); if [ \"$h\" -gt 0 ]; then H=ok; else H=fail; fi; echo \"gw=$g dns=$D http=$H\"; fi",
+   "cmd": "g=$(netstat -rn -f inet 2>/dev/null | awk '$1==\"default\" && $2 ~ /^[0-9]+\\./ {print $2; exit}'); if [ -z \"$g\" ]; then echo \"gw=none\"; else d=$(dscacheutil -q host -a name apple.com 2>/dev/null | grep -c \"^ip_address\"); if [ \"$d\" -gt 0 ]; then D=ok; else D=fail; fi; h=$(curl -s --max-time 6 http://captive.apple.com/hotspot-detect.html 2>/dev/null | grep -c Success); if [ \"$h\" -gt 0 ]; then H=ok; else H=fail; fi; echo \"gw=$g dns=$D http=$H\"; fi",
    "pass": "dns=ok http=ok",
    "fail": "dns=fail|http=fail",
    "skip": "gw=none",
@@ -641,7 +641,7 @@
    "why": "General advice, not from the Dortania guide: this resolves apple.com and loads captive.apple.com, the same page macOS itself uses to detect a working internet connection (it contacts Apple, nothing else). A failed DNS lookup means the router or DNS server is the problem; a failed page load with working DNS can mean a captive login portal, a firewall, or no internet access.",
    "fixes": [
     {
-     "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"No default route: this Mac is not connected to any network.\"; else echo \"DNS lookup of apple.com:\"; dscacheutil -q host -a name apple.com 2>/dev/null | grep -E \"^(name|ip_address)\" | head -3 || true; c=$(curl -s -o /tmp/.ocat_net.$$ -w \"%{http_code}\" --max-time 6 http://captive.apple.com/hotspot-detect.html 2>/dev/null); echo \"HTTP check (captive.apple.com): code ${c:-none}\"; if [ \"$c\" = 200 ] && ! grep -q Success /tmp/.ocat_net.$$ 2>/dev/null; then echo \"Reply was not Apple's: a login / captive portal page may be in the way.\"; fi; rm -f /tmp/.ocat_net.$$; fi",
+     "cmd": "g=$(netstat -rn -f inet 2>/dev/null | awk '$1==\"default\" && $2 ~ /^[0-9]+\\./ {print $2; exit}'); if [ -z \"$g\" ]; then echo \"No default route: this Mac is not connected to any network.\"; else echo \"DNS lookup of apple.com:\"; dscacheutil -q host -a name apple.com 2>/dev/null | grep -E \"^(name|ip_address)\" | head -3 || true; c=$(curl -s -o /tmp/.ocat_net.$$ -w \"%{http_code}\" --max-time 6 http://captive.apple.com/hotspot-detect.html 2>/dev/null); echo \"HTTP check (captive.apple.com): code ${c:-none}\"; if [ \"$c\" = 200 ] && ! grep -q Success /tmp/.ocat_net.$$ 2>/dev/null; then echo \"Reply was not Apple's: a login / captive portal page may be in the way.\"; fi; rm -f /tmp/.ocat_net.$$; fi",
      "why": "Shows the DNS lookup of apple.com and the result of the connectivity page. Nothing is changed.",
      "run": "user"
     },
