@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.12.1] — 2026-10-25
+
+### Fixed
+- Post-Install Check: the laptop test behind the keyboard/trackpad checks relied on a MacBook model name or a working battery driver, so a laptop that uses an iMac/Mac mini SMBIOS (common on Hackintosh) without a battery kext was wrongly Skipped as "not a laptop". It now also counts the firmware's ACPI lid or battery device (PNP0C0D / PNP0C0A).
+
 ## [1.12.0] — 2026-10-25
 
 ### Added
