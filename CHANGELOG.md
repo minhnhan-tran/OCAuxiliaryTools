@@ -4,6 +4,16 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.14.0] — 2026-10-25
+
+### Added
+- Post-Install Check: a new **LAN** group with five checks.
+  - **The Ethernet controller has a working driver** (Dortania kext guide): fails when the PCI bus has an Ethernet controller but no network interface was created for it. The fix lists the controller's vendor:device ID, its vendor name and any Ethernet kexts that are loaded.
+  - **en0 exists and is marked built-in** (Dortania "Fixing en0"): Apple services need it. The fix shows en0 and the network ports, and the note explains the network-settings reset and the `built-in` property.
+  - **The wired link runs at gigabit speed or faster, full duplex**, **the router answers** (ping and ARP), and **DNS works and the internet is reachable**. These three are general advice, not from the guide, and say so. The internet check loads Apple's own connectivity page (captive.apple.com) and nothing else.
+- Each check has a **Run here** script that shows what the check saw. They only read information.
+- The checks are Skipped when they do not apply: no wired controller, no cable, or no network connection at all.
+
 ## [1.13.1] — 2026-10-25
 
 ### Fixed

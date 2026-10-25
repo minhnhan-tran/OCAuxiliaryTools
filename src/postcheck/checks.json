@@ -532,6 +532,127 @@
    "needsReport": false
   },
   {
+   "id": "lan-nic",
+   "group": "LAN",
+   "title": "The Ethernet controller has a working driver",
+   "cmd": "ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk 'function hx(s,  h){ if (match(s,/<[0-9a-f]+>/)) { h=substr(s,RSTART+1,4); return substr(h,3,2) substr(h,1,2) } return \"?\" } function flush(){ if (pci && cc==\"00000200\") { n++; if (hasif) w++; ids=ids \" \" vid \":\" did; lst=lst vid \":\" did (hasif ? \"\" : \" (no network interface)\") \"\\n\" } } /\\+-o .*<class /{ if ($0 ~ /<class IOPCIDevice,/) { flush(); pci=1; cc=\"\"; hasif=0; vid=\"?\"; did=\"?\" } else if ($0 ~ /<class IOEthernetInterface,/) { if (pci && cc==\"00000200\") hasif=1 } else { sub_=1 } ; next } pci && cc==\"\" && /\"class-code\" = </{ if (match($0,/<[0-9a-f]+>/)) cc=substr($0,RSTART+1,8) } pci && vid==\"?\" && /\"vendor-id\" = </{ vid=hx($0) } pci && did==\"?\" && /\"device-id\" = </{ did=hx($0) } END{ flush(); printf \"nic=%d withif=%d ids=%s\\n\", n, w, (ids==\"\"?\"-\":ids) }'",
+   "pass": "nic=[1-9]\\d* withif=[1-9]",
+   "fail": "nic=[1-9]\\d* withif=0\\b",
+   "skip": "nic=0\\b",
+   "skipWhy": "No wired Ethernet controller is on the PCI bus (a Wi-Fi-only Mac, or a USB / Thunderbolt adapter), so there is nothing to check.",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Install-Guide/ktext.html#ethernet",
+   "why": "macOS can see an Ethernet controller on the PCI bus, but no network interface was created for it, which means no driver is attached. Most Ethernet controllers need a third-party kext that the Dortania kext guide lists by controller (IntelMausi, AppleIGB, AtherosE2200Ethernet, RealtekRTL8111, LucyRTL8125Ethernet, AppleIGC); a few, such as Aquantia, are supported natively. Add the kext that matches your controller's vendor:device ID to EFI/OC/Kexts and Kernel > Add, then rebuild.",
+   "fixes": [
+    {
+     "cmd": "o=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk 'function hx(s,  h){ if (match(s,/<[0-9a-f]+>/)) { h=substr(s,RSTART+1,4); return substr(h,3,2) substr(h,1,2) } return \"?\" } function flush(){ if (pci && cc==\"00000200\") { n++; if (hasif) w++; ids=ids \" \" vid \":\" did; lst=lst vid \":\" did (hasif ? \"\" : \" (no network interface)\") \"\\n\" } } /\\+-o .*<class /{ if ($0 ~ /<class IOPCIDevice,/) { flush(); pci=1; cc=\"\"; hasif=0; vid=\"?\"; did=\"?\" } else if ($0 ~ /<class IOEthernetInterface,/) { if (pci && cc==\"00000200\") hasif=1 } else { sub_=1 } ; next } pci && cc==\"\" && /\"class-code\" = </{ if (match($0,/<[0-9a-f]+>/)) cc=substr($0,RSTART+1,8) } pci && vid==\"?\" && /\"vendor-id\" = </{ vid=hx($0) } pci && did==\"?\" && /\"device-id\" = </{ did=hx($0) } END{ flush(); printf \"%s\", lst }'); if [ -z \"$o\" ]; then echo \"No wired Ethernet controller is visible on the PCI bus.\"; else echo \"Ethernet controllers (vendor:device):\"; echo \"$o\" | while read -r id rest; do v=${id%%:*}; case $v in 8086) n=Intel;; 10ec) n=Realtek;; 14e4) n=Broadcom;; 1969) n=Atheros/Killer;; 1d6a) n=Aquantia;; 11ab) n=Marvell;; *) n=\"vendor $v\";; esac; echo \"  $id  $n $rest\"; done; echo \"--- Ethernet kexts loaded:\"; kmutil showloaded --list-only 2>/dev/null | grep -iE \"ethernet|mausi|rtl81|igb|igc|e1000\" | awk '{print $6}' | grep . || echo none; fi",
+     "why": "Lists the Ethernet controllers with their vendor:device IDs and any Ethernet kexts that are loaded. Nothing is changed. Look the ID up in the Ethernet section of the kext guide.",
+     "run": "user"
+    },
+    {
+     "note": "Add the Ethernet kext that matches your controller (see the guide's Ethernet list) to EFI/OC/Kexts and Kernel > Add, then rebuild and reboot."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "lan-en0",
+   "group": "LAN",
+   "title": "en0 exists and is marked built-in (needed for Apple services)",
+   "cmd": "ioreg -rxc IOEthernetInterface -w0 2>/dev/null | awk 'function flush(){ if (nm==\"en0\") r=(bi==\"Yes\"?\"builtin\":\"notbuiltin\") } /^\\+-o /{ flush(); nm=\"\"; bi=\"\" } /\"BSD Name\" = /{ if (nm==\"\") { nm=$NF; gsub(/\"/,\"\",nm) } } /\"IOBuiltin\" = /{ if (bi==\"\") bi=$NF } END{ flush(); print \"en0=\" (r==\"\"?\"missing\":r) }'",
+   "pass": "en0=builtin",
+   "fail": "en0=(notbuiltin|missing)",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/iservices.html#fixing-en0",
+   "why": "Apple services such as iMessage, FaceTime and the App Store expect a network interface called en0 that macOS treats as built-in. The Dortania guide says it does not matter whether en0 is Wi-Fi, Ethernet or Thunderbolt, only that it is present and built-in. If it is missing, the guide resets the macOS network settings (the two files below) and, if that does not help, adds NullEthernet. If it is present but not built-in, set the built-in property on your Ethernet controller in config.plist.",
+   "fixes": [
+    {
+     "cmd": "echo \"$(ioreg -rxc IOEthernetInterface -w0 2>/dev/null | awk 'function flush(){ if (nm==\"en0\") r=(bi==\"Yes\"?\"builtin\":\"notbuiltin\") } /^\\+-o /{ flush(); nm=\"\"; bi=\"\" } /\"BSD Name\" = /{ if (nm==\"\") { nm=$NF; gsub(/\"/,\"\",nm) } } /\"IOBuiltin\" = /{ if (bi==\"\") bi=$NF } END{ flush(); print \"en0=\" (r==\"\"?\"missing\":r) }')\"; echo \"--- Hardware ports:\"; networksetup -listallhardwareports 2>/dev/null | grep -E \"^(Hardware Port|Device)\" | paste - - | sed \"s/Hardware Port: //; s/Device: /-> /\" | head -8",
+     "why": "Shows whether en0 exists and is built-in, and lists the network ports. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "en0 missing: delete /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist and preferences.plist (this resets all your network settings), reboot and check again; if it is still missing, add NullEthernet.kext and SSDT-RMNE. en0 not built-in: in config.plist > DeviceProperties > Add, under your Ethernet controller's PciRoot (Hackintool > PCI shows it), add the key built-in, type Data, value 01."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "lan-speed",
+   "group": "LAN",
+   "title": "The wired link runs at gigabit speed or faster, full duplex",
+   "cmd": "p=$(networksetup -listallhardwareports 2>/dev/null | awk '/^Hardware Port:/{ok=($0 ~ /Ethernet|LAN/ && $0 !~ /Wi-?Fi|AirPort|Bridge/)} /^Device:/{ if (ok) print $2 }'); i=\"\"; for d in $p; do [ -z \"$i\" ] && i=$d; ifconfig $d 2>/dev/null | grep -q 'status: active' && { i=$d; break; }; done; if [ -z \"$i\" ]; then echo \"link=none\"; elif ifconfig $i 2>/dev/null | grep -q 'status: active'; then s=$(ifconfig $i | sed -nE 's/.*media: .*\\(([0-9.]+)(G?)[Bb]ase.*/\\1 \\2/p' | head -1 | awk '{ v=$1; if ($2==\"G\") v=v*1000; if (v!=\"\") printf \"%d\", v }'); d=$(ifconfig $i | grep -o 'full-duplex\\|half-duplex' | head -1); echo \"link=active iface=$i speed=${s:-?} duplex=${d:-?}\"; else echo \"link=inactive iface=$i\"; fi",
+   "pass": "link=active iface=\\S+ speed=\\d{4,} duplex=full-duplex",
+   "fail": "link=active iface=\\S+ speed=(10|100) |duplex=half-duplex",
+   "skip": "link=(none|inactive)",
+   "skipWhy": "There is no active wired connection (no Ethernet port, or no cable plugged in), so there is nothing to test.",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Install-Guide/ktext.html#ethernet",
+   "why": "General advice, not from the Dortania guide: a wired link that negotiated 10 or 100 Mbps, or half duplex, usually points to a bad cable or port, or to a driver that is not talking to the controller properly. A gigabit (or faster) controller should link at 1000 Mbps full duplex.",
+   "fixes": [
+    {
+     "cmd": "l=$(p=$(networksetup -listallhardwareports 2>/dev/null | awk '/^Hardware Port:/{ok=($0 ~ /Ethernet|LAN/ && $0 !~ /Wi-?Fi|AirPort|Bridge/)} /^Device:/{ if (ok) print $2 }'); i=\"\"; for d in $p; do [ -z \"$i\" ] && i=$d; ifconfig $d 2>/dev/null | grep -q 'status: active' && { i=$d; break; }; done; if [ -z \"$i\" ]; then echo \"link=none\"; elif ifconfig $i 2>/dev/null | grep -q 'status: active'; then s=$(ifconfig $i | sed -nE 's/.*media: .*\\(([0-9.]+)(G?)[Bb]ase.*/\\1 \\2/p' | head -1 | awk '{ v=$1; if ($2==\"G\") v=v*1000; if (v!=\"\") printf \"%d\", v }'); d=$(ifconfig $i | grep -o 'full-duplex\\|half-duplex' | head -1); echo \"link=active iface=$i speed=${s:-?} duplex=${d:-?}\"; else echo \"link=inactive iface=$i\"; fi); echo \"$l\"; i=$(echo \"$l\" | sed -nE \"s/.*iface=([a-z0-9]+).*/\\1/p\"); if [ -n \"$i\" ]; then ifconfig $i 2>/dev/null | grep -E \"media:|status:\" | sed \"s/^[[:space:]]*//\"; fi",
+     "why": "Shows the Ethernet link status, negotiated speed and duplex. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "Try another cable (Cat 5e or better) and another switch / router port; if the speed stays low, check that you are using the right Ethernet kext and a current version of it."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
+   "id": "lan-gateway",
+   "group": "LAN",
+   "title": "The router (default gateway) answers",
+   "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"gw=none\"; else i=$(route -n get default 2>/dev/null | awk '/interface:/{print $2; exit}'); l=$(ping -c 4 -W 1000 -q \"$g\" 2>&1 | sed -nE 's/.* ([0-9.]+)% packet loss.*/\\1/p'); a=$(arp -n \"$g\" 2>/dev/null | grep -cE ' at ([0-9a-f]{1,2}:){5}[0-9a-f]{1,2} '); echo \"gw=$g iface=$i loss=${l%%.*} arp=$a\"; fi",
+   "pass": "loss=0 arp=[1-9]",
+   "fail": "gw=none|arp=0\\b|loss=(?!100\\b)[1-9]\\d*\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/iservices.html#fixing-en0",
+   "why": "General advice, not from the Dortania guide: this pings the router macOS uses for its default route and checks that its hardware (ARP) address resolved. No default route means this Mac is not connected to any network; no ARP entry or lost packets point to a cable, driver, or switch problem. A router that ignores pings but resolves via ARP gives no verdict.",
+   "fixes": [
+    {
+     "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"No default route: this Mac is not connected to any network.\"; else i=$(route -n get default 2>/dev/null | awk '/interface:/{print $2; exit}'); echo \"Router (default gateway): $g via $i\"; echo \"This Mac: $(ipconfig getifaddr $i 2>/dev/null)\"; echo \"DNS servers: $(scutil --dns 2>/dev/null | awk '/nameserver\\[[0-9]+\\]/{print $3}' | sort -u | tr '\\n' ' ')\"; ping -c 4 -W 1000 -q \"$g\" 2>&1 | tail -2; fi",
+     "why": "Shows the router, this Mac's address, the DNS servers and the ping result. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "Check the cable and the router; renew the address in System Settings > Network > (your connection) > Details > TCP/IP > Renew DHCP Lease. If nothing is connected at all, see the Ethernet driver check above."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "lan-internet",
+   "group": "LAN",
+   "title": "DNS works and the internet is reachable",
+   "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"gw=none\"; else d=$(dscacheutil -q host -a name apple.com 2>/dev/null | grep -c \"^ip_address\"); if [ \"$d\" -gt 0 ]; then D=ok; else D=fail; fi; h=$(curl -s --max-time 6 http://captive.apple.com/hotspot-detect.html 2>/dev/null | grep -c Success); if [ \"$h\" -gt 0 ]; then H=ok; else H=fail; fi; echo \"gw=$g dns=$D http=$H\"; fi",
+   "pass": "dns=ok http=ok",
+   "fail": "dns=fail|http=fail",
+   "skip": "gw=none",
+   "skipWhy": "This Mac has no default route (not connected to a network); the router check reports that.",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/iservices.html#fixing-en0",
+   "why": "General advice, not from the Dortania guide: this resolves apple.com and loads captive.apple.com, the same page macOS itself uses to detect a working internet connection (it contacts Apple, nothing else). A failed DNS lookup means the router or DNS server is the problem; a failed page load with working DNS can mean a captive login portal, a firewall, or no internet access.",
+   "fixes": [
+    {
+     "cmd": "g=$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}'); if [ -z \"$g\" ]; then echo \"No default route: this Mac is not connected to any network.\"; else echo \"DNS lookup of apple.com:\"; dscacheutil -q host -a name apple.com 2>/dev/null | grep -E \"^(name|ip_address)\" | head -3 || true; c=$(curl -s -o /tmp/.ocat_net.$$ -w \"%{http_code}\" --max-time 6 http://captive.apple.com/hotspot-detect.html 2>/dev/null); echo \"HTTP check (captive.apple.com): code ${c:-none}\"; if [ \"$c\" = 200 ] && ! grep -q Success /tmp/.ocat_net.$$ 2>/dev/null; then echo \"Reply was not Apple's: a login / captive portal page may be in the way.\"; fi; rm -f /tmp/.ocat_net.$$; fi",
+     "why": "Shows the DNS lookup of apple.com and the result of the connectivity page. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "Try another DNS server (System Settings > Network > Details > DNS), check the router has internet, and open a browser to see whether a login page is required."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
    "id": "usbmap",
    "group": "USB",
    "title": "USB ports have a port map applied",
