@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.18.0] — 2026-10-26
+
+### Added
+- EFI Builder: GPU selection, ported from OpCore Simplify. When the report has several GPUs, a "GPU" box lists the valid combinations (APU, Navi 22 and the rest are kept apart to avoid kext conflicts) with the macOS range each supports. The plan, SMBIOS, kexts and macOS list follow the chosen combination, and GPUs that are not picked get `disable-gpu` in DeviceProperties. The default keeps as many GPUs as are valid together, so a report with a discrete GPU plus an Intel iGPU behaves as before unless you change it.
+
 ## [1.17.3] — 2026-10-25
 
 ### Fixed

@@ -1053,4 +1053,89 @@ int pruneUnused(QVariantMap* config) {
   return removed;
 }
 
+QList<GpuCombo> gpuCombinations(const QJsonObject& r, const Compatibility& c) {
+  const QJsonObject gpus = r["GPU"].toObject();
+  const QStringList names = gpus.keys();
+  if (names.size() < 2) return {};
+  QList<int> apu, navi22, navi, intel, other;
+  for (int i = 0; i < names.size(); ++i) {
+    const QJsonObject g = gpus[names[i]].toObject();
+    const QString man = g["Manufacturer"].toString(), type = g["Device Type"].toString(),
+                  code = g["Codename"].toString();
+    if (man == "AMD") {
+      if (type == "Integrated GPU") { apu << i; continue; }
+      if (type == "Discrete GPU" && code.startsWith("Navi")) { (code == "Navi 22" ? navi22 : navi) << i; continue; }
+    } else if (man == "Intel") { intel << i; continue; }
+    other << i;
+  }
+  auto cat = [](QList<int> a, const QList<int>& b) { a += b; return a; };
+  QList<QList<int>> groups;
+  if (!apu.isEmpty()) groups << cat(apu, other);
+  if (!navi22.isEmpty()) groups << cat(navi22, other);
+  if (!navi.isEmpty() || !intel.isEmpty() || !other.isEmpty()) groups << cat(cat(navi, intel), other);
+
+  QHash<QString, Range> rng;
+  for (const auto& d : c.devices) if (d.kind == "GPU") rng[d.name] = d.range;
+  QList<GpuCombo> out;
+  QSet<QString> seen;
+  for (const QList<int>& grp : groups) {
+    QList<int> g = grp;
+    std::sort(g.begin(), g.end());
+    for (int mask = 1; mask < (1 << g.size()); ++mask) {
+      GpuCombo gc;
+      bool first = true;
+      for (int j = 0; j < g.size(); ++j) {
+        if (!((mask >> j) & 1)) continue;
+        const QString n = names[g[j]];
+        gc.names << n;
+        const Range one = rng.value(n);
+        if (!one.supported()) continue;
+        if (first) { gc.range = one; first = false; continue; }
+        // Intersection: lowest top version, highest bottom version.
+        if (darwinLess(one.maxV, gc.range.maxV)) gc.range.maxV = one.maxV;
+        if (darwinLess(gc.range.minV, one.minV)) gc.range.minV = one.minV;
+      }
+      const QString key = gc.names.join('\n');
+      if (seen.contains(key)) continue;
+      seen.insert(key);
+      out << gc;
+    }
+  }
+  std::sort(out.begin(), out.end(), [](const GpuCombo& a, const GpuCombo& b) {
+    if (a.names.size() != b.names.size()) return a.names.size() < b.names.size();
+    return a.names.join('\n') < b.names.join('\n');
+  });
+  return out;
+}
+
+QJsonObject withGpus(const QJsonObject& r, const QStringList& keep) {
+  QJsonObject out = r, g;
+  const QJsonObject all = r["GPU"].toObject();
+  for (auto it = all.begin(); it != all.end(); ++it)
+    if (keep.contains(it.key())) g[it.key()] = it.value();
+  out["GPU"] = g;
+  return out;
+}
+
+int disableGpus(QVariantMap* config, const QJsonObject& full, const QJsonObject& active) {
+  const QJsonObject all = full["GPU"].toObject(), kept = active["GPU"].toObject();
+  QVariantMap dp = config->value("DeviceProperties").toMap();
+  QVariantMap add = dp.value("Add").toMap();
+  int n = 0;
+  for (auto it = all.begin(); it != all.end(); ++it) {
+    if (kept.contains(it.key())) continue;
+    const QString path = it.value().toObject()["PCI Path"].toString();
+    if (path.isEmpty()) continue;
+    QVariantMap dev = add.value(path).toMap();
+    dev["disable-gpu"] = true;
+    add[path] = dev;
+    ++n;
+  }
+  if (n) {
+    dp["Add"] = add;
+    config->insert("DeviceProperties", dp);
+  }
+  return n;
+}
+
 }  // namespace EfiBuilder

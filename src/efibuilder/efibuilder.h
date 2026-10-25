@@ -127,6 +127,24 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan,
 // Returns how many entries were removed. Unrelated sections are untouched.
 int pruneUnused(QVariantMap* config);
 
+// One selectable GPU combination (OpCore Simplify "GPU combination").
+struct GpuCombo {
+  QStringList names;  // GPU names as keys of report["GPU"]
+  Range range;        // macOS range supported by all of them together
+};
+
+// Valid GPU combinations, as OpCore Simplify offers them when the report has
+// several GPUs (APU / Navi 22 / the rest are kept apart to avoid kext conflicts).
+// Sorted by size then name; empty when the report has fewer than 2 GPUs.
+QList<GpuCombo> gpuCombinations(const QJsonObject& report, const Compatibility& c);
+
+// Copy of the report that keeps only the named GPUs.
+QJsonObject withGpus(const QJsonObject& report, const QStringList& keep);
+
+// Adds disable-gpu to DeviceProperties for every GPU in `full` that is missing
+// from `active`. Returns how many were disabled.
+int disableGpus(QVariantMap* config, const QJsonObject& full, const QJsonObject& active);
+
 // macOS releases (name, darwin major) usable within a compat range.
 QList<QPair<QString, int>> macosChoices(const Compatibility& compat);
 QString macosName(int darwinMajor);

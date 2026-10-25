@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QDialog>
 #include <QJsonObject>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTextBrowser>
@@ -25,6 +26,7 @@ class dlgEfiBuilder : public QDialog {
   void build();
   void customize();
   void browseAcpi();
+  void refresh();
   void showNextSteps(const QJsonObject& rep, const EfiBuilder::Plan& plan);
 
  private:
@@ -40,7 +42,11 @@ class dlgEfiBuilder : public QDialog {
   QComboBox* cboMacos;
   QTextBrowser* view;
 
-  QJsonObject report;
+  QJsonObject fullReport;  // as loaded
+  QJsonObject report;      // fullReport minus the GPUs the user did not pick
+  QLabel* lblGpu;
+  QComboBox* cboGpu;
+  QList<EfiBuilder::GpuCombo> gpuCombos;
   EfiBuilder::Compatibility compat;
   bool analyzed = false;
   // User overrides (empty = use the automatic pick). Reset on every analyze.

@@ -109,6 +109,16 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   finRow->addWidget(chkCanopy);
   finRow->addStretch(1);
 
+  // GPU combination (only shown when the report has several GPUs).
+  lblGpu = new QLabel(tr("GPU:"));
+  cboGpu = new QComboBox;
+  cboGpu->setToolTip(tr("GPUs you do not pick are disabled with disable-gpu. Several active GPUs can cause kext conflicts in macOS."));
+  lblGpu->hide();
+  cboGpu->hide();
+  QHBoxLayout* gpuRow = new QHBoxLayout;
+  gpuRow->addWidget(lblGpu);
+  gpuRow->addWidget(cboGpu, 1);
+
   QHBoxLayout* bottom = new QHBoxLayout;
   bottom->addWidget(new QLabel(tr("Target macOS:")));
   bottom->addWidget(cboMacos, 1);
@@ -123,6 +133,7 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   lay->addLayout(top);
   lay->addLayout(acpiRow);
   lay->addWidget(view, 1);
+  lay->addLayout(gpuRow);
   lay->addLayout(finRow);
   lay->addLayout(bottom);
 
@@ -132,6 +143,7 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   connect(editAcpi, &QLineEdit::returnPressed, this, &dlgEfiBuilder::analyze);
   connect(editReport, &QLineEdit::returnPressed, this, &dlgEfiBuilder::analyze);
   connect(btnBuild, &QPushButton::clicked, this, &dlgEfiBuilder::build);
+  connect(cboGpu, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] { if (!fullReport.isEmpty()) refresh(); });
   connect(btnCustomize, &QPushButton::clicked, this, &dlgEfiBuilder::customize);
   // A different macOS target changes which models/kexts are valid.
   connect(cboMacos, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] {
@@ -200,13 +212,54 @@ void dlgEfiBuilder::analyze() {
   kextsOverridden = false;
   kextOverride.clear();
 
+  gpuCombos.clear();
+  { QSignalBlocker b(cboGpu); cboGpu->clear(); }
+  lblGpu->hide();
+  cboGpu->hide();
+  fullReport = QJsonObject();
   QStringList errors;
-  if (!EfiBuilder::loadReport(editReport->text().trimmed(), &report, &errors)) {
+  if (!EfiBuilder::loadReport(editReport->text().trimmed(), &fullReport, &errors)) {
     QString h = "<h3>" + esc(tr("Invalid report")) + "</h3><ul>";
     for (const QString& e : errors) h += "<li>" + esc(e) + "</li>";
     setResult(h + "</ul>");
     return;
   }
+
+  // Several GPUs: let the user pick a combination, like OpCore Simplify.
+  report = fullReport;
+  compat = EfiBuilder::checkCompatibility(fullReport);
+  gpuCombos = EfiBuilder::gpuCombinations(fullReport, compat);
+  if (!gpuCombos.isEmpty()) {
+    QSignalBlocker b(cboGpu);
+    int best = 0;
+    for (int i = 0; i < gpuCombos.size(); ++i) {
+      const auto& gc = gpuCombos[i];
+      const QString rg = gc.range.supported()
+          ? tr("up to %1").arg(EfiBuilder::macosName(EfiBuilder::darwinMajor(gc.range.maxV)))
+          : tr("unsupported");
+      cboGpu->addItem(gc.names.join(" + ") + "   (" + rg + ")");
+      if (gc.names.size() > gpuCombos[best].names.size()) best = i;  // default: keep as many as are valid
+    }
+    cboGpu->setCurrentIndex(best);
+    lblGpu->show();
+    cboGpu->show();
+  }
+  refresh();
+}
+
+void dlgEfiBuilder::refresh() {
+  analyzed = false;
+  btnBuild->setEnabled(false);
+  btnCustomize->setEnabled(false);
+  cboMacos->clear();
+  smbiosOverride.clear();
+  audioOverride = 0;
+  kextsOverridden = false;
+  kextOverride.clear();
+  report = fullReport;
+  const int gi = cboGpu->currentIndex();
+  if (!gpuCombos.isEmpty() && gi >= 0 && gi < gpuCombos.size())
+    report = EfiBuilder::withGpus(fullReport, gpuCombos[gi].names);
 
   compat = EfiBuilder::checkCompatibility(report);
   const QJsonObject cpu = report["CPU"].toObject();
@@ -336,6 +389,9 @@ void dlgEfiBuilder::build() {
 
   QStringList missing;
   config = EfiBuilder::applyPlan(config, plan, available, &missing, disableKexts, kextDir);
+  // GPUs the user did not pick get disable-gpu, so macOS ignores them.
+  const int gpusOff = EfiBuilder::disableGpus(&config, fullReport, report);
+  if (gpusOff > 0) plan.notes << tr("%1 GPU(s) not selected: disabled with disable-gpu in DeviceProperties.").arg(gpusOff);
   // Keep the config and the EFI folder to what this build uses: no disabled sample rows.
   EfiBuilder::pruneUnused(&config);
   const bool serials = applySerials(&config, plan.smbios, dbDir);
