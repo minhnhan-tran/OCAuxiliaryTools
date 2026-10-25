@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.8.2] — 2026-10-25
+
+### Fixed
+- CI: the MinGW workflow now uses `actions/upload-artifact@v4` and `actions/checkout@v4`; v2 is rejected by GitHub, so the job failed at setup.
+
 ## [1.8.1] — 2026-10-25
 
 ### Fixed
