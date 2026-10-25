@@ -673,6 +673,24 @@
    ],
    "timeoutSec": 30,
    "needsReport": false
+  },
+  {
+   "id": "windows-time",
+   "group": "Dual-boot",
+   "title": "Windows keeps its clock in UTC (dual-boot time sync)",
+   "cmd": "h=\"\"; for v in /Volumes/*; do if [ -f \"$v/Windows/System32/config/SYSTEM\" ]; then h=\"$v/Windows/System32/config/SYSTEM\"; break; fi; done; w=$(diskutil list 2>/dev/null | grep -ciE 'Windows Recovery|Microsoft Reserved|BOOTCAMP'); if [ -z \"$h\" ]; then echo \"windows=$w hive=none\"; else r=$(perl -0777 -ne 'if (/vk\\x13\\x00(.{4})(.{4})(.{4})(.{2})(.{2})RealTimeIsUniversal/s) { my $sz=unpack(\"V\",$1); my $of=unpack(\"V\",$2); if ($sz & 0x80000000) { print $of } elsif (($sz & 0xffff) >= 4 && 4096+$of+8 <= length($_)) { print unpack(\"V\", substr($_, 4096+$of+4, 4)) } else { print \"unreadable\" } } elsif (/R\\0e\\0a\\0l\\0T\\0i\\0m\\0e\\0I\\0s\\0U\\0n\\0i\\0v\\0e\\0r\\0s\\0a\\0l\\0/) { print \"unreadable\" } else { print \"absent\" }' \"$h\" 2>/dev/null); if [ \"$r\" = absent ] && grep -qa RealTimeIsUniversal \"$h.LOG1\" \"$h.LOG2\" 2>/dev/null; then r=unreadable; fi; echo \"windows=$w hive=found utc=${r:-unreadable}\"; fi",
+   "pass": "hive=found utc=1\\b",
+   "fail": "hive=found utc=(0|absent)\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Install-Guide/troubleshooting/extended/post-issues.html#time-inconsistency-between-macos-and-windows",
+   "why": "Windows is installed on this machine but its registry does not set RealTimeIsUniversal. macOS keeps the hardware clock in universal time (UTC) while Windows keeps it in local time, so every time you switch OS the clock is wrong by your timezone offset until it re-syncs. The Dortania guide recommends changing Windows rather than macOS, as it is far less destructive: install the Boot Camp utilities, or set the registry value below. This reads the offline Windows registry of the mounted Windows volume, which can be out of date if Windows has not fully shut down (turn Fast Startup off).",
+   "fixes": [
+    {
+     "note": "In Windows, open Command Prompt as administrator and run: reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation\" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f   Then restart Windows and use Settings > Time & language > Sync now once. (Or install the Boot Camp utilities, as the guide suggests.)"
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
   }
  ]
 }

@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.10.0] — 2026-10-25
+
+### Added
+- Post-Install Check: **Windows dual-boot time sync**. If a Windows volume is mounted, the check reads its offline registry for `RealTimeIsUniversal`: macOS keeps the hardware clock in UTC and Windows in local time, so the clock is wrong after every OS switch (the Dortania guide recommends changing Windows, not macOS). The fix shows the `reg add` command to run in Windows.
+- It gives no verdict when no Windows volume is mounted (not installed, encrypted with BitLocker, or just not mounted) or the registry cannot be read reliably, for example when Windows left unsaved changes in the registry logs (turn Fast Startup off).
+
 ## [1.9.1] — 2026-10-25
 
 ### Fixed
