@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.23.1] — 2026-10-26
+
+### Fixed
+- EFI Builder: use `QString::SkipEmptyParts` instead of `Qt::SkipEmptyParts` (Qt 5.14+ only), so the app still builds with Qt 5.9.9 (the macOS 10.12 workflow).
+
 ## [1.23.0] — 2026-10-26
 
 ### Added

@@ -553,7 +553,7 @@ void finalizeConfig(QVariantMap* config, const Finalize& f, const QStringList& d
     const QString guid = "7C436110-AB2A-4BBB-A880-FE41995C9F82";
     QVariantMap g = add[guid].toMap();
     QStringList keep;
-    for (const QString& t : g["boot-args"].toString().split(' ', Qt::SkipEmptyParts))
+    for (const QString& t : g["boot-args"].toString().split(' ', QString::SkipEmptyParts))
       if (t != "-v" && t != "debug=0x100" && t != "keepsyms=1") keep << t;
     g["boot-args"] = keep.join(' ');
     add[guid] = g;
@@ -1029,7 +1029,7 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan, const QStringList& a
   // Without a known audio controller there is no PCI path for layout-id; use alcid.
   if (applyAudio && plan.audioPciPath.isEmpty())
     extraArgs += QString(" alcid=%1").arg(plan.audioLayout);
-  for (const QString& tok : extraArgs.split(' ', Qt::SkipEmptyParts)) {
+  for (const QString& tok : extraArgs.split(' ', QString::SkipEmptyParts)) {
     const QString key = tok.section('=', 0, 0);
     if (!QRegularExpression("(^|\\s)" + QRegularExpression::escape(key) + "(=|\\s|$)").match(args).hasMatch())
       args += (args.isEmpty() ? "" : " ") + tok;
@@ -1037,7 +1037,7 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan, const QStringList& a
   if (plan.nvidiaDriver) {
     // nv_disable=1 and -wegnoegpu hide the NVIDIA card from the driver.
     QStringList keep;
-    for (const QString& t : args.split(' ', Qt::SkipEmptyParts))
+    for (const QString& t : args.split(' ', QString::SkipEmptyParts))
       if (t != "nv_disable=1" && t != "-wegnoegpu") keep << t;
     args = keep.join(' ');
     // csr-active-config must include 0x0A43 (little-endian uint32).
