@@ -3,6 +3,7 @@
 #include "dlgefibuilder.h"
 #include "dlgpostcheck.h"
 #include "dlgusbmap.h"
+#include "iconset.h"
 #include "theme.h"
 
 #include <fstream>
@@ -4091,7 +4092,7 @@ void MainWindow::readResultDiskInfo() {
         dlgMESP->ui->listWidget->addItem(new QListWidgetItem(str1));
         // dlgMESP->ui->listWidget->setIconSize(QSize(30, 30));
         // dlgMESP->ui->listWidget->addItem(
-        //    new QListWidgetItem(QIcon(":/icon/espicon.png"), str1));
+        //    new QListWidgetItem(IconSet::icon(":/icon/espicon.png"), str1));
       }
     }
   }
@@ -4807,7 +4808,7 @@ void MainWindow::setListMainIcon() {
   QSize size(64, 45);
   for (int i = 0; i < strItemList.count(); i++) {
     ui->listMain->addItem(
-        new QListWidgetItem(QIcon(strIconList.at(i)), strItemList1.at(i)));
+        new QListWidgetItem(IconSet::icon(strIconList.at(i)), strItemList1.at(i)));
 
     ui->listMain->item(i)->setSizeHint(size);
 
@@ -4817,7 +4818,7 @@ void MainWindow::setListMainIcon() {
   /*if (win) {
       strIconList.append(":/icon/m9.png");
       strItemList.append(tr("Hardware Information"));
-      ui->listMain->addItem(new QListWidgetItem(QIcon(":/icon/m9.png"),
+      ui->listMain->addItem(new QListWidgetItem(IconSet::icon(":/icon/m9.png"),
   "Info")); ui->listMain->item(8)->setSizeHint(size);
       ui->listMain->item(8)->setToolTip(tr("Hardware Information"));
   }*/
@@ -4959,42 +4960,42 @@ void MainWindow::init_ToolBarIcon() {
   ui->toolBar->setIconSize(QSize(iSize, iSize));
 
   if (Theme::isDark(red)) {
-    btn0->setIcon(QIcon(":/icon/rp0.png"));
-    if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi0.png"));
-    if (actionPostCheck) actionPostCheck->setIcon(QIcon(":/icon/postcheck0.png"));
-    if (actionUsbMapBtn) actionUsbMapBtn->setIcon(QIcon(":/icon/usbmap0.png"));
-    ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir0.png"));
-    if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save0.png"));
+    btn0->setIcon(IconSet::icon(":/icon/rp0.png"));
+    if (actionBuildEfi) actionBuildEfi->setIcon(IconSet::icon(":/icon/efi0.png"));
+    if (actionPostCheck) actionPostCheck->setIcon(IconSet::icon(":/icon/postcheck0.png"));
+    if (actionUsbMapBtn) actionUsbMapBtn->setIcon(IconSet::icon(":/icon/usbmap0.png"));
+    ui->actionOpen_Directory->setIcon(IconSet::icon(":/icon/opendir0.png"));
+    if (!isWindowModified()) ui->actionSave->setIcon(IconSet::icon(":/icon/save0.png"));
     if (!blOCValidateError)
-      ui->actionOcvalidate->setIcon(QIcon(":/icon/ov0.png"));
-    ui->actionMountEsp->setIcon(QIcon(":/icon/esp0.png"));
-    ui->actionUpgrade_OC->setIcon(QIcon(":/icon/um0.png"));
-    ui->actionDatabase->setIcon(QIcon(":/icon/db0.png"));
-    undoAction->setIcon(QIcon(":/icon/undo0.png"));
-    redoAction->setIcon(QIcon(":/icon/redo0.png"));
-    ui->actionFind->setIcon(QIcon(":/icon/find0.png"));
-    ui->actionBackup_EFI->setIcon(QIcon(":/icon/be0.png"));
-    btnBak->setIcon(QIcon(":/icon/be0.png"));
-    btnClear->setIcon(QIcon(":/icon/c0.png"));
+      ui->actionOcvalidate->setIcon(IconSet::icon(":/icon/ov0.png"));
+    ui->actionMountEsp->setIcon(IconSet::icon(":/icon/esp0.png"));
+    ui->actionUpgrade_OC->setIcon(IconSet::icon(":/icon/um0.png"));
+    ui->actionDatabase->setIcon(IconSet::icon(":/icon/db0.png"));
+    undoAction->setIcon(IconSet::icon(":/icon/undo0.png"));
+    redoAction->setIcon(IconSet::icon(":/icon/redo0.png"));
+    ui->actionFind->setIcon(IconSet::icon(":/icon/find0.png"));
+    ui->actionBackup_EFI->setIcon(IconSet::icon(":/icon/be0.png"));
+    btnBak->setIcon(IconSet::icon(":/icon/be0.png"));
+    btnClear->setIcon(IconSet::icon(":/icon/c0.png"));
   } else {
-    btn0->setIcon(QIcon(":/icon/rp.png"));
-    if (actionBuildEfi) actionBuildEfi->setIcon(QIcon(":/icon/efi.png"));
-    if (actionPostCheck) actionPostCheck->setIcon(QIcon(":/icon/postcheck.png"));
-    if (actionUsbMapBtn) actionUsbMapBtn->setIcon(QIcon(":/icon/usbmap.png"));
-    ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir.png"));
-    if (!isWindowModified()) ui->actionSave->setIcon(QIcon(":/icon/save.png"));
+    btn0->setIcon(IconSet::icon(":/icon/rp.png"));
+    if (actionBuildEfi) actionBuildEfi->setIcon(IconSet::icon(":/icon/efi.png"));
+    if (actionPostCheck) actionPostCheck->setIcon(IconSet::icon(":/icon/postcheck.png"));
+    if (actionUsbMapBtn) actionUsbMapBtn->setIcon(IconSet::icon(":/icon/usbmap.png"));
+    ui->actionOpen_Directory->setIcon(IconSet::icon(":/icon/opendir.png"));
+    if (!isWindowModified()) ui->actionSave->setIcon(IconSet::icon(":/icon/save.png"));
     if (!blOCValidateError)
-      ui->actionOcvalidate->setIcon(QIcon(":/icon/ov.png"));
+      ui->actionOcvalidate->setIcon(IconSet::icon(":/icon/ov.png"));
 
-    ui->actionMountEsp->setIcon(QIcon(":/icon/esp.png"));
-    ui->actionUpgrade_OC->setIcon(QIcon(":/icon/um.png"));
-    ui->actionDatabase->setIcon(QIcon(":/icon/db.png"));
-    undoAction->setIcon(QIcon(":/icon/undo.png"));
-    redoAction->setIcon(QIcon(":/icon/redo.png"));
-    ui->actionFind->setIcon(QIcon(":/icon/find.png"));
-    ui->actionBackup_EFI->setIcon(QIcon(":/icon/be.png"));
-    btnBak->setIcon(QIcon(":/icon/be.png"));
-    btnClear->setIcon(QIcon(":/icon/c.png"));
+    ui->actionMountEsp->setIcon(IconSet::icon(":/icon/esp.png"));
+    ui->actionUpgrade_OC->setIcon(IconSet::icon(":/icon/um.png"));
+    ui->actionDatabase->setIcon(IconSet::icon(":/icon/db.png"));
+    undoAction->setIcon(IconSet::icon(":/icon/undo.png"));
+    redoAction->setIcon(IconSet::icon(":/icon/redo.png"));
+    ui->actionFind->setIcon(IconSet::icon(":/icon/find.png"));
+    ui->actionBackup_EFI->setIcon(IconSet::icon(":/icon/be.png"));
+    btnBak->setIcon(IconSet::icon(":/icon/be.png"));
+    btnClear->setIcon(IconSet::icon(":/icon/c.png"));
   }
 
   QString listStyleMain = Theme::listStyle(red), listStyle;
@@ -5044,7 +5045,7 @@ void MainWindow::init_FileMenu() {
 
   btn0 = new QToolButton(this);
   btn0->setToolTip(tr("Open Recent..."));
-  btn0->setIcon(QIcon(":/icon/rp.png"));
+  btn0->setIcon(IconSet::icon(":/icon/rp.png"));
   btn0->setPopupMode(QToolButton::InstantPopup);
   if (Reg.value("chkRecentOpen", 1).toBool() == true) {
     ui->toolBar->addWidget(btn0);
@@ -5060,7 +5061,7 @@ void MainWindow::init_FileMenu() {
   // Build EFI (sits just before Browse Catalog)
   actionBuildEfi = new QAction(tr("Build EFI"), this);
   actionBuildEfi->setToolTip(tr("Build EFI (OpCore Simplify)"));
-  actionBuildEfi->setIcon(QIcon(Theme::icon("efi", red)));
+  actionBuildEfi->setIcon(IconSet::icon(Theme::icon("efi", red)));
   actionBuildEfi->setIconVisibleInMenu(false);
   connect(actionBuildEfi, &QAction::triggered, this, &MainWindow::openEfiBuilder);
   ui->toolBar->addAction(actionBuildEfi);
@@ -5068,7 +5069,7 @@ void MainWindow::init_FileMenu() {
   // Post-Install Check (right after Build EFI)
   actionPostCheck = new QAction(tr("Post-Install Check"), this);
   actionPostCheck->setToolTip(tr("Post-Install Check (macOS only: run it on the Hackintosh)"));
-  actionPostCheck->setIcon(QIcon(Theme::icon("postcheck", red)));
+  actionPostCheck->setIcon(IconSet::icon(Theme::icon("postcheck", red)));
   actionPostCheck->setIconVisibleInMenu(false);
   connect(actionPostCheck, &QAction::triggered, this, &MainWindow::openPostCheck);
   ui->toolBar->addAction(actionPostCheck);
@@ -5076,14 +5077,14 @@ void MainWindow::init_FileMenu() {
   // USB Mapping (right after Post-Install Check)
   actionUsbMapBtn = new QAction(tr("USB Mapping"), this);
   actionUsbMapBtn->setToolTip(tr("USB Mapping (macOS only: run it on the Hackintosh)"));
-  actionUsbMapBtn->setIcon(QIcon(Theme::icon("usbmap", red)));
+  actionUsbMapBtn->setIcon(IconSet::icon(Theme::icon("usbmap", red)));
   actionUsbMapBtn->setIconVisibleInMenu(false);
   connect(actionUsbMapBtn, &QAction::triggered, this, &MainWindow::openUsbMap);
   ui->toolBar->addAction(actionUsbMapBtn);
 
   // Open Dir
   if (mac || osx1012) ui->actionOpen_Directory->setIconVisibleInMenu(false);
-  ui->actionOpen_Directory->setIcon(QIcon(":/icon/opendir.png"));
+  ui->actionOpen_Directory->setIcon(IconSet::icon(":/icon/opendir.png"));
   if (Reg.value("chkOpenDir", 1).toBool() == true) {
     ui->toolBar->addAction(ui->actionOpen_Directory);
   }
@@ -5092,7 +5093,7 @@ void MainWindow::init_FileMenu() {
   if (mac || osx1012) ui->actionSave->setIconVisibleInMenu(false);
   connect(ui->actionSave, &QAction::triggered, this, &MainWindow::on_btnSave);
   ui->actionSave->setShortcut(tr("ctrl+s"));
-  ui->actionSave->setIcon(QIcon(":/icon/save.png"));
+  ui->actionSave->setIcon(IconSet::icon(":/icon/save.png"));
   ui->toolBar->addAction(ui->actionSave);
   ui->actionSave->setEnabled(false);
 
@@ -5119,7 +5120,7 @@ void MainWindow::init_EditMenu() {
   // Find
   if (mac || osx1012) ui->actionFind->setIconVisibleInMenu(false);
   ui->actionFind->setShortcut(tr("ctrl+f"));
-  ui->actionFind->setIcon(QIcon(":/icon/find.png"));
+  ui->actionFind->setIcon(IconSet::icon(":/icon/find.png"));
 
   if (mac || osx1012) ui->actionGo_to_the_previous->setIconVisibleInMenu(false);
   ui->actionGo_to_the_previous->setShortcut(tr("ctrl+3"));
@@ -5131,7 +5132,7 @@ void MainWindow::init_EditMenu() {
   if (mac || osx1012) ui->actionOcvalidate->setIconVisibleInMenu(false);
 
   ui->actionOcvalidate->setShortcut(tr("ctrl+l"));
-  ui->actionOcvalidate->setIcon(QIcon(":/icon/ov.png"));
+  ui->actionOcvalidate->setIcon(IconSet::icon(":/icon/ov.png"));
   ui->toolBar->addAction(ui->actionOcvalidate);
   ui->toolBar->addAction(ui->actionUpgrade_OC);
 
@@ -5139,7 +5140,7 @@ void MainWindow::init_EditMenu() {
   if (mac || osx1012) ui->actionMountEsp->setIconVisibleInMenu(false);
 
   ui->actionMountEsp->setShortcut(tr("ctrl+m"));
-  ui->actionMountEsp->setIcon(QIcon(":/icon/esp.png"));
+  ui->actionMountEsp->setIcon(IconSet::icon(":/icon/esp.png"));
   if (Reg.value("chkMountESP", 1).toBool() == true) {
     ui->toolBar->addAction(ui->actionMountEsp);
   }
@@ -5150,13 +5151,13 @@ void MainWindow::init_EditMenu() {
   // Update OC Main Program
   if (mac || osx1012) ui->actionUpgrade_OC->setIconVisibleInMenu(false);
 
-  ui->actionUpgrade_OC->setIcon(QIcon(":/icon/um.png"));
+  ui->actionUpgrade_OC->setIcon(IconSet::icon(":/icon/um.png"));
   // ui->actionUpgrade_OC->setEnabled(false);
 
   // Open DataBase
   if (mac || osx1012) ui->actionDatabase->setIconVisibleInMenu(false);
   ui->actionDatabase->setShortcut(tr("ctrl+d"));
-  ui->actionDatabase->setIcon(QIcon(":/icon/db.png"));
+  ui->actionDatabase->setIcon(IconSet::icon(":/icon/db.png"));
 
   // Open DataBase Dir
   if (mac || osx1012)
@@ -5168,10 +5169,10 @@ void MainWindow::init_EditMenu() {
 
   // Backup EFI
   if (mac || osx1012) ui->actionBackup_EFI->setIconVisibleInMenu(false);
-  ui->actionBackup_EFI->setIcon(QIcon(":/icon/be.png"));
+  ui->actionBackup_EFI->setIcon(IconSet::icon(":/icon/be.png"));
 
   btnBak = new QToolButton(this);
-  btnBak->setIcon(QIcon(":/icon/be.png"));
+  btnBak->setIcon(IconSet::icon(":/icon/be.png"));
   btnBak->setToolTip(ui->actionBackup_EFI->text());
 
   QMenu* bakMenu = new QMenu(this);
@@ -5232,7 +5233,7 @@ void MainWindow::init_HelpMenu() {
 
   // Bug Report
   if (mac || osx1012) ui->actionBug_Report->setIconVisibleInMenu(false);
-  ui->actionBug_Report->setIcon(QIcon(":/icon/about.png"));
+  ui->actionBug_Report->setIcon(IconSet::icon(":/icon/about.png"));
 
   // Auto check update
   manager = new QNetworkAccessManager(this);
@@ -5265,12 +5266,12 @@ void MainWindow::init_UndoRedo() {
 
   // Undo
   // undoAction->setShortcut(tr("ctrl+1"));
-  undoAction->setIcon(QIcon(":/icon/undo.png"));
+  undoAction->setIcon(IconSet::icon(":/icon/undo.png"));
   ui->toolBar->addAction(undoAction);
 
   // Redo
   // redoAction->setShortcut(tr("ctrl+2"));
-  redoAction->setIcon(QIcon(":/icon/redo.png"));
+  redoAction->setIcon(IconSet::icon(":/icon/redo.png"));
   ui->toolBar->addAction(redoAction);
 }
 
@@ -5349,7 +5350,7 @@ void MainWindow::init_SearchUI() {
 
   clearTextsAction = new QAction(this);
   clearTextsAction->setToolTip(tr("Clear search history"));
-  clearTextsAction->setIcon(QIcon(":/icon/clear.png"));
+  clearTextsAction->setIcon(IconSet::icon(":/icon/clear.png"));
   ui->mycboxFind->lineEdit()->addAction(clearTextsAction,
                                         QLineEdit::LeadingPosition);
   connect(clearTextsAction, SIGNAL(triggered()), this, SLOT(clearFindTexts()));
@@ -5368,7 +5369,7 @@ void MainWindow::init_SearchUI() {
   btnClear->setMaximumWidth(b_w);
   btnClear->setMaximumHeight(b_w);
   btnClear->setStyleSheet("QToolButton{border:none;}");
-  btnClear->setIcon(QIcon(":/icon/c.png"));
+  btnClear->setIcon(IconSet::icon(":/icon/c.png"));
   btnClear->setCursor(QCursor(Qt::ArrowCursor));
   buttonLayout->addWidget(btnClear);
 
@@ -6102,7 +6103,7 @@ int MainWindow::parse_UpdateJSON(QString str) {
                            tr("Release Notes: ") + "\n" + ReleaseNote;
 
       if (ui->actionAutoChkUpdate->isChecked()) {
-        ui->btnCheckUpdate->setIcon(QIcon(":/icon/newver.png"));
+        ui->btnCheckUpdate->setIcon(IconSet::icon(":/icon/newver.png"));
         ui->btnCheckUpdate->setToolTip(tr("There is a new version"));
 
         int ret = QMessageBox::warning(this, "", warningStr, tr("Download"),
@@ -9276,7 +9277,7 @@ void MainWindow::oc_Validate(bool show) {
     str = tr("OK !");
     strMsg = result + "\n\n" + str;
 
-    ui->actionOcvalidate->setIcon(QIcon(Theme::icon("ov", red)));
+    ui->actionOcvalidate->setIcon(IconSet::icon(Theme::icon("ov", red)));
     ui->actionOcvalidate->setToolTip(ui->actionOcvalidate->text());
 
     dlgOCV->setGoEnabled(false);
@@ -9294,7 +9295,7 @@ void MainWindow::oc_Validate(bool show) {
     strMsg = result;
     dlgOCV->setGoEnabled(true);
 
-    ui->actionOcvalidate->setIcon(QIcon(":/icon/overror.png"));
+    ui->actionOcvalidate->setIcon(IconSet::icon(":/icon/overror.png"));
     ui->actionOcvalidate->setToolTip(
         tr("There is a issue with the configuration file."));
 
@@ -9572,9 +9573,9 @@ void MainWindow::on_listSub_currentRowChanged(int currentRow) {
 void MainWindow::on_listMain_currentRowChanged(int currentRow) {
   for (int i = 0; i < 8; i++) {
     if (ui->listMain->currentRow() == i)
-      ui->listMain->item(i)->setIcon(QIcon(strIconListSel.at(i)));
+      ui->listMain->item(i)->setIcon(IconSet::icon(strIconListSel.at(i)));
     else
-      ui->listMain->item(i)->setIcon(QIcon(strIconList.at(i)));
+      ui->listMain->item(i)->setIcon(IconSet::icon(strIconList.at(i)));
   }
 
   // Misc
@@ -9791,9 +9792,9 @@ void MainWindow::updateStatus() { mymethod->autoTip(); }
 
 void MainWindow::updateIconStatus() {
   if (isWindowModified()) {
-    ui->actionSave->setIcon(QIcon(Theme::icon("savetip", red)));
+    ui->actionSave->setIcon(IconSet::icon(Theme::icon("savetip", red)));
   } else {
-    ui->actionSave->setIcon(QIcon(Theme::icon("save", red)));
+    ui->actionSave->setIcon(IconSet::icon(Theme::icon("save", red)));
   }
 }
 

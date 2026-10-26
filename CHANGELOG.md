@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.21.0] — 2026-10-26
+
+### Added
+- Switchable icon sets (Preferences > Icon set, applied on restart): **Classic** (the existing PNGs, default) or **Material Symbols** (Apache-2.0 SVGs in `icon-material/`). Material icons are tinted at runtime from one file each, so the dark, light and selected variants follow the theme. Icons without a Material equivalent keep the classic PNG. The choice is stored as `IconStyle` in the INI file. Adds the Qt SVG module (`QT += svg`).
+
 ## [1.20.4] — 2026-10-26
 
 ### Changed

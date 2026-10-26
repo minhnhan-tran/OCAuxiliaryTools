@@ -2,6 +2,7 @@
 
 #include "Method.h"
 #include "mainwindow.h"
+#include "iconset.h"
 #include "ui_mainwindow.h"
 #include "ui_syncocdialog.h"
 
@@ -257,10 +258,10 @@ void SyncOCDialog::on_listOpenCore_currentRowChanged(int currentRow) {
                            tr("Available File: ") + "md5    " + sourceHash);
 
   if (sourceHash != targetHash) {
-    ui->listOpenCore->item(currentRow)->setIcon(QIcon(":/icon/no.png"));
+    ui->listOpenCore->item(currentRow)->setIcon(IconSet::icon(":/icon/no.png"));
 
   } else {
-    ui->listOpenCore->item(currentRow)->setIcon(QIcon(":/icon/ok.png"));
+    ui->listOpenCore->item(currentRow)->setIcon(IconSet::icon(":/icon/ok.png"));
   }
 }
 

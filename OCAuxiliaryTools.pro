@@ -1,6 +1,7 @@
 QT     += core gui
 QT     += xml
 QT     += network
+QT     += svg
 CONFIG +=sdk_no_version_check
 
 ICON = Icon.icns
@@ -105,6 +106,7 @@ FORMS += \
 
 HEADERS += \
     src/BalloonTip.h \
+    src/iconset.h \
     src/theme.h \
     src/dlgefibuilder.h \
     src/dlgpostcheck.h \

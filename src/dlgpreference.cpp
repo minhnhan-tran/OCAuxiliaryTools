@@ -1,12 +1,17 @@
 #include "dlgpreference.h"
 
 #include <QCheckBox>
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
 #include <QDir>
 #include <QGridLayout>
 #include <QKeyEvent>
 #include <QSettings>
 
 #include "Method.h"
+#include "iconset.h"
 #include "mainwindow.h"
 #include "theme.h"
 #include "ui_dlgpreference.h"
@@ -53,6 +58,27 @@ dlgPreference::dlgPreference(QWidget *parent)
     };
     connect(chkDark, &QCheckBox::toggled, this, update);
     connect(chkMaterial, &QCheckBox::toggled, this, update);
+
+    // Icon set: classic PNGs or Material Symbols (recoloured to the theme).
+    QWidget* row = new QWidget(this);
+    QHBoxLayout* hl = new QHBoxLayout(row);
+    hl->setContentsMargins(0, 0, 0, 0);
+    QComboBox* cboIcons = new QComboBox(row);
+    cboIcons->addItem(tr("Classic"), "classic");
+    cboIcons->addItem(tr("Material Symbols"), "material");
+    cboIcons->setCurrentIndex(IconSet::style() == "material" ? 1 : 0);
+    hl->addWidget(new QLabel(tr("Icon set:"), row));
+    hl->addWidget(cboIcons, 1);
+    if (QGridLayout* grid = qobject_cast<QGridLayout*>(lay))
+      grid->addWidget(row, grid->rowCount(), 0, 1, qMax(1, grid->columnCount()));
+    else if (lay)
+      lay->addWidget(row);
+    connect(cboIcons, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [this, cboIcons] {
+              IconSet::setStyle(cboIcons->currentData().toString());
+              QMessageBox::information(this, tr("Icon set"),
+                                       tr("Restart the app to apply the new icon set."));
+            });
   }
 
   // Kexts Urls

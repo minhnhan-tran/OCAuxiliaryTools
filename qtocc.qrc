@@ -7,6 +7,36 @@
         <file alias="efibuilder/efidata.json">src/efibuilder/efidata.json</file>
         <file alias="efibuilder/postinstall.json">src/efibuilder/postinstall.json</file>
         <file alias="postcheck/checks.json">src/postcheck/checks.json</file>
+        <file>icon-material/backspace.svg</file>
+        <file>icon-material/backup.svg</file>
+        <file>icon-material/cancel.svg</file>
+        <file>icon-material/check_circle.svg</file>
+        <file>icon-material/clear_all.svg</file>
+        <file>icon-material/computer.svg</file>
+        <file>icon-material/database.svg</file>
+        <file>icon-material/deployed_code.svg</file>
+        <file>icon-material/developer_board.svg</file>
+        <file>icon-material/devices.svg</file>
+        <file>icon-material/error.svg</file>
+        <file>icon-material/fact_check.svg</file>
+        <file>icon-material/folder_open.svg</file>
+        <file>icon-material/hard_drive.svg</file>
+        <file>icon-material/history.svg</file>
+        <file>icon-material/info.svg</file>
+        <file>icon-material/memory.svg</file>
+        <file>icon-material/new_releases.svg</file>
+        <file>icon-material/redo.svg</file>
+        <file>icon-material/rocket_launch.svg</file>
+        <file>icon-material/save.svg</file>
+        <file>icon-material/search.svg</file>
+        <file>icon-material/storage.svg</file>
+        <file>icon-material/system_update_alt.svg</file>
+        <file>icon-material/terminal.svg</file>
+        <file>icon-material/tune.svg</file>
+        <file>icon-material/undo.svg</file>
+        <file>icon-material/usb.svg</file>
+        <file>icon-material/verified.svg</file>
+        <file>icon-material/LICENSE</file>
         <file>icon/m1.png</file>
         <file>icon/m2.png</file>
         <file>icon/m3.png</file>
