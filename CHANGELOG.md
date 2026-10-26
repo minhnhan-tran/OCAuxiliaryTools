@@ -4,6 +4,14 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.22.0] — 2026-10-26
+
+### Added
+- Post-Install Check (GPU): two checks for the [NullMoth NVIDIA macOS driver](https://github.com/nullmoth/nvidia-macos-driver), shown only when an NVIDIA display GPU is found and macOS is 15 or 26 (otherwise they are skipped).
+  - **Driver loaded:** the NVRM and NVAccel kexts are loaded. The fix links open the project's releases page and list the loaded NullMoth kexts.
+  - **OpenCore settings:** the running boot-args (nvfb=1, nvaccel=1, nvfbheads=4, -nvkmsnosmooth, amfi_get_out_of_my_way=0x1, amfi=0x80, ipc_control_port_options=0), no nv_disable=1 or -wegnoegpu, csr-active-config including 0x0A43, and Lilu plus AMFIPass loaded. SecureBootModel cannot be read from a running system, so the check says to confirm it in config.plist.
+- Nothing from the driver is bundled or installed: its licence (PolyForm Noncommercial) is for the user to read, so the checks only detect and link to it. Supports Turing and newer only, as the driver does.
+
 ## [1.21.4] — 2026-10-26
 
 ### Changed

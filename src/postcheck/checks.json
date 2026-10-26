@@ -1068,6 +1068,51 @@
    ],
    "timeoutSec": 30,
    "needsReport": false
+  },
+  {
+   "id": "nv-driver-loaded",
+   "group": "GPU",
+   "title": "NVIDIA GPU: the NullMoth macOS driver is loaded",
+   "cmd": "nv=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/ && b ~ /\"vendor-id\" = <de10/) n++; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/ && b ~ /\"vendor-id\" = <de10/) n++; print n+0 }'); mac=$(sw_vers -productVersion 2>/dev/null | cut -d. -f1); nvrm=$(kmutil showloaded --list-only 2>/dev/null | grep -cE 'com\\.nullmoth\\.NVRM[ (]'); acc=$(kmutil showloaded --list-only 2>/dev/null | grep -cE 'com\\.nullmoth\\.NVAccel[ (]'); echo \"nv=$nv macos=$mac nvrm=$nvrm nvaccel=$acc\"",
+   "skip": "\\bnv=0\\b|\\bmacos=(?!15\\b|26\\b)\\d+",
+   "skipWhy": "Not applicable: no NVIDIA GPU was found, or this macOS is not 15 or 26 (the NullMoth NVIDIA driver supports macOS 15 Sequoia and 26 Tahoe only).",
+   "pass": "\\bnvrm=[1-9]\\d* nvaccel=[1-9]",
+   "fail": "\\bnvrm=0\\b|\\bnvaccel=0\\b",
+   "severity": "warn",
+   "guide": "https://github.com/nullmoth/nvidia-macos-driver",
+   "why": "An NVIDIA GPU is installed, but the NullMoth driver (NVRM and NVAccel kexts) is not loaded. macOS has no built-in driver for these cards, so there is no graphics acceleration (no Metal) and the display falls back to a basic framebuffer or stays black. The driver covers NVIDIA Turing and newer (GTX 16, RTX 20/30/40/50 and the T-series) on macOS 15 and 26, and it is a separate, third-party project: read its README and licence before installing. Older cards (Kepler, Maxwell, Pascal) are not covered. Install it with the project's 1401 Mac app, or by hand with install.sh.",
+   "fixes": [
+    {
+     "cmd": "open \"https://github.com/nullmoth/nvidia-macos-driver/releases/latest\"",
+     "why": "Opens the driver's releases page in your browser (download the 1401 Mac app or the tar.gz). Nothing is installed.",
+     "run": "user"
+    },
+    {
+     "cmd": "kmutil showloaded --list-only 2>/dev/null | grep -i 'com.nullmoth' || echo 'No NullMoth kexts are loaded.'",
+     "why": "Lists the NullMoth kexts macOS has loaded. Nothing is changed.",
+     "run": "user"
+    }
+   ]
+  },
+  {
+   "id": "nv-oc-settings",
+   "group": "GPU",
+   "title": "NVIDIA GPU: OpenCore settings the NullMoth driver needs are present",
+   "cmd": "nv=$(ioreg -rxc IOPCIDevice -w0 2>/dev/null | awk '/\\+-o /{ if (b ~ /\"class-code\" = <0000030/ && b ~ /\"vendor-id\" = <de10/) n++; b=\"\" } { b = b \"\\n\" $0 } END { if (b ~ /\"class-code\" = <0000030/ && b ~ /\"vendor-id\" = <de10/) n++; print n+0 }'); mac=$(sw_vers -productVersion 2>/dev/null | cut -d. -f1); a=\" $(sysctl -n kern.bootargs 2>/dev/null) \"; miss=\"\"; for t in nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0; do case \"$a\" in *\" $t \"*) ;; *) miss=\"$miss $t\";; esac; done; hide=0; case \"$a\" in *\" nv_disable=1 \"*|*\" -wegnoegpu \"*) hide=1;; esac; b=$(nvram -x csr-active-config 2>/dev/null | awk '/<data>/{f=1;next}/<\\/data>/{f=0}f' | tr -d \" \\t\\n\" | base64 -D 2>/dev/null | od -An -tu1 | head -1); set -- $b; csr=0; if [ -n \"$1\" ]; then v=$(( $1 + 256 * ${2:-0} )); [ $(( v & 2627 )) -eq 2627 ] && csr=1; fi; lilu=$(kmutil showloaded --list-only 2>/dev/null | grep -c \"as.vit9696.Lilu\"); amfi=$(kmutil showloaded --list-only 2>/dev/null | grep -c \"AMFIPass\"); echo \"nv=$nv macos=$mac missing=[${miss# }] hide=$hide csr=$csr lilu=$lilu amfipass=$amfi\"",
+   "skip": "\\bnv=0\\b|\\bmacos=(?!15\\b|26\\b)\\d+",
+   "skipWhy": "Not applicable: no NVIDIA GPU was found, or this macOS is not 15 or 26 (the NullMoth NVIDIA driver supports macOS 15 Sequoia and 26 Tahoe only).",
+   "pass": "missing=\\[\\] hide=0 csr=1 lilu=[1-9]\\d* amfipass=[1-9]",
+   "fail": "missing=\\[[^\\]]+\\]|\\bhide=1\\b|\\bcsr=0\\b|\\blilu=0\\b|\\bamfipass=0\\b",
+   "severity": "warn",
+   "guide": "https://github.com/nullmoth/nvidia-macos-driver#install--by-hand",
+   "why": "The driver does not start until OpenCore sets these: boot-args nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 (and not nv_disable=1 or -wegnoegpu, which hide the card), csr-active-config including the bits 0x0A43, Misc > Security > SecureBootModel = Disabled, and Lilu.kext plus AMFIPass.kext enabled. This check reads the running boot-args, the NVRAM csr-active-config value and the loaded kexts; it cannot read SecureBootModel, so check that one in config.plist. 'missing' lists boot-args that are not set.",
+   "fixes": [
+    {
+     "cmd": "echo 'boot-args add: nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0'; echo 'remove: nv_disable=1 -wegnoegpu'; echo 'csr-active-config must include 0x0A43; SecureBootModel = Disabled; Lilu and AMFIPass enabled'",
+     "why": "Prints the values to put in config.plist (the Kernel, Misc and NVRAM tabs of this app). Nothing is changed.",
+     "run": "user"
+    }
+   ]
   }
  ]
 }

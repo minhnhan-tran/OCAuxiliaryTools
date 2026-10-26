@@ -55,7 +55,7 @@ Not included yet: adding the kext to `EFI/OC/Kexts` and `config.plist` for you.
 
 Inspects the running Hackintosh against the [Dortania post-install guide](https://dortania.github.io/OpenCore-Post-Install/) and lists what needs attention.
 
-* Sleep and wake, power management, SIP, GPU acceleration, audio, USB, NVMe, LAN, Wi-Fi, Bluetooth, keyboard and trackpad, hardware video decoding, CPU power management, iServices and more. Windows dual-boot time sync is checked too.
+* Sleep and wake, power management, SIP, GPU acceleration, audio, USB, NVMe, LAN, Wi-Fi, Bluetooth, keyboard and trackpad, hardware video decoding, CPU power management, iServices and more. Windows dual-boot time sync is checked too. With an NVIDIA GPU on macOS 15 / 26 it also checks that the [NullMoth NVIDIA driver](https://github.com/nullmoth/nvidia-macos-driver) is loaded and that the OpenCore settings it needs are present (the driver itself is a separate, non-commercial-licence project and is not bundled).
 * Each failing check explains why it matters and gives the fix, with **Copy** and **Run in Terminal**. Commands that need no admin rights get **Run here**; admin commands get **Run (asks for password)**, which asks you to confirm first.
 * A **Skipped** result for checks that do not apply. **Copy report** puts the results on the clipboard for forum help.
 * Optionally compares a Hardware Sniffer `Report.json` with what macOS reports (CPU name and core count).
