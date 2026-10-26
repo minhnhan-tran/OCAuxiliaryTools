@@ -4,6 +4,16 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.20.2] — 2026-10-26
+
+### Fixed
+- EFI Builder kext download: repos that publish only pre-releases have no GitHub "latest" release, so the request returned 404 and the kext was reported as unavailable (laobamac AirportItlwm). It now falls back to the newest release.
+
+## [1.20.1] — 2026-10-26
+
+### Fixed
+- EFI Builder Wi-Fi choice: the "laobamac AirportItlwm" option could never be installed. The download holds `AirportItlwm.kext`, but the builder looked for `AirportItlwm-laobamac.kext` and then pointed the config at a binary of that name. It now looks for the real bundle and uses its real executable name.
+
 ## [1.20.0] — 2026-10-26
 
 ### Added

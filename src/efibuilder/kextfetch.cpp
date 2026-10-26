@@ -179,7 +179,8 @@ FetchResult fetchKexts(const QStringList& names, int major, const QString& destD
       if (zip.isEmpty()) { errs << url.host() + ": " + e; return false; }
       QDir(dir + "/x").removeRecursively();
       if (!unzipTo(zip, dir, opt)) { errs << "unzip failed"; return false; }
-      found = findKext(dir + "/x", name);
+      // "AirportItlwm-laobamac" is a catalog alias: the archive holds AirportItlwm.kext.
+      found = findKext(dir + "/x", QString(name).remove("-laobamac"));
       if (found.isEmpty()) { errs << QString("%1.kext not in archive").arg(name); return false; }
       return true;
     };
@@ -202,11 +203,21 @@ FetchResult fetchKexts(const QStringList& names, int major, const QString& destD
     // 3) GitHub releases
     if (!done && !rec["gh"].toString().isEmpty()) {
       QString e;
-      const QByteArray js = http.get(QUrl("https://api.github.com/repos/" + rec["gh"].toString() + "/releases/latest"), &e);
-      if (js.isEmpty()) {
+      const QString api = "https://api.github.com/repos/" + rec["gh"].toString() + "/releases";
+      QByteArray js = http.get(QUrl(api + "/latest"), &e);
+      QJsonObject rel;
+      if (!js.isEmpty()) {
+        rel = QJsonDocument::fromJson(js).object();
+      } else {
+        // Repos that only publish pre-releases (e.g. laobamac/itlwm) have no "latest": use the newest release.
+        QString e2;
+        js = http.get(QUrl(api + "?per_page=1"), &e2);
+        rel = QJsonDocument::fromJson(js).array().first().toObject();
+        if (rel.isEmpty()) e = e.isEmpty() ? e2 : e;
+      }
+      if (rel.isEmpty()) {
         errs << "github: " + e;
       } else {
-        const QJsonObject rel = QJsonDocument::fromJson(js).object();
         const QJsonArray assets = rel["assets"].toArray();
         const QString asset = pickAsset(assets, name, major);
         if (asset.isEmpty()) {

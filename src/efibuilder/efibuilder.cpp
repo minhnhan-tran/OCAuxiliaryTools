@@ -953,9 +953,11 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan, const QStringList& a
       e["Comment"] = "Added by EFI builder";
       e["Enabled"] = true;
       // Some kexts (e.g. injectors, UTBDefault) have no binary.
+      // Catalog aliases (AirportItlwm-laobamac) keep the upstream binary name.
+      const QString exe = QString(name).remove("-laobamac");
       const bool hasBin = kextDir.isEmpty() ||
-                          QFile::exists(kextDir + "/" + name + ".kext/Contents/MacOS/" + name);
-      e["ExecutablePath"] = hasBin ? "Contents/MacOS/" + name : QString();
+                          QFile::exists(kextDir + "/" + name + ".kext/Contents/MacOS/" + exe);
+      e["ExecutablePath"] = hasBin ? "Contents/MacOS/" + exe : QString();
       e["MaxKernel"] = "";
       e["MinKernel"] = "";
       e["PlistPath"] = "Contents/Info.plist";
