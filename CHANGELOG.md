@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.21.1] — 2026-10-26
+
+### Fixed
+- Material icon set: the "file modified" Save icon is now blue like the classic one, not orange.
+
 ## [1.21.0] — 2026-10-26
 
 ### Added

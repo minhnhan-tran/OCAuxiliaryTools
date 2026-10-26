@@ -46,7 +46,7 @@ struct Spec {
 // classic base name -> Material Symbol
 inline const QHash<QString, Spec>& specs() {
   static const QHash<QString, Spec> m = {
-      {"save", {"save", nullptr}},          {"savetip", {"save", "#f0883e"}},
+      {"save", {"save", nullptr}},          {"savetip", {"save", "#2f81f7"}},
       {"undo", {"undo", nullptr}},          {"redo", {"redo", nullptr}},
       {"find", {"search", nullptr}},        {"db", {"database", nullptr}},
       {"opendir", {"folder_open", nullptr}}, {"esp", {"hard_drive", nullptr}},
