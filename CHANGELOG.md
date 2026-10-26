@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.22.1] — 2026-10-26
+
+### Fixed
+- Post-Install Check: the NullMoth NVIDIA driver checks now run only for Turing-or-newer cards (PCI device id 0x1E00 and up, the driver's own cut-off). Before, an older NVIDIA card (GTX 10 series, Kepler, Maxwell) showed two failures that no fix could clear; it is now skipped.
+
 ## [1.22.0] — 2026-10-26
 
 ### Added
