@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.23.0] — 2026-10-26
+
+### Added
+- EFI Builder: with a Turing-or-newer NVIDIA GPU in the hardware report (PCI device id 0x1E00 and up) and a macOS 15 / 26 target, the EFI is prepared for the [NullMoth NVIDIA driver](https://github.com/nullmoth/nvidia-macos-driver): boot-args `nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0`, `nv_disable=1` / `-wegnoegpu` removed, `csr-active-config` OR-ed with 0x0A43, Lilu and AMFIPass added, and `SecureBootModel=Disabled`. Such a card is now listed as supported on macOS 15 / 26 (it was unsupported before). A note and a "Install the NVIDIA driver" next step explain that the driver itself is not bundled (separate project, non-commercial licence) and is untested here on real hardware. Older NVIDIA cards are unchanged.
+
 ## [1.22.1] — 2026-10-26
 
 ### Fixed

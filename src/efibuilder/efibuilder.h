@@ -44,6 +44,7 @@ struct Plan {
   QString audioPciPath;        // audio controller PCI path ("" = fall back to alcid=)
   bool audioForced = false;    // user picked a layout: wins over a layout-id already in the template
   bool secureBootOff = false;  // OCLP root patches need Misc > Security > SecureBootModel = Disabled
+  bool nvidiaDriver = false;   // NullMoth NVIDIA driver: csr-active-config bits + clean nv_disable/-wegnoegpu
   QStringList acpi;            // SSDT-*.aml files to enable (from the ACPI folder analysis)
   QStringList acpiManaged;     // SSDTs the planner decided on (others are left to the base config)
 };
@@ -150,6 +151,10 @@ int wifiDefaultIndex(const QStringList& options, const QString& targetDarwin);
 void overrideWifi(Plan* p, const QString& kext, const QString& targetDarwin);
 
 // One selectable GPU combination (OpCore Simplify "GPU combination").
+// First NVIDIA display GPU the NullMoth macOS driver supports (Turing and newer = PCI device id
+// >= 0x1E00, the driver's own cut-off) in report["GPU"]; "" if none.
+QString nvidiaDriverGpu(const QJsonObject& report);
+
 struct GpuCombo {
   QStringList names;  // GPU names as keys of report["GPU"]
   Range range;        // macOS range supported by all of them together

@@ -167,6 +167,23 @@ bool loadReport(const QString& path, QJsonObject* report, QStringList* errors) {
 
 // ---------------------------------------------------------- compatibility ----
 
+namespace {
+int nvidiaDeviceId(const QJsonObject& g) {
+  if (g["Manufacturer"].toString() != "NVIDIA") return 0;
+  if (g["Device Type"].toString() != "Discrete GPU") return 0;
+  bool ok = false;
+  const int id = g["Device ID"].toString().section('-', 1, 1).toInt(&ok, 16);
+  return ok ? id : 0;
+}
+}  // namespace
+
+QString nvidiaDriverGpu(const QJsonObject& report) {
+  const QJsonObject gpus = report["GPU"].toObject();
+  for (auto it = gpus.begin(); it != gpus.end(); ++it)
+    if (nvidiaDeviceId(it.value().toObject()) >= 0x1E00) return it.key();
+  return QString();
+}
+
 Compatibility checkCompatibility(const QJsonObject& r) {
   Compatibility c;
   c.nativeMax = latestV();
@@ -245,6 +262,12 @@ Compatibility checkCompatibility(const QJsonObject& r) {
     } else if (mfr.contains("NVIDIA")) {
       if (cn.contains("Kepler")) rg.maxV = "20.99.99";
       else if (QStringList{"Pascal", "Maxwell", "Fermi", "Tesla"}.contains(cn)) { rg.maxV = "17.99.99"; rg.minV = "17.0.0"; }
+      else if (nvidiaDeviceId(g) >= 0x1E00) {
+        // NullMoth NVIDIA driver (third party): macOS 15 and 26 only.
+        rg.minV = "24.0.0";
+        rg.maxV = latestV();
+        note = "needs the third-party NullMoth NVIDIA driver (macOS 15 / 26)";
+      }
       else rg = Range();
     }
     // Intel gen 2-4 iGPUs only drive VGA here -> unusable (original `all()`
@@ -498,6 +521,7 @@ QList<NextStep> nextSteps(const QJsonObject& r, const Plan& p) {
     if (cond == "intel") return vendor.contains("Intel");
     if (cond == "amd") return vendor.contains("AMD");
     if (cond == "audio") return p.audioLayout > 0;
+    if (cond == "nvidia") return p.nvidiaDriver;
     if (cond.startsWith("kext:")) return p.kexts.contains(cond.mid(5));
     return false;  // unknown condition: hide the step rather than show a wrong one
   };
@@ -916,6 +940,20 @@ Plan makePlan(const QJsonObject& r, const Compatibility& c, const QString& targe
         !p.bootArgsAdd.contains("agdpmod"))
       p.bootArgsAdd += " agdpmod=pikera";
   }
+  if (!nvidiaDriverGpu(r).isEmpty() && darwinMajor(targetMax) >= 24) {
+    // https://github.com/nullmoth/nvidia-macos-driver ("Install - by hand"): the driver only starts
+    // with these OpenCore settings. SecureBootModel/csr bits are written in applyPlan.
+    p.nvidiaDriver = true;
+    p.secureBootOff = true;
+    for (const char* kx : {"Lilu", "AMFIPass"})
+      if (!p.kexts.contains(kx)) p.kexts << kx;
+    std::sort(p.kexts.begin(), p.kexts.end());
+    p.bootArgsAdd += " nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0";
+    p.notes << QString("GPU %1: the EFI is set up for the NullMoth NVIDIA driver, but the driver itself is not included. "
+                       "Install it (macOS 15.5+ or 26) with the 1401 Mac app or install.sh from https://github.com/nullmoth/nvidia-macos-driver "
+                       "- a separate project under a non-commercial licence. Not tested here on real hardware.")
+                   .arg(nvidiaDriverGpu(r));
+  }
   if (!targetMax.isEmpty() && darwinMajor(targetMax) >= 22 && !intel)
     p.notes << "AMD CPU on Ventura+: ensure the AMD kernel patches match the macOS version.";
 
@@ -995,6 +1033,21 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan, const QStringList& a
     const QString key = tok.section('=', 0, 0);
     if (!QRegularExpression("(^|\\s)" + QRegularExpression::escape(key) + "(=|\\s|$)").match(args).hasMatch())
       args += (args.isEmpty() ? "" : " ") + tok;
+  }
+  if (plan.nvidiaDriver) {
+    // nv_disable=1 and -wegnoegpu hide the NVIDIA card from the driver.
+    QStringList keep;
+    for (const QString& t : args.split(' ', Qt::SkipEmptyParts))
+      if (t != "nv_disable=1" && t != "-wegnoegpu") keep << t;
+    args = keep.join(' ');
+    // csr-active-config must include 0x0A43 (little-endian uint32).
+    const QVariant cur = g["csr-active-config"];
+    QByteArray b = cur.type() == QVariant::ByteArray ? cur.toByteArray() : QByteArray();
+    if (b.size() < 4) b = QByteArray(4, '\0');
+    quint32 v = quint8(b[0]) | quint32(quint8(b[1])) << 8 | quint32(quint8(b[2])) << 16 | quint32(quint8(b[3])) << 24;
+    v |= 0x0A43;
+    for (int i = 0; i < 4; ++i) b[i] = char((v >> (8 * i)) & 0xFF);
+    g["csr-active-config"] = b;
   }
   g["boot-args"] = args;
   nadd[guid] = g;

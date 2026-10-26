@@ -1,6 +1,8 @@
 {
   "guide": "https://dortania.github.io/OpenCore-Post-Install/",
   "steps": [
+    {"title": "Install the NVIDIA driver", "when": ["nvidia"], "url": "https://github.com/nullmoth/nvidia-macos-driver#install--by-hand",
+     "text": "The EFI carries the OpenCore settings the NullMoth NVIDIA driver needs (boot-args, csr-active-config, AMFIPass, SecureBootModel=Disabled), but not the driver. Install it with the project's 1401 Mac app or install.sh. It is a separate project under a non-commercial licence; check its README for supported cards (Turing and newer)."},
     {"title": "Map your USB ports", "when": [], "url": "https://dortania.github.io/OpenCore-Post-Install/usb/",
      "text": "The EFI is generated without a USB map. Build one (USBToolBox) so every port works and you stay under the port limit."},
     {"title": "Set up iServices (iMessage / FaceTime / iCloud)", "when": [], "url": "https://dortania.github.io/OpenCore-Post-Install/universal/iservices.html",
