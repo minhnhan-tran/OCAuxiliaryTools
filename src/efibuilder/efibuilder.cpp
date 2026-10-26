@@ -1026,6 +1026,13 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan, const QStringList& a
     config["ACPI"] = acpi;
   }
 
+  if (plan.secureBootOff) {
+    QVariantMap misc = config["Misc"].toMap();
+    QVariantMap sec = misc["Security"].toMap();
+    sec["SecureBootModel"] = "Disabled";
+    misc["Security"] = sec;
+    config["Misc"] = misc;
+  }
   if (!plan.smbios.isEmpty()) {
     QVariantMap pi = config["PlatformInfo"].toMap();
     QVariantMap gen = pi["Generic"].toMap();
@@ -1062,6 +1069,8 @@ bool audioNeedsTahoeChoice(const QJsonObject& r, const QString& target) {
 void overrideAudioKext(Plan* p, bool useOclp) {
   if (!useOclp) return;
   p->kexts.removeAll("SimpleHDA");
+  if (!p->kexts.contains("AMFIPass")) p->kexts << "AMFIPass";  // RestrictEvents is always in the plan
+  p->secureBootOff = true;
   if (!p->bootArgsAdd.contains("-amfipassbeta")) p->bootArgsAdd += " -amfipassbeta";
   p->notes << "Audio on macOS 26 Tahoe uses OpenCore Legacy Patcher root patches (AppleHDA). "
               "Run OCLP on the installed system and apply the audio patch.";

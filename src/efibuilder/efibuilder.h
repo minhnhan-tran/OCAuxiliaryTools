@@ -43,6 +43,7 @@ struct Plan {
   int audioLayout = 0;         // AppleALC layout id (0 = none)
   QString audioPciPath;        // audio controller PCI path ("" = fall back to alcid=)
   bool audioForced = false;    // user picked a layout: wins over a layout-id already in the template
+  bool secureBootOff = false;  // OCLP root patches need Misc > Security > SecureBootModel = Disabled
   QStringList acpi;            // SSDT-*.aml files to enable (from the ACPI folder analysis)
   QStringList acpiManaged;     // SSDTs the planner decided on (others are left to the base config)
 };
@@ -134,7 +135,8 @@ bool audioNeedsTahoeChoice(const QJsonObject& report, const QString& targetDarwi
 
 // useOclp=false: AppleALC + SimpleHDA kext (no root patches; the planner default).
 // useOclp=true : AppleALC only; AppleHDA is restored with OpenCore Legacy Patcher
-//                root patches, which also needs -amfipassbeta.
+//                root patches, which also needs AMFIPass, -amfipassbeta and
+//                SecureBootModel = Disabled.
 void overrideAudioKext(Plan* p, bool useOclp);
 
 // One selectable GPU combination (OpCore Simplify "GPU combination").

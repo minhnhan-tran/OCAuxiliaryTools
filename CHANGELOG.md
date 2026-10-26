@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.19.1] — 2026-10-26
+
+### Fixed
+- EFI Builder Tahoe audio: the "AppleALC + OpenCore Legacy Patcher" choice now also adds AMFIPass and sets SecureBootModel to Disabled, as OpCore Simplify does. Root patches cannot be applied without them; before, only `-amfipassbeta` was added.
+
 ## [1.19.0] — 2026-10-26
 
 ### Added
