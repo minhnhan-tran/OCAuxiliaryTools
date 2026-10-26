@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.21.3] — 2026-10-26
+
+### Fixed
+- README: the build needs C++11 (as set in the .pro file), and the Post-Install Check button description now matches the code.
+
 ## [1.21.2] — 2026-10-26
 
 ### Changed
