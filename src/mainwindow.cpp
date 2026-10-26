@@ -487,61 +487,50 @@ void MainWindow::checkFiles(QTableWidget* table) {
 }
 
 void MainWindow::markColor(QTableWidget* table, QString path, int col) {
-  QIcon icon;
-  QTableWidgetItem* id1;
+  // Parse each SVG once, not once per row.
+  static const QIcon okIcon = [] { QIcon i; i.addFile(":/icon/green.svg", QSize(10, 10)); return i; }();
+  static const QIcon badIcon = [] { QIcon i; i.addFile(":/icon/red.svg", QSize(10, 10)); return i; }();
+
+  table->setUpdatesEnabled(false);
   for (int i = 0; i < table->rowCount(); i++) {
     QString strFile = path + table->item(i, col)->text().trimmed();
-    QFileInfo fi(strFile);
-    if (fi.exists()) {
-      icon.addFile(":/icon/green.svg", QSize(10, 10));
-      id1 = new QTableWidgetItem(icon, QString::number(i + 1));
-      table->setVerticalHeaderItem(i, id1);
+    const bool exists = QFileInfo(strFile).exists();
 
-      if (table == ui->table_kernel_add) {
-        QString strVer = getKextVersion(strKexts + table->item(i, 0)->text());
-        QString text = table->item(i, 1)->text();
-        if (text.trimmed().length() > 0) {
-          if (text.mid(0, 1) == "V") {
-            QStringList strList = text.split("|");
-            if (strList.count() >= 2) {
-              text.replace(strList.at(0), "");
-              text = "V" + strVer + " " + text;
-            } else
-              text = "V" + strVer;
+    QTableWidgetItem* head = table->verticalHeaderItem(i);
+    if (!head) {
+      head = new QTableWidgetItem;
+      table->setVerticalHeaderItem(i, head);
+    }
+    head->setIcon(exists ? okIcon : badIcon);
+    head->setText(QString::number(i + 1));
 
+    if (exists && table == ui->table_kernel_add) {
+      QString strVer = getKextVersion(strKexts + table->item(i, 0)->text());
+      QString text = table->item(i, 1)->text();
+      const QString old = text;
+      if (text.trimmed().length() > 0) {
+        if (text.mid(0, 1) == "V") {
+          QStringList strList = text.split("|");
+          if (strList.count() >= 2) {
+            text.replace(strList.at(0), "");
+            text = "V" + strVer + " " + text;
           } else
-            text = "V" + strVer + " | " + text;
+            text = "V" + strVer;
 
         } else
-          text = "V" + strVer;
-        table->setItem(i, 1, new QTableWidgetItem(text));
-      }
+          text = "V" + strVer + " | " + text;
 
-    } else {
-      icon.addFile(":/icon/red.svg", QSize(10, 10));
-      id1 = new QTableWidgetItem(icon, QString::number(i + 1));
-      table->setVerticalHeaderItem(i, id1);
+      } else
+        text = "V" + strVer;
+      // Skip identical text: setItem fires itemChanged (marks the file modified, rewrites INI).
+      if (text != old) table->setItem(i, 1, new QTableWidgetItem(text));
     }
   }
+  table->setUpdatesEnabled(true);
 }
 
 QString MainWindow::getKextVersion(QString kextFile) {
-  QString strInfo = kextFile + "/Contents/Info.plist";
-  QTextEdit* txtEdit = new QTextEdit;
-  txtEdit->setPlainText(Method::loadText(strInfo));
-  for (int i = 0; i < txtEdit->document()->lineCount(); i++) {
-    QString str0 = Method::getTextEditLineText(txtEdit, i).trimmed();
-    str0.replace("</key>", "");
-    str0.replace("<key>", "");
-    if (str0 == "CFBundleVersion") {
-      QString str1 = Method::getTextEditLineText(txtEdit, i + 1).trimmed();
-      str1.replace("<string>", "");
-      str1.replace("</string>", "");
-      return str1;
-    }
-  }
-
-  return "";
+  return Method::bundleVersion(kextFile);
 }
 
 void MainWindow::on_btnOpen() {

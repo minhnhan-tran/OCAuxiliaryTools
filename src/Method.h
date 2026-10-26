@@ -73,6 +73,8 @@ class Method : public QMainWindow {
   QString getKextBin(QString kextName);
   static QString loadText(QString textFile);
   QString getKextVersion(QString kextFile);
+  // CFBundleVersion of a .kext bundle ("" if unreadable); cached by file mtime/size.
+  static QString bundleVersion(const QString& kextFile);
   static QString getTextEditLineText(QTextEdit *txtEdit, int i);
 
   QObjectList getAllToolButton(QObjectList lstUIControls);

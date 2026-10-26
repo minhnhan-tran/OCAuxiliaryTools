@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.20.4] — 2026-10-26
+
+### Changed
+- Performance: the green/red file-status marking (run on open, add/delete row, undo/redo) no longer builds and leaks a text-editor widget per kext row to read its version; the version is read with a regex and cached by file time/size. The status icons are parsed once instead of per row, tables skip repaints while updating, and unchanged version cells are no longer rewritten (which also fired spurious "modified" signals).
+
 ## [1.20.3] — 2026-10-26
 
 ### Fixed

@@ -926,24 +926,29 @@ QString Method::loadText(QString textFile) {
   return "";
 }
 
+QString Method::bundleVersion(const QString& kextFile) {
+  // Reading Info.plist per row used to build a QTextEdit each time (and leak it);
+  // a regex over the raw text plus a stat-keyed cache is far cheaper.
+  struct Entry { qint64 mtime; qint64 size; QString ver; };
+  static QHash<QString, Entry> cache;
+  const QString info = kextFile + "/Contents/Info.plist";
+  const QFileInfo fi(info);
+  if (!fi.exists()) return "";
+  const auto it = cache.constFind(info);
+  if (it != cache.constEnd() && it->mtime == fi.lastModified().toMSecsSinceEpoch() &&
+      it->size == fi.size())
+    return it->ver;
+  static const QRegularExpression re(
+      "<key>\\s*CFBundleVersion\\s*</key>\\s*<string>\\s*([^<]*?)\\s*</string>");
+  const QRegularExpressionMatch m = re.match(loadText(info));
+  const QString ver = m.hasMatch() ? m.captured(1) : QString();
+  cache.insert(info, {fi.lastModified().toMSecsSinceEpoch(), fi.size(), ver});
+  return ver;
+}
+
 QString Method::getKextVersion(QString kextFile) {
   if (!QDir(kextFile).exists()) return tr("None");
-  QString strInfo = kextFile + "/Contents/Info.plist";
-  QTextEdit* txtEdit = new QTextEdit;
-  txtEdit->setPlainText(loadText(strInfo));
-  for (int i = 0; i < txtEdit->document()->lineCount(); i++) {
-    QString str0 = getTextEditLineText(txtEdit, i).trimmed();
-    str0.replace("</key>", "");
-    str0.replace("<key>", "");
-    if (str0 == "CFBundleVersion") {
-      QString str1 = getTextEditLineText(txtEdit, i + 1).trimmed();
-      str1.replace("<string>", "");
-      str1.replace("</string>", "");
-      return str1;
-    }
-  }
-
-  return "";
+  return bundleVersion(kextFile);
 }
 
 QString Method::getTextEditLineText(QTextEdit* txtEdit, int i) {
