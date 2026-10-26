@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.21.4] — 2026-10-26
+
+### Changed
+- README: screenshots of the main window (Material theme), EFI Builder, USB Mapping and Post-Install Check, in `docs/screenshots/`.
+
 ## [1.21.3] — 2026-10-26
 
 ### Fixed

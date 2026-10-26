@@ -1,6 +1,6 @@
 # OpenCore Auxiliary Tools (OCAT) — extended fork
 
-![GUI](https://user-images.githubusercontent.com/76865553/165901706-abbccb4a-89bc-4b03-b6e5-f52dcb10b53c.png)
+![OCAT main window](docs/screenshots/main.png)
 
 A cross-platform (macOS / Windows / Linux) Qt GUI editor for OpenCore `config.plist`, with an **EFI Builder**, **USB Mapping**, a **Post-Install Check**, a Material theme and switchable icon sets added on top of the original app.
 
@@ -17,6 +17,9 @@ Unlike other configurators, OCAT doesn't break the config when the OpenCore deve
 Everything here is off to the side of the original editor: open it from the **Tools** menu or the toolbar.
 
 ### EFI Builder (Tools > EFI Builder)
+
+![EFI Builder](docs/screenshots/efi.png)
+
 Builds a ready-to-use EFI from a [Hardware Sniffer](https://github.com/lzhoang2801/Hardware-Sniffer) `Report.json`. The rules and datasets are ported from [OpCore Simplify](https://github.com/lzhoang2801/OpCore-Simplify).
 
 * Checks each device for macOS compatibility and shows the macOS versions your hardware supports.
@@ -34,6 +37,9 @@ Builds a ready-to-use EFI from a [Hardware Sniffer](https://github.com/lzhoang28
 Not ported yet: SSDTs that OpCore Simplify generates with `iasl` (battery, XOSI, HPET and similar), Wi-Fi profile extraction, AMD vanilla kernel patches, iGPU framebuffer patching.
 
 ### USB Mapping (Tools > USB Mapping)
+
+![USB Mapping](docs/screenshots/usb.png)
+
 A native C++/Qt port of [USBMap](https://github.com/corpnewt/USBMap) by CorpNewt, so no Python or Terminal is needed.
 
 * **Discover ports** reads `ioreg` and lists each USB controller and port with its class, connector type and plugged-in devices. Ports with a device are remembered across runs.
@@ -44,6 +50,9 @@ A native C++/Qt port of [USBMap](https://github.com/corpnewt/USBMap) by CorpNewt
 Not included yet: adding the kext to `EFI/OC/Kexts` and `config.plist` for you.
 
 ### Post-Install Check (Tools > Post-Install Check, macOS only)
+
+![Post-Install Check](docs/screenshots/post.png)
+
 Inspects the running Hackintosh against the [Dortania post-install guide](https://dortania.github.io/OpenCore-Post-Install/) and lists what needs attention.
 
 * Sleep and wake, power management, SIP, GPU acceleration, audio, USB, NVMe, LAN, Wi-Fi, Bluetooth, keyboard and trackpad, hardware video decoding, CPU power management, iServices and more. Windows dual-boot time sync is checked too.
