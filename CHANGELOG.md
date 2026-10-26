@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.18.1] — 2026-10-26
+
+### Fixed
+- EFI Builder GPU selection: a GPU that macOS does not support natively is now only offered on its own, not combined with other GPUs, as OpCore Simplify does. Before, such combinations could be picked and then fail.
+
 ## [1.18.0] — 2026-10-26
 
 ### Added

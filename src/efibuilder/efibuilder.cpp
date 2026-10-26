@@ -1083,18 +1083,21 @@ QList<GpuCombo> gpuCombinations(const QJsonObject& r, const Compatibility& c) {
     std::sort(g.begin(), g.end());
     for (int mask = 1; mask < (1 << g.size()); ++mask) {
       GpuCombo gc;
-      bool first = true;
+      bool first = true, needsPatch = false;
       for (int j = 0; j < g.size(); ++j) {
         if (!((mask >> j) & 1)) continue;
         const QString n = names[g[j]];
         gc.names << n;
         const Range one = rng.value(n);
-        if (!one.supported()) continue;
+        if (!one.supported()) { needsPatch = true; continue; }
         if (first) { gc.range = one; first = false; continue; }
         // Intersection: lowest top version, highest bottom version.
         if (darwinLess(one.maxV, gc.range.maxV)) gc.range.maxV = one.maxV;
         if (darwinLess(gc.range.minV, one.minV)) gc.range.minV = one.minV;
       }
+      // Like OpCore Simplify: a GPU that macOS does not support natively (needs
+      // OCLP/root patches) is only offered on its own, never combined with others.
+      if (needsPatch && gc.names.size() > 1) continue;
       const QString key = gc.names.join('\n');
       if (seen.contains(key)) continue;
       seen.insert(key);
