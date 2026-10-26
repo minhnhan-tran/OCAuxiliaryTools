@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.20.0] — 2026-10-26
+
+### Added
+- EFI Builder: Intel Wi-Fi kext choice, ported from OpCore Simplify. When the report has an Intel Wi-Fi card, an "Intel Wi-Fi kext" box offers laobamac AirportItlwm (native Wi-Fi on Sequoia 15.2+/Tahoe without root patches, only when the target supports it), AirportItlwm and itlwm, with OpCore Simplify's recommended default. AirportItlwm on Sequoia/Tahoe also adds IOSkywalkFamily and AMFIPass (plus AirPortBrcmNIC-Tahoe, `-amfipassbeta` on Tahoe), sets SecureBootModel to Disabled and adds an OCLP note. Before, the planner always picked AirportItlwm, which needs OCLP root patches on those macOS versions.
+
 ## [1.19.1] — 2026-10-26
 
 ### Fixed

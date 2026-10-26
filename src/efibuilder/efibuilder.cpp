@@ -1076,6 +1076,43 @@ void overrideAudioKext(Plan* p, bool useOclp) {
               "Run OCLP on the installed system and apply the audio patch.";
 }
 
+QStringList wifiOptions(const QJsonObject& r, const QString& target) {
+  bool intel = false;
+  const QJsonObject net = r["Network"].toObject();
+  for (auto it = net.begin(); it != net.end(); ++it)
+    if (inPci("IntelWiFiIDs", it.value().toObject()["Device ID"].toString())) intel = true;
+  if (!intel) return {};
+  bool fork = false;
+  for (const KextInfo& k : kextCatalog(target, QStringList()))
+    if (k.name == "AirportItlwm-laobamac" && k.compatible) fork = true;
+  QStringList o;
+  if (fork) o << "AirportItlwm-laobamac";
+  o << "AirportItlwm" << "itlwm";
+  return o;
+}
+
+int wifiDefaultIndex(const QStringList& o, const QString& target) {
+  if (o.value(0) == "AirportItlwm-laobamac") return 0;
+  return darwinMajor(target) < 23 ? o.indexOf("AirportItlwm") : o.indexOf("itlwm");
+}
+
+void overrideWifi(Plan* p, const QString& kext, const QString& target) {
+  p->kexts.removeAll("AirportItlwm");
+  p->kexts.removeAll("AirportItlwm-laobamac");
+  p->kexts.removeAll("itlwm");
+  p->kexts << kext;
+  const int major = darwinMajor(target);
+  if (kext != "AirportItlwm" || major < 24) return;
+  // Native AirportItlwm needs the old IO80211 stack restored with OCLP root patches.
+  for (const char* n : {"IOSkywalkFamily", "AMFIPass", "RestrictEvents"})
+    if (!p->kexts.contains(n)) p->kexts << n;
+  if (major >= 25 && !p->kexts.contains("AirPortBrcmNIC-Tahoe")) p->kexts << "AirPortBrcmNIC-Tahoe";
+  if (major >= 25 && !p->bootArgsAdd.contains("-amfipassbeta")) p->bootArgsAdd += " -amfipassbeta";
+  p->secureBootOff = true;
+  p->notes << "AirportItlwm on macOS 15/26 needs OpenCore Legacy Patcher root patches. "
+              "Run OCLP on the installed system, or pick laobamac AirportItlwm / itlwm instead.";
+}
+
 QList<GpuCombo> gpuCombinations(const QJsonObject& r, const Compatibility& c) {
   const QJsonObject gpus = r["GPU"].toObject();
   const QStringList names = gpus.keys();

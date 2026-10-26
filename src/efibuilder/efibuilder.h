@@ -139,6 +139,16 @@ bool audioNeedsTahoeChoice(const QJsonObject& report, const QString& targetDarwi
 //                SecureBootModel = Disabled.
 void overrideAudioKext(Plan* p, bool useOclp);
 
+// Intel Wi-Fi kext choice, as OpCore Simplify offers it: laobamac AirportItlwm
+// (native Wi-Fi on Sequoia 15.2+/Tahoe, no root patches), AirportItlwm, itlwm.
+// Empty when the report has no Intel Wi-Fi card.
+QStringList wifiOptions(const QJsonObject& report, const QString& targetDarwin);
+// Index into wifiOptions() that OpCore Simplify recommends.
+int wifiDefaultIndex(const QStringList& options, const QString& targetDarwin);
+// Swaps the planner's Intel Wi-Fi kext for `kext`. AirportItlwm on Sequoia/Tahoe
+// needs OCLP root patches (IOSkywalkFamily, AMFIPass, -amfipassbeta, SecureBoot off).
+void overrideWifi(Plan* p, const QString& kext, const QString& targetDarwin);
+
 // One selectable GPU combination (OpCore Simplify "GPU combination").
 struct GpuCombo {
   QStringList names;  // GPU names as keys of report["GPU"]

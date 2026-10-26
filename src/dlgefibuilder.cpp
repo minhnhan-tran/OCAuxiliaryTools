@@ -132,6 +132,18 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   audioRow->addWidget(lblAudio);
   audioRow->addWidget(cboAudioKext, 1);
 
+  // Intel Wi-Fi kext (shown only when the report has an Intel Wi-Fi card).
+  lblWifi = new QLabel(tr("Intel Wi-Fi kext:"));
+  cboWifi = new QComboBox;
+  cboWifi->setToolTip(tr("laobamac AirportItlwm: native Wi-Fi on Sequoia 15.2+ and Tahoe without root patches.\n"
+                         "AirportItlwm: native Wi-Fi menu with Continuity; needs OCLP root patches on Sequoia and Tahoe.\n"
+                         "itlwm: more stable, uses the HeliPort app, no Continuity."));
+  lblWifi->hide();
+  cboWifi->hide();
+  QHBoxLayout* wifiRow = new QHBoxLayout;
+  wifiRow->addWidget(lblWifi);
+  wifiRow->addWidget(cboWifi, 1);
+
   QHBoxLayout* bottom = new QHBoxLayout;
   bottom->addWidget(new QLabel(tr("Target macOS:")));
   bottom->addWidget(cboMacos, 1);
@@ -148,6 +160,7 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   lay->addWidget(view, 1);
   lay->addLayout(gpuRow);
   lay->addLayout(audioRow);
+  lay->addLayout(wifiRow);
   lay->addLayout(finRow);
   lay->addLayout(bottom);
 
@@ -157,11 +170,17 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   connect(editAcpi, &QLineEdit::returnPressed, this, &dlgEfiBuilder::analyze);
   connect(editReport, &QLineEdit::returnPressed, this, &dlgEfiBuilder::analyze);
   connect(btnBuild, &QPushButton::clicked, this, &dlgEfiBuilder::build);
+  // A different Wi-Fi kext invalidates a hand-edited kext list.
+  connect(cboWifi, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] {
+    kextsOverridden = false;
+    kextOverride.clear();
+  });
   connect(cboGpu, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] { if (!fullReport.isEmpty()) refresh(); });
   connect(btnCustomize, &QPushButton::clicked, this, &dlgEfiBuilder::customize);
   // A different macOS target changes which models/kexts are valid.
   connect(cboMacos, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] {
     updateAudioRow();
+    updateWifiRow();
     smbiosOverride.clear();
     audioOverride = 0;
     kextsOverridden = false;
@@ -270,6 +289,32 @@ void dlgEfiBuilder::updateAudioRow() {
   cboAudioKext->setVisible(show);
 }
 
+void dlgEfiBuilder::updateWifiRow() {
+  QSignalBlocker b(cboWifi);
+  cboWifi->clear();
+  lblWifi->hide();
+  cboWifi->hide();
+  if (cboMacos->currentIndex() < 0 || report.isEmpty()) return;
+  const QString target = QString("%1.99.99").arg(cboMacos->currentData().toInt());
+  const QStringList opts = EfiBuilder::wifiOptions(report, target);
+  if (opts.isEmpty()) return;
+  const int major = EfiBuilder::darwinMajor(target);
+  for (const QString& o : opts) {
+    QString label;
+    if (o == "AirportItlwm-laobamac")
+      label = tr("laobamac AirportItlwm - native Wi-Fi on Sequoia 15.2+ and Tahoe, no root patches");
+    else if (o == "AirportItlwm")
+      label = tr("AirportItlwm - native Wi-Fi menu, Continuity") +
+              (major >= 24 ? tr(" (needs OCLP root patches)") : QString());
+    else
+      label = tr("itlwm - more stable, uses HeliPort, no Continuity");
+    cboWifi->addItem(label, o);
+  }
+  cboWifi->setCurrentIndex(EfiBuilder::wifiDefaultIndex(opts, target));
+  lblWifi->show();
+  cboWifi->show();
+}
+
 void dlgEfiBuilder::refresh() {
   analyzed = false;
   btnBuild->setEnabled(false);
@@ -338,6 +383,8 @@ void dlgEfiBuilder::build() {
 
   const QString target = QString("%1.99.99").arg(cboMacos->currentData().toInt());
   EfiBuilder::Plan plan = EfiBuilder::makePlan(report, compat, target);
+  if (cboWifi->isVisible() && cboWifi->currentIndex() >= 0)
+    EfiBuilder::overrideWifi(&plan, cboWifi->currentData().toString(), target);
   EfiBuilder::overrideSmbios(&plan, smbiosOverride);
   EfiBuilder::overrideAudio(&plan, audioOverride);
   EfiBuilder::planAcpi(report, loadAcpi(), &plan, databaseAml());
@@ -494,7 +541,9 @@ void dlgEfiBuilder::showNextSteps(const QJsonObject& rep, const EfiBuilder::Plan
 void dlgEfiBuilder::customize() {
   if (!analyzed || cboMacos->currentIndex() < 0) return;
   const QString target = QString("%1.99.99").arg(cboMacos->currentData().toInt());
-  const EfiBuilder::Plan autoPlan = EfiBuilder::makePlan(report, compat, target);
+  EfiBuilder::Plan autoPlan = EfiBuilder::makePlan(report, compat, target);
+  if (cboWifi->isVisible() && cboWifi->currentIndex() >= 0)
+    EfiBuilder::overrideWifi(&autoPlan, cboWifi->currentData().toString(), target);
   const QString currentModel = smbiosOverride.isEmpty() ? autoPlan.smbios : smbiosOverride;
   QStringList currentKexts =
       kextsOverridden ? kextOverride : EfiBuilder::resolveKexts(autoPlan.kexts, target);
