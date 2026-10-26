@@ -845,7 +845,8 @@ Plan makePlan(const QJsonObject& r, const Compatibility& c, const QString& targe
     p.notes << "AMD CPU: the AMD Vanilla kernel patches are NOT applied; add them from AMD_Vanilla.";
 
   // Kexts ---------------------------------------------------------------
-  QSet<QString> k{"Lilu", "VirtualSMC", "RestrictEvents"};
+  // UTBDefault always (its dependency pulls in USBToolBox), like OpCore Simplify.
+  QSet<QString> k{"Lilu", "VirtualSMC", "RestrictEvents", "UTBDefault"};
   if (intel) k << "SMCProcessor";
   k << (laptop ? "SMCBatteryManager" : "SMCSuperIO");
   bool anyGpu = false;
@@ -874,6 +875,11 @@ Plan makePlan(const QJsonObject& r, const Compatibility& c, const QString& targe
     const QString id = it.value().toObject()["Device ID"].toString();
     for (const auto& e : ethMap) if (inPci(e.first, id)) k << e.second;
     if (inPci("IntelWiFiIDs", id)) { k << "AirportItlwm"; }
+    if (pciList("AtherosWiFiIDs").mid(0, 8).contains(id)) {
+      k << "corecaptureElCap";
+      if (targetMax.isEmpty() || darwinMajor(targetMax) >= 25) k << "AirPortAtheros40-Tahoe";
+      if (targetMax.isEmpty() || darwinMajor(targetMax) > 20) k << "AMFIPass";
+    }
     if (inPci("BroadcomWiFiIDs", id)) { k << "AirportBrcmFixup"; p.notes << "Broadcom Wi-Fi: also needs BrcmFirmwareData/BrcmPatchRAM."; }
   }
   const QJsonObject bt = r["Bluetooth"].toObject();
@@ -897,7 +903,7 @@ Plan makePlan(const QJsonObject& r, const Compatibility& c, const QString& targe
   // Storage.
   const QJsonObject stoCtl = r["Storage Controllers"].toObject();
   for (auto it = stoCtl.begin(); it != stoCtl.end(); ++it)
-    if (QJsonDocument(it.value().toObject()).toJson().contains("NVM")) { k << "NVMeFix"; break; }
+    if (it.key().contains("NVMe") || it.key().contains("NVM Express")) { k << "NVMeFix"; break; }
 
   p.kexts = k.values();
   std::sort(p.kexts.begin(), p.kexts.end());

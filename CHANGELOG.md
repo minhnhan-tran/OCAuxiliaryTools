@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.20.3] — 2026-10-26
+
+### Fixed
+- EFI Builder kext planning, aligned with OpCore Simplify: **UTBDefault** is now always added (it pulls in **USBToolBox**); **NVMeFix** is chosen when a storage controller is named NVMe / NVM Express (before, the check matched the wrong field); Atheros Wi-Fi now adds corecaptureElCap, AirPortAtheros40-Tahoe (macOS 26) and **AMFIPass** (macOS 12+).
+
 ## [1.20.2] — 2026-10-26
 
 ### Fixed
