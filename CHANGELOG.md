@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.21.2] — 2026-10-26
+
+### Changed
+- README rewritten: lists this fork's additions (EFI Builder, USB Mapping, Post-Install Check, themes and icon sets), with credit to OpCore Simplify, USBMap, Material Symbols and the original OCAuxiliaryTools.
+
 ## [1.21.1] — 2026-10-26
 
 ### Fixed
