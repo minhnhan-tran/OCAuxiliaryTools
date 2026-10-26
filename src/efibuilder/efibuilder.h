@@ -127,6 +127,16 @@ QVariantMap applyPlan(QVariantMap config, const Plan& plan,
 // Returns how many entries were removed. Unrelated sections are untouched.
 int pruneUnused(QVariantMap* config);
 
+// macOS 26 Tahoe (Darwin 25) removed AppleHDA, so AppleALC alone no longer gives
+// audio. OpCore Simplify asks how to restore it; this is that choice.
+// True when the report has a supported codec and the target is Darwin 25 or newer.
+bool audioNeedsTahoeChoice(const QJsonObject& report, const QString& targetDarwin);
+
+// useOclp=false: AppleALC + SimpleHDA kext (no root patches; the planner default).
+// useOclp=true : AppleALC only; AppleHDA is restored with OpenCore Legacy Patcher
+//                root patches, which also needs -amfipassbeta.
+void overrideAudioKext(Plan* p, bool useOclp);
+
 // One selectable GPU combination (OpCore Simplify "GPU combination").
 struct GpuCombo {
   QStringList names;  // GPU names as keys of report["GPU"]

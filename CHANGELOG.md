@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.19.0] — 2026-10-26
+
+### Added
+- EFI Builder: audio choice for macOS 26 Tahoe, ported from OpCore Simplify. Tahoe removed AppleHDA, so for a target of macOS 26 and a supported codec the dialog now shows an "Audio (macOS Tahoe)" box: **AppleALC + SimpleHDA** (default, no root patches; the SimpleHDA kext is added to the build) or **AppleALC + OpenCore Legacy Patcher** (root-patch AppleHDA; adds `-amfipassbeta` and a note to run OCLP). The box is hidden for older macOS versions or when there is no supported codec.
+
 ## [1.18.1] — 2026-10-26
 
 ### Fixed

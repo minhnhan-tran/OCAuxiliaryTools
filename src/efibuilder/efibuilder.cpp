@@ -857,6 +857,8 @@ Plan makePlan(const QJsonObject& r, const Compatibility& c, const QString& targe
     const AudioInfo au = audioInfo(r);
     if (!au.layouts.isEmpty()) {
       k << "AppleALC";
+      // Tahoe dropped AppleHDA: SimpleHDA restores it without root patches.
+      if (darwinMajor(targetMax) >= 25) k << "SimpleHDA";
       p.audioLayout = au.defaultId;
       p.audioPciPath = au.controllerPciPath;
     }
@@ -1051,6 +1053,18 @@ int pruneUnused(QVariantMap* config) {
   prune("ACPI");
   prune("Kernel");
   return removed;
+}
+
+bool audioNeedsTahoeChoice(const QJsonObject& r, const QString& target) {
+  return darwinMajor(target) >= 25 && !audioInfo(r).layouts.isEmpty();
+}
+
+void overrideAudioKext(Plan* p, bool useOclp) {
+  if (!useOclp) return;
+  p->kexts.removeAll("SimpleHDA");
+  if (!p->bootArgsAdd.contains("-amfipassbeta")) p->bootArgsAdd += " -amfipassbeta";
+  p->notes << "Audio on macOS 26 Tahoe uses OpenCore Legacy Patcher root patches (AppleHDA). "
+              "Run OCLP on the installed system and apply the audio patch.";
 }
 
 QList<GpuCombo> gpuCombinations(const QJsonObject& r, const Compatibility& c) {

@@ -119,6 +119,19 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   gpuRow->addWidget(lblGpu);
   gpuRow->addWidget(cboGpu, 1);
 
+  // Audio on macOS Tahoe (shown only when it applies).
+  lblAudio = new QLabel(tr("Audio (macOS Tahoe):"));
+  cboAudioKext = new QComboBox;
+  cboAudioKext->addItem(tr("AppleALC + SimpleHDA (no root patches)"), false);
+  cboAudioKext->addItem(tr("AppleALC + OpenCore Legacy Patcher (root patch AppleHDA)"), true);
+  cboAudioKext->setToolTip(tr("macOS 26 removed AppleHDA. SimpleHDA restores it through OpenCore; "
+                              "OCLP needs root patches and -amfipassbeta."));
+  lblAudio->hide();
+  cboAudioKext->hide();
+  QHBoxLayout* audioRow = new QHBoxLayout;
+  audioRow->addWidget(lblAudio);
+  audioRow->addWidget(cboAudioKext, 1);
+
   QHBoxLayout* bottom = new QHBoxLayout;
   bottom->addWidget(new QLabel(tr("Target macOS:")));
   bottom->addWidget(cboMacos, 1);
@@ -134,6 +147,7 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   lay->addLayout(acpiRow);
   lay->addWidget(view, 1);
   lay->addLayout(gpuRow);
+  lay->addLayout(audioRow);
   lay->addLayout(finRow);
   lay->addLayout(bottom);
 
@@ -147,6 +161,7 @@ dlgEfiBuilder::dlgEfiBuilder(QWidget* parent) : QDialog(parent) {
   connect(btnCustomize, &QPushButton::clicked, this, &dlgEfiBuilder::customize);
   // A different macOS target changes which models/kexts are valid.
   connect(cboMacos, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] {
+    updateAudioRow();
     smbiosOverride.clear();
     audioOverride = 0;
     kextsOverridden = false;
@@ -247,6 +262,14 @@ void dlgEfiBuilder::analyze() {
   refresh();
 }
 
+void dlgEfiBuilder::updateAudioRow() {
+  const bool show = cboMacos->currentIndex() >= 0 && !report.isEmpty() &&
+                    EfiBuilder::audioNeedsTahoeChoice(
+                        report, QString("%1.99.99").arg(cboMacos->currentData().toInt()));
+  lblAudio->setVisible(show);
+  cboAudioKext->setVisible(show);
+}
+
 void dlgEfiBuilder::refresh() {
   analyzed = false;
   btnBuild->setEnabled(false);
@@ -327,6 +350,9 @@ void dlgEfiBuilder::build() {
   } else {
     EfiBuilder::overrideKexts(&plan, defaultKexts);
   }
+  // Tahoe audio: SimpleHDA (default) or OCLP root patches. Applied last so it wins over kext edits.
+  if (EfiBuilder::audioNeedsTahoeChoice(report, target) && cboAudioKext->currentData().toBool())
+    EfiBuilder::overrideAudioKext(&plan, true);
 
   const QString dbDir = mw_one->userDataBaseDir;
   QString tplPath = dbDir + "BaseConfigs/" + plan.templateName + ".plist";
@@ -470,8 +496,10 @@ void dlgEfiBuilder::customize() {
   const QString target = QString("%1.99.99").arg(cboMacos->currentData().toInt());
   const EfiBuilder::Plan autoPlan = EfiBuilder::makePlan(report, compat, target);
   const QString currentModel = smbiosOverride.isEmpty() ? autoPlan.smbios : smbiosOverride;
-  const QStringList currentKexts =
+  QStringList currentKexts =
       kextsOverridden ? kextOverride : EfiBuilder::resolveKexts(autoPlan.kexts, target);
+  if (EfiBuilder::audioNeedsTahoeChoice(report, target) && cboAudioKext->currentData().toBool())
+    currentKexts.removeAll("SimpleHDA");  // the OCLP choice replaces it
 
   QStringList database;
   for (const QFileInfo& fi : QDir(mw_one->userDataBaseDir + "EFI/OC/Kexts")

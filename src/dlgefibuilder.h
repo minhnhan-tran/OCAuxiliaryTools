@@ -27,6 +27,7 @@ class dlgEfiBuilder : public QDialog {
   void customize();
   void browseAcpi();
   void refresh();
+  void updateAudioRow();
   void showNextSteps(const QJsonObject& rep, const EfiBuilder::Plan& plan);
 
  private:
@@ -45,6 +46,8 @@ class dlgEfiBuilder : public QDialog {
   QJsonObject fullReport;  // as loaded
   QJsonObject report;      // fullReport minus the GPUs the user did not pick
   QLabel* lblGpu;
+  QLabel* lblAudio;
+  QComboBox* cboAudioKext;
   QComboBox* cboGpu;
   QList<EfiBuilder::GpuCombo> gpuCombos;
   EfiBuilder::Compatibility compat;
