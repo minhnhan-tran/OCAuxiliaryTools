@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.26.1] — 2026-10-27
+
+### Fixed
+- Post-Install Check "OpenCore boots from the internal disk": read the disk's Internal flag with grep instead of `plutil -extract ... raw`, which older macOS versions lack. There an internal disk would have been reported as missing (a false failure).
+
 ## [1.26.0] — 2026-10-27
 
 ### Added

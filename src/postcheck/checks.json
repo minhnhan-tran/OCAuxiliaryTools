@@ -998,7 +998,7 @@
    "id": "boot-from-internal",
    "group": "Boot and NVRAM",
    "title": "OpenCore boots from the internal disk (no USB stick needed)",
-   "cmd": "oc=$(nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:opencore-version 2>/dev/null | grep -c opencore-version); bp=$(nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:boot-path 2>/dev/null | sed 's/%00//g'); u=$(printf '%s' \"$bp\" | grep -oiE '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' | head -1); if [ \"$oc\" = 0 ]; then echo \"oc=0\"; elif [ -z \"$u\" ]; then echo \"oc=1 bootdisk=unknown\"; else i=$(diskutil info -plist \"$u\" 2>/dev/null | plutil -extract Internal raw -o - - 2>/dev/null); case \"$i\" in true) r=internal;; false) r=external;; *) r=missing;; esac; echo \"oc=1 bootdisk=$r\"; fi",
+   "cmd": "oc=$(nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:opencore-version 2>/dev/null | grep -c opencore-version); bp=$(nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:boot-path 2>/dev/null | sed 's/%00//g'); u=$(printf '%s' \"$bp\" | grep -oiE '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' | head -1); if [ \"$oc\" = 0 ]; then echo \"oc=0\"; elif [ -z \"$u\" ]; then echo \"oc=1 bootdisk=unknown\"; else i=$(diskutil info -plist \"$u\" 2>/dev/null | grep -A1 '<key>Internal</key>' | grep -o 'true\\|false' | head -1); case \"$i\" in true) r=internal;; false) r=external;; *) r=missing;; esac; echo \"oc=1 bootdisk=$r\"; fi",
    "skip": "\\boc=0\\b",
    "skipWhy": "Not applicable: OpenCore did not report its version, so this Mac was not started by OpenCore (or the opencore-version NVRAM variable is not exposed).",
    "pass": "bootdisk=internal\\b",
