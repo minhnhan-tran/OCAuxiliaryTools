@@ -6,9 +6,12 @@
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
+#include <QNetworkAccessManager>
 #include <QPlainTextEdit>
+#include <QProgressBar>
 #include <QPushButton>
 
+#include "macosinstaller/macosdownload.h"
 #include "macosinstaller/macosinstaller.h"
 
 // Tools > Create macOS Installation: make a bootable macOS installer USB with Apple's
@@ -26,6 +29,12 @@ class dlgMacOSInstaller : public QDialog {
   void browseInstaller();
   void browseEfi();
   void downloadSelected();
+  void cancelDownload();
+  void downloadFinished(bool ok, const QString& error);
+  void installDownloaded();
+  void browseFolder();
+  QString downloadPath(const MacInstaller::Product& p) const;
+  void updateDownloadButtons();
   void updateCommand();
   void createUsb();
   QString currentInstaller() const;
@@ -36,10 +45,18 @@ class dlgMacOSInstaller : public QDialog {
   QCheckBox* chkEfi;
   QLineEdit* editEfi;
   QPlainTextEdit* preview;
-  QPushButton *btnCreate, *btnCopy, *btnDownload;
+  QPushButton *btnCreate, *btnCopy, *btnDownload, *btnCancel, *btnInstallPkg, *btnLoad;
+  QCheckBox* chkBeta;
+  QLineEdit* editFolder;
+  QProgressBar* bar;
+  QNetworkAccessManager nam;
+  MacInstaller::CatalogLoader* loader = nullptr;
+  MacInstaller::Downloader* downloader = nullptr;
+  QString downloadedPkg;   // a finished, verified InstallAssistant pkg waiting to be installed
   QString extraInstaller;  // chosen with Browse
   QString command;         // the command the buttons use; "" when something is missing
-  QList<MacInstaller::AppleInstaller> appleList;
+  QList<MacInstaller::Product> appleList;  // everything the catalog offered, newest first
+  QList<MacInstaller::Product> shown;      // what cboApple lists (beta filter applied)
 };
 
 #endif

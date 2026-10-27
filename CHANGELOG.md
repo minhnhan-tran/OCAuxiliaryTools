@@ -4,6 +4,15 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.25.0] — 2026-10-27
+
+### Added
+- Create macOS Installation: download the macOS installer inside the app, like OpenCore Legacy Patcher. It reads Apple's software-update catalog and lists every full installer (Tahoe back to Big Sur) with version, build and size, newest first; seed/beta builds are hidden unless ticked.
+  - The `InstallAssistant.pkg` is downloaded with a progress bar, Cancel, and resume (a stalled connection is aborted after 60 s and the partial file kept). Only https `apple.com` addresses are accepted, and free disk space is checked first.
+  - The finished file must carry an Apple package signature (`pkgutil --check-signature`) before it can be installed. "Install to /Applications..." then runs `sudo installer -pkg ...` in Terminal, which creates the `Install macOS *.app` the USB step uses.
+### Changed
+- The "From Apple" list no longer uses `softwareupdate --list-full-installers` (it only offered what Apple allows for the running Mac); the catalog also covers older macOS versions.
+
 ## [1.24.0] — 2026-10-27
 
 ### Added

@@ -9,6 +9,8 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QProcess>
+#include <QStorageInfo>
+#include <QDir>
 #include <QVBoxLayout>
 
 #include "postcheck/postcheck.h"
@@ -49,14 +51,37 @@ dlgMacOSInstaller::dlgMacOSInstaller(QWidget* parent) : QDialog(parent) {
   lblInstaller->setWordWrap(true);
   l1->addWidget(lblInstaller, 1, 0, 1, 4);
   cboApple = new QComboBox;
-  btnDownload = new QPushButton(tr("Download in Terminal"));
-  btnDownload->setEnabled(false);
+  btnLoad = new QPushButton(tr("Load list"));
   l1->addWidget(new QLabel(tr("From Apple:")), 2, 0);
   l1->addWidget(cboApple, 2, 1);
-  l1->addWidget(btnDownload, 2, 2, 1, 2);
-  lblApple = new QLabel(tr("Looking up the installers Apple offers..."));
+  l1->addWidget(btnLoad, 2, 2, 1, 2);
+  chkBeta = new QCheckBox(tr("Show beta / seed builds"));
+  l1->addWidget(chkBeta, 3, 1, 1, 3);
+  editFolder = new QLineEdit(QDir::homePath() + "/Downloads");
+  QPushButton* bFolder = new QPushButton(tr("Browse..."));
+  l1->addWidget(new QLabel(tr("Save to:")), 4, 0);
+  l1->addWidget(editFolder, 4, 1);
+  l1->addWidget(bFolder, 4, 2, 1, 2);
+  btnDownload = new QPushButton(tr("Download"));
+  btnCancel = new QPushButton(tr("Cancel"));
+  btnInstallPkg = new QPushButton(tr("Install to /Applications..."));
+  btnDownload->setEnabled(false);
+  btnCancel->setEnabled(false);
+  btnInstallPkg->setEnabled(false);
+  QHBoxLayout* dl = new QHBoxLayout;
+  dl->addWidget(btnDownload);
+  dl->addWidget(btnCancel);
+  dl->addWidget(btnInstallPkg);
+  dl->addStretch(1);
+  l1->addLayout(dl, 5, 0, 1, 4);
+  bar = new QProgressBar;
+  bar->setRange(0, 1000);
+  bar->setTextVisible(true);
+  bar->setVisible(false);
+  l1->addWidget(bar, 6, 0, 1, 4);
+  lblApple = new QLabel(tr("Press \"Load list\" to read Apple's installer catalog."));
   lblApple->setWordWrap(true);
-  l1->addWidget(lblApple, 3, 0, 1, 4);
+  l1->addWidget(lblApple, 7, 0, 1, 4);
   l1->setColumnStretch(1, 1);
   top->addWidget(g1);
 
@@ -108,14 +133,18 @@ dlgMacOSInstaller::dlgMacOSInstaller(QWidget* parent) : QDialog(parent) {
   connect(bDisks, &QPushButton::clicked, this, &dlgMacOSInstaller::refreshDisks);
   connect(bEfi, &QPushButton::clicked, this, &dlgMacOSInstaller::browseEfi);
   connect(btnDownload, &QPushButton::clicked, this, &dlgMacOSInstaller::downloadSelected);
+  connect(btnCancel, &QPushButton::clicked, this, &dlgMacOSInstaller::cancelDownload);
+  connect(btnInstallPkg, &QPushButton::clicked, this, &dlgMacOSInstaller::installDownloaded);
+  connect(btnLoad, &QPushButton::clicked, this, &dlgMacOSInstaller::fetchAppleList);
+  connect(bFolder, &QPushButton::clicked, this, &dlgMacOSInstaller::browseFolder);
+  connect(chkBeta, &QCheckBox::toggled, this, [this] { updateDownloadButtons(); });
+  connect(editFolder, &QLineEdit::textChanged, this, [this] { updateDownloadButtons(); });
   connect(btnCreate, &QPushButton::clicked, this, &dlgMacOSInstaller::createUsb);
   connect(bClose, &QPushButton::clicked, this, &QDialog::accept);
   connect(btnCopy, &QPushButton::clicked, this, [this] { QApplication::clipboard()->setText(command); });
   connect(cboInstaller, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] { updateCommand(); });
   connect(cboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] { updateCommand(); });
-  connect(cboApple, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int i) {
-    btnDownload->setEnabled(i >= 0 && i < appleList.size());
-  });
+  connect(cboApple, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] { updateDownloadButtons(); });
   connect(chkEfi, &QCheckBox::toggled, this, [this] { updateCommand(); });
   connect(editEfi, &QLineEdit::textChanged, this, [this] { updateCommand(); });
 
@@ -123,6 +152,7 @@ dlgMacOSInstaller::dlgMacOSInstaller(QWidget* parent) : QDialog(parent) {
   refreshDisks();
   fetchAppleList();
   updateCommand();
+  updateDownloadButtons();
 #endif
 }
 
@@ -199,35 +229,135 @@ void dlgMacOSInstaller::refreshDisks() {
 }
 
 void dlgMacOSInstaller::fetchAppleList() {
-  QProcess* p = new QProcess(this);
-  connect(p, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this, p](int code, QProcess::ExitStatus) {
-    const QString out = QString::fromUtf8(p->readAllStandardOutput()) + QString::fromUtf8(p->readAllStandardError());
-    p->deleteLater();
-    appleList = parseFullInstallers(out);
-    cboApple->clear();
-    for (const AppleInstaller& a : appleList)
-      cboApple->addItem(QString("%1 %2  (%3, %4 GB)%5").arg(a.title, a.version, a.build, QString::number(a.sizeKiB * 1024.0 / 1e9, 'f', 1),
-                                                          a.deferred ? tr(" - deferred") : QString()), a.version);
-    lblApple->setText(appleList.isEmpty()
-        ? (code == 0 ? tr("Apple lists no full installers for this Mac.") : tr("Could not get Apple's installer list (no network?)."))
-        : tr("Downloads to /Applications as \"Install macOS ...app\" and needs your password. It can take a while."));
-    btnDownload->setEnabled(!appleList.isEmpty());
+  if (loader) return;
+  btnLoad->setEnabled(false);
+  lblApple->setText(tr("Reading Apple's installer catalog..."));
+  loader = new MacInstaller::CatalogLoader(&nam, this);
+  connect(loader, &CatalogLoader::finished, this, [this](const QList<Product>& list, const QString& error) {
+    loader->deleteLater();
+    loader = nullptr;
+    btnLoad->setEnabled(true);
+    appleList = list;
+    if (!error.isEmpty()) lblApple->setText(error);
+    else lblApple->setText(tr("%1 installers from Apple. The file is a signed InstallAssistant.pkg; it is checked, then installed into /Applications.").arg(list.size()));
+    updateDownloadButtons();
   });
-  connect(p, &QProcess::errorOccurred, this, [this, p](QProcess::ProcessError) {
-    lblApple->setText(tr("Could not run softwareupdate."));
-    p->deleteLater();
-  });
-  p->start("softwareupdate", QStringList() << "--list-full-installers");
+  loader->start();
+}
+
+QString dlgMacOSInstaller::downloadPath(const Product& p) const {
+  const QString name = pkgFileName(p);
+  return name.isEmpty() ? QString() : QDir(editFolder->text().trimmed()).filePath(name);
+}
+
+void dlgMacOSInstaller::updateDownloadButtons() {
+  const QString keep = cboApple->currentData().toString();
+  cboApple->blockSignals(true);
+  cboApple->clear();
+  shown.clear();
+  for (const Product& p : appleList) {
+    if (!chkBeta->isChecked() && isBetaBuild(p.build)) continue;
+    shown << p;
+    cboApple->addItem(QString("%1 %2  (%3, %4)").arg(p.title, p.version, p.build, humanSize(p.size)), p.id);
+  }
+  int idx = cboApple->findData(keep);
+  cboApple->setCurrentIndex(idx >= 0 ? idx : (cboApple->count() ? 0 : -1));
+  cboApple->blockSignals(false);
+  const bool busy = downloader && downloader->running();
+  const int i = cboApple->currentIndex();
+  const bool ok = !busy && i >= 0 && i < shown.size() && !downloadPath(shown[i]).isEmpty() && QFileInfo(editFolder->text().trimmed()).isDir();
+  btnDownload->setEnabled(ok);
+  btnCancel->setEnabled(busy);
+  btnLoad->setEnabled(!loader && !busy);
+  cboApple->setEnabled(!busy);
+  btnInstallPkg->setEnabled(!busy && !downloadedPkg.isEmpty());
+  if (ok && QFileInfo::exists(downloadPath(shown[i]) + ".part"))
+    btnDownload->setText(tr("Resume download"));
+  else
+    btnDownload->setText(tr("Download"));
+}
+
+void dlgMacOSInstaller::browseFolder() {
+  const QString d = QFileDialog::getExistingDirectory(this, tr("Save the installer to"), editFolder->text());
+  if (!d.isEmpty()) editFolder->setText(d);
 }
 
 void dlgMacOSInstaller::downloadSelected() {
   const int i = cboApple->currentIndex();
-  if (i < 0 || i >= appleList.size()) return;
-  const QString cmd = downloadCommand(appleList[i].version);
-  if (cmd.isEmpty()) return;
+  if (i < 0 || i >= shown.size() || (downloader && downloader->running())) return;
+  const Product p = shown[i];
+  const QString path = downloadPath(p);
+  if (path.isEmpty()) return;
+  downloadedPkg.clear();
+  // The pkg is as big as the installer, and installing it needs about the same again.
+  const QString dir = editFolder->text().trimmed();
+  const qint64 have = QStorageInfo(dir).bytesAvailable();
+  const qint64 partial = QFileInfo(path + ".part").exists() ? QFileInfo(path + ".part").size() : 0;
+  if (!QFileInfo::exists(path) && have >= 0 && have < p.size - partial + 1000000000LL) {
+    QMessageBox::warning(this, windowTitle(), tr("Not enough free space in %1: %2 free, %3 needed. Pick another folder.")
+                                                  .arg(dir, humanSize(have), humanSize(p.size - partial)));
+    return;
+  }
+  if (!downloader) {
+    downloader = new MacInstaller::Downloader(&nam, this);
+    connect(downloader, &Downloader::progress, this, [this](qint64 done, qint64 total) {
+      bar->setVisible(true);
+      bar->setValue(total > 0 ? int(done * 1000 / total) : 0);
+      bar->setFormat(QString("%1 / %2").arg(humanSize(done), humanSize(total)));
+    });
+    connect(downloader, &Downloader::finished, this, &dlgMacOSInstaller::downloadFinished);
+  }
+  if (QFileInfo::exists(path)) {  // already downloaded: just verify it again
+    downloadedPkg = path;
+    downloadFinished(true, QString());
+    return;
+  }
   QString err;
-  if (!PostCheck::openInTerminal(cmd, &err)) QMessageBox::warning(this, windowTitle(), tr("Could not open Terminal: %1").arg(err));
-  else lblApple->setText(tr("Download started in Terminal. When it finishes, press Refresh next to \"Installed\"."));
+  lblApple->setText(tr("Downloading %1 %2...").arg(p.title, p.version));
+  if (!downloader->start(p.pkgUrl, path, p.size, &err)) {
+    lblApple->setText(err);
+    return;
+  }
+  downloadedPkg = path;
+  updateDownloadButtons();
+}
+
+void dlgMacOSInstaller::cancelDownload() {
+  if (downloader) downloader->cancel();
+}
+
+void dlgMacOSInstaller::downloadFinished(bool ok, const QString& error) {
+  if (!ok) {
+    downloadedPkg.clear();
+    lblApple->setText(error);
+    updateDownloadButtons();
+    return;
+  }
+  // Apple signs the pkg; refuse anything else before it can reach `installer`.
+  QProcess p;
+  p.start("pkgutil", QStringList() << "--check-signature" << downloadedPkg);
+  const bool done = p.waitForFinished(120000);
+  const QString out = QString::fromUtf8(p.readAllStandardOutput()) + QString::fromUtf8(p.readAllStandardError());
+  if (!done || p.exitCode() != 0 || !packageSigned(out)) {
+    lblApple->setText(tr("The downloaded file is not a package signed by Apple, so it was NOT trusted: %1\nDelete it and download again.").arg(downloadedPkg));
+    downloadedPkg.clear();
+    updateDownloadButtons();
+    return;
+  }
+  bar->setVisible(false);
+  lblApple->setText(tr("Downloaded and verified (Apple signature): %1\nPress \"Install to /Applications...\" to unpack the installer app.").arg(downloadedPkg));
+  updateDownloadButtons();
+}
+
+void dlgMacOSInstaller::installDownloaded() {
+  const QString cmd = installPkgCommand(downloadedPkg);
+  if (cmd.isEmpty() || !QFileInfo::exists(downloadedPkg)) return;
+  QString err;
+  if (!PostCheck::openInTerminal(cmd, &err)) {
+    QMessageBox::warning(this, windowTitle(), tr("Could not open Terminal: %1").arg(err));
+    return;
+  }
+  lblApple->setText(tr("Terminal is installing the package. Enter your password there; when it says \"The install was successful\", press Refresh next to \"Installed\"."));
 }
 
 void dlgMacOSInstaller::browseEfi() {

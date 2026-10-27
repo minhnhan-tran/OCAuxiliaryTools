@@ -72,6 +72,7 @@ SOURCES += \
     src/dlgusbmap.cpp \
     src/dlgmacosinstaller.cpp \
     src/macosinstaller/macosinstaller.cpp \
+    src/macosinstaller/macosdownload.cpp \
     src/usbmap/usbmap.cpp \
     src/postcheck/postcheck.cpp \
     src/efibuilder/efibuilder.cpp \
@@ -115,6 +116,7 @@ HEADERS += \
     src/dlgusbmap.h \
     src/dlgmacosinstaller.h \
     src/macosinstaller/macosinstaller.h \
+    src/macosinstaller/macosdownload.h \
     src/usbmap/usbmap.h \
     src/postcheck/postcheck.h \
     src/efibuilder/efibuilder.h \

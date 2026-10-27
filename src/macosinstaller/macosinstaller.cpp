@@ -6,6 +6,7 @@
 #include <QJsonDocument>
 #include <QProcess>
 #include <QRegularExpression>
+#include <QVersionNumber>
 
 namespace MacInstaller {
 
@@ -18,18 +19,80 @@ bool validDiskId(const QString& id) {
   return QRegularExpression("\\Adisk[0-9]+\\z").match(id).hasMatch();
 }
 
-QList<AppleInstaller> parseFullInstallers(const QString& out) {
-  QList<AppleInstaller> list;
-  const QRegularExpression re("Title: (.*?), Version: ([0-9.]+), Size: ([0-9]+)KiB, Build: ([A-Za-z0-9]+), Deferred: (YES|NO)");
-  for (const QString& line : out.split('\n')) {
-    const QRegularExpressionMatch m = re.match(line);
-    if (!m.hasMatch() || !validVersion(m.captured(2))) continue;
-    AppleInstaller a;
-    a.title = m.captured(1); a.version = m.captured(2); a.sizeKiB = m.captured(3).toLongLong();
-    a.build = m.captured(4); a.deferred = m.captured(5) == "YES";
-    list << a;
+QUrl catalogUrl() {
+  return QUrl("https://swscan.apple.com/content/catalogs/others/index-26-15-14-13-12-10.16-10.15-10.14-10.13-10.12-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog");
+}
+
+bool trustedAppleUrl(const QUrl& u) {
+  const QString h = u.host().toLower();
+  return u.isValid() && u.scheme() == "https" && (h == "apple.com" || h.endsWith(".apple.com")) && u.userInfo().isEmpty();
+}
+
+QList<Product> parseCatalog(const QVariantMap& root) {
+  QList<Product> list;
+  const QVariantMap products = root["Products"].toMap();
+  for (auto it = products.begin(); it != products.end(); ++it) {
+    const QVariantMap p = it.value().toMap();
+    Product out;
+    for (const QVariant& pv : p["Packages"].toList()) {
+      const QVariantMap pk = pv.toMap();
+      const QUrl u(pk["URL"].toString());
+      if (u.path().endsWith("/InstallAssistant.pkg")) { out.pkgUrl = u; out.size = pk["Size"].toLongLong(); break; }
+    }
+    out.distUrl = QUrl(p["Distributions"].toMap()["English"].toString());
+    if (out.pkgUrl.isEmpty() || out.size <= 0 || !trustedAppleUrl(out.pkgUrl) || !trustedAppleUrl(out.distUrl)) continue;
+    out.id = it.key();
+    out.date = p["PostDate"].toDateTime();
+    list << out;
   }
   return list;
+}
+
+bool parseDistribution(const QString& xml, Product* p) {
+  const QRegularExpression title("<title>([^<]+)</title>");
+  auto key = [&](const char* k) {
+    const QRegularExpressionMatch m = QRegularExpression(QString("<key>%1</key>\\s*<string>([^<]+)</string>").arg(k)).match(xml);
+    return m.hasMatch() ? m.captured(1).trimmed() : QString();
+  };
+  const QRegularExpressionMatch t = title.match(xml);
+  const QString v = key("VERSION"), b = key("BUILD");
+  if (!t.hasMatch() || !validVersion(v) || !QRegularExpression("\\A[A-Za-z0-9]+\\z").match(b).hasMatch()) return false;
+  p->title = t.captured(1).trimmed(); p->version = v; p->build = b;
+  return true;
+}
+
+QString pkgFileName(const Product& p) {
+  if (!validVersion(p.version) || !QRegularExpression("\\A[A-Za-z0-9]+\\z").match(p.build).hasMatch()) return QString();
+  return "InstallAssistant-" + p.version + "-" + p.build + ".pkg";
+}
+
+bool packageSigned(const QString& out) {
+  return out.contains("Status: signed Apple Software") || out.contains("Status: signed by a certificate trusted by macOS");
+}
+
+QString installPkgCommand(const QString& pkg) {
+  if (!pkg.endsWith(".pkg")) return QString();
+  return "sudo installer -pkg " + shQuote(pkg) + " -target /";
+}
+
+bool isBetaBuild(const QString& build) {
+  // Apple has no beta flag in the catalog. Seed builds end in a lowercase letter (25A5316i) or
+  // carry a build number of 5000+ (26B7124), while release builds stay lower (25G332, 21H1320).
+  if (QRegularExpression("[0-9][a-z]\\z").match(build).hasMatch()) return true;
+  const QRegularExpressionMatch m = QRegularExpression("\\A[0-9]+[A-Z]+([0-9]+)\\z").match(build);
+  return m.hasMatch() && m.captured(1).toInt() >= 5000;
+}
+
+bool newerFirst(const Product& a, const Product& b) {
+  const QVersionNumber va = QVersionNumber::fromString(a.version), vb = QVersionNumber::fromString(b.version);
+  if (va != vb) return va > vb;
+  if (a.date != b.date) return a.date > b.date;
+  return a.build > b.build;
+}
+
+QString humanSize(qint64 b) {
+  if (b < 1000000000LL) return QString::number(b / 1e6, 'f', 1) + " MB";
+  return QString::number(b / 1e9, 'f', b >= 100e9 ? 0 : 1) + " GB";
 }
 
 static QString wholeDisk(QString id) {  // disk0s2 -> disk0
@@ -77,11 +140,6 @@ QString checkEfiFolder(const QString& dir) {
 }
 
 QString volumeLabel(const Disk& disk) { return "OCAT-" + disk.id; }
-
-QString downloadCommand(const QString& version) {
-  if (!validVersion(version)) return QString();
-  return "sudo softwareupdate --fetch-full-installer --full-installer-version " + version;
-}
 
 QString createCommand(const QString& app, const Disk& disk, const QString& efi) {
   const QString cim = app + "/Contents/Resources/createinstallmedia";
