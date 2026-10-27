@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.26.0] — 2026-10-27
+
+### Added
+- Post-Install Check (Boot and NVRAM): **OpenCore boots from the internal disk (no USB stick needed)**. It reads OpenCore's `boot-path` NVRAM variable, finds the partition OpenCore was started from, and asks macOS whether that disk is internal. External (still running from the stick) and missing disks fail; the check is skipped when the Mac was not started by OpenCore. If `boot-path` is not exposed (Misc > Security > ExposeSensitiveData bit 0x1) it gives no verdict and says how to enable it. It cannot see the internal EFI partition's contents or `LauncherOption`, and says so.
+
 ## [1.25.1] — 2026-10-27
 
 ### Fixed

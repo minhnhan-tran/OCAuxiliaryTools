@@ -995,6 +995,31 @@
    "needsReport": false
   },
   {
+   "id": "boot-from-internal",
+   "group": "Boot and NVRAM",
+   "title": "OpenCore boots from the internal disk (no USB stick needed)",
+   "cmd": "oc=$(nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:opencore-version 2>/dev/null | grep -c opencore-version); bp=$(nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:boot-path 2>/dev/null | sed 's/%00//g'); u=$(printf '%s' \"$bp\" | grep -oiE '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' | head -1); if [ \"$oc\" = 0 ]; then echo \"oc=0\"; elif [ -z \"$u\" ]; then echo \"oc=1 bootdisk=unknown\"; else i=$(diskutil info -plist \"$u\" 2>/dev/null | plutil -extract Internal raw -o - - 2>/dev/null); case \"$i\" in true) r=internal;; false) r=external;; *) r=missing;; esac; echo \"oc=1 bootdisk=$r\"; fi",
+   "skip": "\\boc=0\\b",
+   "skipWhy": "Not applicable: OpenCore did not report its version, so this Mac was not started by OpenCore (or the opencore-version NVRAM variable is not exposed).",
+   "pass": "bootdisk=internal\\b",
+   "fail": "bootdisk=(external|missing)\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/oc2hdd.html",
+   "why": "This reads the NVRAM boot-path variable, which holds the partition OpenCore was started from, and asks macOS whether that disk is internal. 'external' means OpenCore is still running from a USB stick (or another external drive), so the Mac cannot start without it. 'missing' means the recorded partition is not attached any more. If the result is unknown, OpenCore does not expose boot-path: set Misc > Security > ExposeSensitiveData to include bit 0x1 (value 3 is the usual default) and restart. This only shows where OpenCore started from this time. It cannot see whether the internal EFI partition holds a working copy, or read Misc > Boot > LauncherOption, so it does not prove the Mac will boot with the stick removed.",
+   "fixes": [
+    {
+     "cmd": "nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:boot-path 2>&1; nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:opencore-version 2>&1",
+     "why": "Shows the raw boot-path and OpenCore version. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "Copy the EFI folder from the USB stick to the EFI partition of the internal disk (mount it with `sudo diskutil mount disk0s1`, adjusting the disk number), then boot from that disk in the firmware's boot menu. If the firmware cannot find OpenCore by itself, set Misc > Boot > LauncherOption to Full (this needs RequestBootVarRouting). The Dortania page linked above has the steps."
+    }
+   ],
+   "timeoutSec": 20,
+   "needsReport": false
+  },
+  {
    "id": "rom-en0",
    "group": "iServices",
    "title": "NVRAM ROM matches the en0 MAC address",
