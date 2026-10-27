@@ -4,6 +4,15 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.24.0] — 2026-10-27
+
+### Added
+- Tools > **Create macOS Installation...** (macOS only), modelled on Dortania's OpenCore Legacy Patcher: make a bootable macOS installer USB with Apple's `createinstallmedia`.
+  - Lists the `Install macOS *.app` bundles in /Applications (or Browse to one), and the full installers Apple offers (`softwareupdate --list-full-installers`); a chosen one is downloaded in Terminal.
+  - Only external physical drives of 16 GB or more are offered. Internal and virtual disks and the disk macOS runs from are never listed, and the drive is checked again right before the erase.
+  - Optionally copies an OpenCore EFI folder (needs `BOOT/BOOTx64.efi` and `OC/config.plist`) onto the USB's EFI partition.
+  - Nothing is erased from the app: the exact command is shown, opened in Terminal after an explicit "Erase and create" confirmation, and you type your password there.
+
 ## [1.23.1] — 2026-10-26
 
 ### Fixed

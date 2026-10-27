@@ -1038,6 +1038,7 @@ class MainWindow : public QMainWindow {
   void openEfiBuilder();
   void openPostCheck();
   void openUsbMap();
+  void openMacOSInstaller();
   QAction* actionBuildEfi = nullptr;
   QAction* actionPostCheck = nullptr;
   QAction* actionUsbMapBtn = nullptr;

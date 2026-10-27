@@ -3,6 +3,7 @@
 #include "dlgefibuilder.h"
 #include "dlgpostcheck.h"
 #include "dlgusbmap.h"
+#include "dlgmacosinstaller.h"
 #include "iconset.h"
 #include "theme.h"
 
@@ -255,6 +256,11 @@ void MainWindow::openUsbMap() {
   dlg.exec();
 }
 
+void MainWindow::openMacOSInstaller() {
+  dlgMacOSInstaller dlg(this);
+  dlg.exec();
+}
+
 void MainWindow::initRecentFilesForToolBar() {
   // One-time: add the OpCore-Simplify style EFI builder to the Tools menu.
   if (!ui->menuTools->findChild<QAction*>("actionEfiBuilder")) {
@@ -274,6 +280,15 @@ void MainWindow::initRecentFilesForToolBar() {
     usb->setObjectName("actionUsbMap");
     ui->menuTools->insertAction(ui->actionGenerateEFI, usb);
     connect(usb, &QAction::triggered, this, &MainWindow::openUsbMap);
+  }
+  if (!ui->menuTools->findChild<QAction*>("actionMacOSInstaller")) {
+    QAction* mi = new QAction(tr("Create macOS Installation..."), ui->menuTools);
+    mi->setObjectName("actionMacOSInstaller");
+#ifndef Q_OS_MAC
+    mi->setToolTip(tr("Only available on macOS"));
+#endif
+    ui->menuTools->insertAction(ui->actionGenerateEFI, mi);
+    connect(mi, &QAction::triggered, this, &MainWindow::openMacOSInstaller);
   }
   if (!ui->menuHelp->findChild<QAction*>("actionPostInstall")) {
     QAction* post = new QAction(tr("OpenCore Post-Install Guide"), ui->menuHelp);
