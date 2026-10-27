@@ -314,12 +314,16 @@ void dlgMacOSInstaller::downloadSelected() {
   }
   QString err;
   lblApple->setText(tr("Downloading %1 %2...").arg(p.title, p.version));
+  // Set before start(): a complete leftover .part file finishes synchronously and is verified
+  // from downloadFinished(), which reads downloadedPkg.
+  downloadedPkg = path;
   if (!downloader->start(p.pkgUrl, path, p.size, &err)) {
+    downloadedPkg.clear();
     lblApple->setText(err);
+    updateDownloadButtons();
     return;
   }
-  downloadedPkg = path;
-  updateDownloadButtons();
+  if (downloader->running()) updateDownloadButtons();
 }
 
 void dlgMacOSInstaller::cancelDownload() {

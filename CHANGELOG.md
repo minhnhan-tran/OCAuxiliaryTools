@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.25.1] — 2026-10-27
+
+### Fixed
+- Create macOS Installation: a complete leftover `.part` download was accepted without the Apple signature check (the check ran on an empty path, showed a false error, and then enabled Install on the unverified file). The file is now verified before Install can be used.
+
 ## [1.25.0] — 2026-10-27
 
 ### Added
