@@ -993,6 +993,9 @@ Tianocore AcpiAml.h源文件可能有助于更好地理解ACPI操作码。
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_36">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkFadtEnableReset">
                  <property name="toolTip">
@@ -1121,6 +1124,19 @@ This works around patched tables becoming incompatible with the SLIC table causi
                   <string>SyncTableIds</string>
                  </property>
                 </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_pi_36">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -1355,6 +1371,9 @@ Description: Exclude MMIO address from the devirtualisation procedure.
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_38">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkAllowRelocationBlock">
                  <property name="toolTip">
@@ -1622,6 +1641,19 @@ Note: The necessity of this quirk is determined by early boot crashes of the fir
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_38">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -1634,6 +1666,9 @@ Note: The necessity of this quirk is determined by early boot crashes of the fir
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_48">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkForceBooterSignature">
                  <property name="toolTip">
@@ -1887,6 +1922,19 @@ Note: The necessity of this quirk is determined by early boot failures either in
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_48">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -1898,10 +1946,26 @@ Note: The necessity of this quirk is determined by early boot failures either in
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_39">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_56">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_39" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_41">
                    <property name="maximumSize">
                     <size>
@@ -1933,25 +1997,15 @@ Note: The necessity of this quirk is determined by random boot failure when Prov
                     <string>ProvideMaxSlide</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="1">
                   <widget class="QLineEdit" name="editIntProvideMaxSlide">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                    <property name="text">
                     <string>0</string>
                    </property>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_57">
-                 <item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_120">
                    <property name="toolTip">
                     <string>Type: plist integer
@@ -1978,21 +2032,26 @@ Note: See ResizeGpuBars quirk for general GPU PCI BAR size configuration and mor
                     <string>ResizeAppleGpuBars</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="1">
                   <widget class="QLineEdit" name="editIntResizeAppleGpuBars">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                    <property name="text">
                     <string>-1</string>
                    </property>
                   </widget>
-                 </item>
-                </layout>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <spacer name="verticalSpacer_pi_39">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -2730,6 +2789,9 @@ Note: See ResizeGpuBars quirk for general GPU PCI BAR size configuration and mor
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_40">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkDummyPowerManagement">
                  <property name="toolTip">
@@ -2751,6 +2813,19 @@ Note 2 : While this option is usually needed to disable AppleIntelCpuPowerManage
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_40">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -2762,8 +2837,26 @@ Note 2 : While this option is usually needed to disable AppleIntelCpuPowerManage
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_41">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_pi_41" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0" colspan="2">
                 <layout class="QHBoxLayout" name="horizontalLayout_58">
                  <item>
                   <spacer name="horizontalSpacer_14">
@@ -2842,9 +2935,7 @@ Note 2 : While this option is usually needed to disable AppleIntelCpuPowerManage
                  </item>
                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_59">
-                 <item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label">
                    <property name="toolTip">
                     <string notr="true">This property serves for two needs:
@@ -2905,15 +2996,11 @@ Cpuid1Mask: FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
                     <string>Cpuid1Data</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatCpuid1Data"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_60">
-                 <item>
+               <item row="1" column="1">
+                  <widget class="QLineEdit" name="editDatCpuid1Data"/>
+               </item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_2">
                    <property name="toolTip">
                     <string notr="true">When each Cpuid1Mask bit is set to 0, the original CPU bit is used, otherwise set bits take the value of Cpuid1Data.</string>
@@ -2925,15 +3012,11 @@ Cpuid1Mask: FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
                     <string>Cpuid1Mask</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatCpuid1Mask"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_61">
-                 <item>
+               <item row="2" column="1">
+                  <widget class="QLineEdit" name="editDatCpuid1Mask"/>
+               </item>
+               <item row="3" column="0">
                   <widget class="QLabel" name="label_97">
                    <property name="toolTip">
                     <string notr="true">Note: Refer to Add MaxKernel description for matching logic.</string>
@@ -2945,15 +3028,11 @@ Cpuid1Mask: FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
                     <string notr="true">MaxKernel</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editMaxKernel"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_62">
-                 <item>
+               <item row="3" column="1">
+                  <widget class="QLineEdit" name="editMaxKernel"/>
+               </item>
+               <item row="4" column="0">
                   <widget class="QLabel" name="label_98">
                    <property name="toolTip">
                     <string notr="true">Note: Refer to Add MaxKernel description for matching logic.</string>
@@ -2965,11 +3044,22 @@ Cpuid1Mask: FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
                     <string notr="true">MinKernel</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="1">
                   <widget class="QLineEdit" name="editMinKernel"/>
-                 </item>
-                </layout>
+               </item>
+               <item row="5" column="0" colspan="2">
+                <spacer name="verticalSpacer_pi_41">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -2990,6 +3080,9 @@ Cpuid1Mask: FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_42">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkAppleCpuPmCfgLock">
                  <property name="toolTip">
@@ -3186,6 +3279,19 @@ Note 2 : This option will not protect areas from being overwritten at firmware s
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_42">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -3198,6 +3304,9 @@ Note 2 : This option will not protect areas from being overwritten at firmware s
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_43">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkExternalDiskIcons">
                  <property name="toolTip">
@@ -3418,6 +3527,19 @@ The only valid solution is to limit the amount of used ports to 15 (discarding s
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_43">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -3429,10 +3551,26 @@ The only valid solution is to limit the amount of used ports to 15 (discarding s
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_44">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_63">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_44" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_13">
                    <property name="toolTip">
                     <string notr="true">Type: plist integer
@@ -3456,15 +3594,9 @@ Description: Set trim timeout in microseconds for APFS filesystems on SSDs.
                     <string>SetApfsTrimTimeout</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="1">
                   <widget class="QLineEdit" name="editIntSetApfsTrimTimeout">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                    <property name="toolTip">
                     <string>Depending on the SSD controller trim procedure may take considerable amount of time, causing noticeable boot
 slowdown as this is when the APFS driver executes the trim operation. If the SSD supports over-provisioning or
@@ -3478,8 +3610,19 @@ trim.</string>
                     <string>-1</string>
                    </property>
                   </widget>
-                 </item>
-                </layout>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <spacer name="verticalSpacer_pi_44">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -3553,6 +3696,9 @@ trim.</string>
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_45">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkCustomKernel">
                  <property name="toolTip">
@@ -3600,6 +3746,19 @@ This setting allows matching the latest kernelcache with a suitable architecture
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_45">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -3611,10 +3770,26 @@ This setting allows matching the latest kernelcache with a suitable architecture
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_46">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_64">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_46" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_43">
                    <property name="toolTip">
                     <string notr="true">On macOS 10.7 and earlier XNU kernel can boot with architectures different from the usual x86_64. 
@@ -3659,19 +3834,15 @@ The behaviour corresponds to -legacy kernel boot argument.
                     <string>KernelArch</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="1">
                   <widget class="QComboBox" name="cboxKernelArch">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_65">
-                 <item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_42">
                    <property name="toolTip">
                     <string notr="true">Different variants of macOS support different kernel caching variants designed to improve boot performance. 
@@ -3691,15 +3862,26 @@ This setting allows to prevent using faster kernel caching variants if slower va
                     <string>KernelCache</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="1">
                   <widget class="QComboBox" name="cboxKernelCache">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                </layout>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <spacer name="verticalSpacer_pi_46">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -3740,6 +3922,9 @@ This setting allows to prevent using faster kernel caching variants if slower va
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_63">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkHideAuxiliary">
                  <property name="toolTip">
@@ -3860,6 +4045,19 @@ Note: The screen reader requires working audio support. Refer to the UEFI Audio 
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_63">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -3871,10 +4069,26 @@ Note: The screen reader requires working audio support. Refer to the UEFI Audio 
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_64">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_74">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_64" columnstretch="0,1,0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_5">
                    <property name="toolTip">
                     <string notr="true">Description: Sets specific attributes for the OpenCore picker.
@@ -3896,21 +4110,26 @@ Different OpenCore pickers may be configured through the attribute mask containi
                     <string>PickerAttributes</string>
                    </property>
                   </widget>
-                 </item>
+               </item>
+               <item row="0" column="1" colspan="3">
+                 <layout class="QHBoxLayout" name="horizontalLayout_pi_64_0">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="spacing">
+                   <number>10</number>
+                  </property>
                  <item>
                   <widget class="QLineEdit" name="editIntPickerAttributes">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                   </widget>
                  </item>
                  <item>
@@ -3933,11 +4152,9 @@ Different OpenCore pickers may be configured through the attribute mask containi
                    </property>
                   </widget>
                  </item>
-                </layout>
+                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_75">
-                 <item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_4">
                    <property name="toolTip">
                     <string notr="true">Description: Hibernation detection mode. The following modes are supported:
@@ -3963,15 +4180,15 @@ Different OpenCore pickers may be configured through the attribute mask containi
                     <string>HibernateMode</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="1">
                   <widget class="QComboBox" name="cboxHibernateMode">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="2">
                   <widget class="QLabel" name="label_108">
                    <property name="toolTip">
                     <string notr="true">Description: Register the launcher option in the firmware preferences for persistence.
@@ -4021,19 +4238,15 @@ Note 2 : While NVRAM resets executed from OpenCore would not typically erase the
                     <string>LauncherOption</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="3">
                   <widget class="QComboBox" name="cboxLauncherOption">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_76">
-                 <item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_15">
                    <property name="toolTip">
                     <string notr="true">Default stays for launched OpenCore.efi, any other path, e.g. EFILauncher.efi, can be used to provide custom loaders, which are supposed to load OpenCore.efi themselves.
@@ -4049,15 +4262,15 @@ Note 2 : While NVRAM resets executed from OpenCore would not typically erase the
                     <string>LauncherPath</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="1">
                   <widget class="QComboBox" name="cboxLauncherPath">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="2">
                   <widget class="QLabel" name="label_6">
                    <property name="toolTip">
                     <string notr="true">Picker describes underlying boot management with an optional user interface responsible for handling boot options. The following values are supported:
@@ -4081,19 +4294,15 @@ Picker描述了底层的引导管理，有一个可选的用户界面负责处�
                     <string>PickerMode</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="3">
                   <widget class="QComboBox" name="cboxPickerMode">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_77">
-                 <item>
+               <item row="3" column="0">
                   <widget class="QLabel" name="label_10">
                    <property name="toolTip">
                     <string notr="true">Type: plist string
@@ -4131,8 +4340,8 @@ Acidanthera\GoldenGate。
                     <string>PickerVariant</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="3" column="1" colspan="3">
                   <widget class="QComboBox" name="cboxPickerVariant">
                    <property name="editable">
                     <bool>true</bool>
@@ -4163,12 +4372,8 @@ Acidanthera\GoldenGate。
                     </property>
                    </item>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_78">
-                 <item>
+               <item row="4" column="0">
                   <widget class="QLabel" name="label_8">
                    <property name="toolTip">
                     <string notr="true">Introducing a delay may give extra time to hold the right action hotkey sequence to e.g. boot to recovery mode.
@@ -4188,11 +4393,11 @@ On some platforms setting this option to at least 5000-10000 microseconds may be
                     <string>TakeoffDelay</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="1">
                   <widget class="QLineEdit" name="editIntTakeoffDelay"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="2">
                   <widget class="QLabel" name="label_7">
                    <property name="toolTip">
                     <string notr="true"> Timeout in seconds in boot picker before automatic booting of the default boot entry. Use 0 to  disable timer.
@@ -4209,15 +4414,11 @@ On some platforms setting this option to at least 5000-10000 microseconds may be
                     <string>Timeout</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntTimeout"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_79">
-                 <item>
+               <item row="4" column="3">
+                  <widget class="QLineEdit" name="editIntTimeout"/>
+               </item>
+               <item row="5" column="0">
                   <widget class="QLabel" name="label_3">
                    <property name="toolTip">
                     <string>Text renderer supports colour arguments as a sum of foreground and background colours according to UEFI specification. The value of black background and black foreground (0) is reserved. List of colour names:
@@ -4287,17 +4488,15 @@ Note: This option may not work well with System text renderer. Setting a backgro
                     <string>ConsoleAttributes</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="5" column="1" colspan="3">
                   <widget class="QLineEdit" name="editIntConsoleAttributes">
                    <property name="text">
                     <string>0</string>
                    </property>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
+               <item row="6" column="0" colspan="4">
                 <layout class="QHBoxLayout" name="horizontalLayout_80">
                  <item>
                   <widget class="QLabel" name="lblColorEffect">
@@ -4314,16 +4513,14 @@ Note: This option may not work well with System text renderer. Setting a backgro
                  </item>
                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_81">
-                 <item>
+               <item row="7" column="0">
                   <widget class="QLabel" name="label_118">
                    <property name="text">
                     <string>Text color</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="7" column="1" colspan="3">
                   <widget class="QComboBox" name="mycboxTextColor">
                    <item>
                     <property name="text">
@@ -4406,19 +4603,15 @@ Note: This option may not work well with System text renderer. Setting a backgro
                     </property>
                    </item>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_82">
-                 <item>
+               <item row="8" column="0">
                   <widget class="QLabel" name="label_119">
                    <property name="text">
                     <string>Background color</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="8" column="1" colspan="3">
                   <widget class="QComboBox" name="mycboxBackColor">
                    <item>
                     <property name="text">
@@ -4461,8 +4654,19 @@ Note: This option may not work well with System text renderer. Setting a backgro
                     </property>
                    </item>
                   </widget>
-                 </item>
-                </layout>
+               </item>
+               <item row="9" column="0" colspan="4">
+                <spacer name="verticalSpacer_pi_64">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -4483,6 +4687,9 @@ Note: This option may not work well with System text renderer. Setting a backgro
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_61">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkAppleDebug">
                  <property name="toolTip">
@@ -4599,6 +4806,19 @@ Note: For security reasons SysReport option is not available in RELEASE builds. 
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_61">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -4610,10 +4830,26 @@ Note: For security reasons SysReport option is not available in RELEASE builds. 
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_62">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_67">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_62" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_39">
                    <property name="toolTip">
                     <string notr="true">Type: plist integer, 64 bit
@@ -4632,15 +4868,26 @@ Description: EDK II debug level bitmask (sum) showed onscreen. Unless Target ena
                     <string>DisplayLevel</string>
                    </property>
                   </widget>
-                 </item>
+               </item>
+               <item row="0" column="1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_pi_62_0">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="spacing">
+                   <number>10</number>
+                  </property>
                  <item>
                   <widget class="QLineEdit" name="editIntDisplayLevel">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                   </widget>
                  </item>
                  <item>
@@ -4663,11 +4910,9 @@ Description: EDK II debug level bitmask (sum) showed onscreen. Unless Target ena
                    </property>
                   </widget>
                  </item>
-                </layout>
+                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_70">
-                 <item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_9">
                    <property name="toolTip">
                     <string notr="true">Delay in microseconds performed after every printed line visible onscreen (i.e. console).
@@ -4683,22 +4928,12 @@ Description: EDK II debug level bitmask (sum) showed onscreen. Unless Target ena
                     <string>DisplayDelay</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntDisplayDelay">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_73">
-                 <item>
+               <item row="1" column="1">
+                  <widget class="QLineEdit" name="editIntDisplayDelay">
+                  </widget>
+               </item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_11">
                    <property name="toolTip">
                     <string>The following logging targets are supported:
@@ -4733,15 +4968,26 @@ Console logging prints less than all the other variants. Depending on the build 
                     <string>Target</string>
                    </property>
                   </widget>
-                 </item>
+               </item>
+               <item row="2" column="1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_pi_62_2">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="spacing">
+                   <number>10</number>
+                  </property>
                  <item>
                   <widget class="QLineEdit" name="editIntTarget">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                    <property name="clearButtonEnabled">
                     <bool>false</bool>
                    </property>
@@ -4760,56 +5006,69 @@ Console logging prints less than all the other variants. Depending on the build 
                    </property>
                   </widget>
                  </item>
-                </layout>
+                 </layout>
                </item>
-               <item>
+               <item row="3" column="0" colspan="2">
                 <widget class="QCheckBox" name="mychkT1">
                  <property name="text">
                   <string>Enable logging, otherwise all log is discarded</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="4" column="0" colspan="2">
                 <widget class="QCheckBox" name="mychkT2">
                  <property name="text">
                   <string>Enable basic console (onscreen) logging</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="5" column="0" colspan="2">
                 <widget class="QCheckBox" name="mychkT6">
                  <property name="text">
                   <string>Enable non-volatile UEFI variable logging</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="6" column="0" colspan="2">
                 <widget class="QCheckBox" name="mychkT5">
                  <property name="text">
                   <string>Enable UEFI variable logging</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="7" column="0" colspan="2">
                 <widget class="QCheckBox" name="mychkT4">
                  <property name="text">
                   <string>Enable serial port logging</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="8" column="0" colspan="2">
                 <widget class="QCheckBox" name="mychkT3">
                  <property name="text">
                   <string>Enable logging to Data Hub</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="9" column="0" colspan="2">
                 <widget class="QCheckBox" name="mychkT7">
                  <property name="text">
                   <string>Enable logging to file</string>
                  </property>
                 </widget>
+               </item>
+               <item row="10" column="0" colspan="2">
+                <spacer name="verticalSpacer_pi_62">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -4830,6 +5089,9 @@ Console logging prints less than all the other variants. Depending on the build 
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_59">
+               <property name="spacing">
+                <number>14</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="chkAuthRestart">
                  <property name="toolTip">
@@ -4973,6 +5235,19 @@ Note: This functionality is still under development and is not ready for product
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_pi_59">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </widget>
             </item>
@@ -4984,10 +5259,26 @@ Note: This functionality is still under development and is not ready for product
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_60">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_60" columnstretch="0,1,0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_27">
                    <property name="toolTip">
                     <string notr="true">Valid values:
@@ -5015,15 +5306,15 @@ Note: This functionality is still under development and is not ready for product
                     <string>DmgLoading</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="1">
                   <widget class="QComboBox" name="cboxDmgLoading">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="2">
                   <widget class="QLabel" name="label_16">
                    <property name="toolTip">
                     <string notr="true">Valid values:
@@ -5051,19 +5342,15 @@ Note: This functionality is still under development and is not ready for product
                     <string>Vault</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="3">
                   <widget class="QComboBox" name="cboxVault">
                    <property name="editable">
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_68">
-                 <item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_45">
                    <property name="toolTip">
                     <string notr="true">Sets Apple Secure Boot hardware model and policy. 
@@ -5123,8 +5410,8 @@ Valid values:
                     <string>SecureBootModel</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="1">
                   <widget class="QComboBox" name="cboxSecureBootModel">
                    <property name="editable">
                     <bool>true</bool>
@@ -5225,8 +5512,8 @@ Valid values:
                     </property>
                    </item>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="2">
                   <widget class="QLabel" name="label_44">
                    <property name="toolTip">
                     <string notr="true">Setting this value to any non-zero 64-bit integer will allow using personalised Apple Secure Boot identifiers. 
@@ -5254,22 +5541,12 @@ Until your operating system is personalised you will only be able to load macOS 
                     <string>ApECID</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntApECID">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_69">
-                 <item>
+               <item row="1" column="3">
+                  <widget class="QLineEdit" name="editIntApECID">
+                  </widget>
+               </item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_14">
                    <property name="toolTip">
                     <string notr="true"> EDK II debug level bitmask (sum) causing CPU to halt (stop execution) after obtaining a message of HaltLevel. Possible values match DisplayLevel values.
@@ -5286,15 +5563,26 @@ Until your operating system is personalised you will only be able to load macOS 
                     <string>HaltLevel</string>
                    </property>
                   </widget>
-                 </item>
+               </item>
+               <item row="2" column="1" colspan="3">
+                 <layout class="QHBoxLayout" name="horizontalLayout_pi_60_2">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="spacing">
+                   <number>10</number>
+                  </property>
                  <item>
                   <widget class="QLineEdit" name="editIntHaltLevel">
-                   <property name="minimumSize">
-                    <size>
-                     <width>150</width>
-                     <height>0</height>
-                    </size>
-                   </property>
                   </widget>
                  </item>
                  <item>
@@ -5310,11 +5598,9 @@ Until your operating system is personalised you will only be able to load macOS 
                    </property>
                   </widget>
                  </item>
-                </layout>
+                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_71">
-                 <item>
+               <item row="3" column="0">
                   <widget class="QLabel" name="label_110">
                    <property name="toolTip">
                     <string notr="true">Type: plist integer
@@ -5340,21 +5626,26 @@ Description: Sensitive data exposure bitmask (sum) to operating system.
                     <string>ExposeSensitiveData</string>
                    </property>
                   </widget>
-                 </item>
+               </item>
+               <item row="3" column="1" colspan="3">
+                 <layout class="QHBoxLayout" name="horizontalLayout_pi_60_3">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="spacing">
+                   <number>10</number>
+                  </property>
                  <item>
                   <widget class="QLineEdit" name="editIntExposeSensitiveData">
-                   <property name="minimumSize">
-                    <size>
-                     <width>150</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                   </widget>
                  </item>
                  <item>
@@ -5377,11 +5668,9 @@ Description: Sensitive data exposure bitmask (sum) to operating system.
                    </property>
                   </widget>
                  </item>
-                </layout>
+                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_72">
-                 <item>
+               <item row="4" column="0">
                   <widget class="QLabel" name="label_111">
                    <property name="toolTip">
                     <string notr="true">Type: plist integer, 32 bit
@@ -5411,15 +5700,26 @@ Third party drivers may introduce additional security (and performance) consider
                     <string>ScanPolicy</string>
                    </property>
                   </widget>
-                 </item>
+               </item>
+               <item row="4" column="1" colspan="3">
+                 <layout class="QHBoxLayout" name="horizontalLayout_pi_60_4">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="spacing">
+                   <number>10</number>
+                  </property>
                  <item>
                   <widget class="QLineEdit" name="editIntScanPolicy">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
                   </widget>
                  </item>
                  <item>
@@ -5442,9 +5742,9 @@ Third party drivers may introduce additional security (and performance) consider
                    </property>
                   </widget>
                  </item>
-                </layout>
+                 </layout>
                </item>
-               <item>
+               <item row="5" column="0" colspan="4">
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <item>
                   <widget class="QToolButton" name="btnGetPassHash">
@@ -5484,9 +5784,7 @@ Third party drivers may introduce additional security (and performance) consider
                  </item>
                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
+               <item row="6" column="0">
                   <widget class="QLabel" name="label_93">
                    <property name="toolTip">
                     <string notr="true">Password hash used when EnabledPassword is set.
@@ -5502,15 +5800,11 @@ Third party drivers may introduce additional security (and performance) consider
                     <string>PasswordHash</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatPasswordHash"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_5">
-                 <item>
+               <item row="6" column="1" colspan="3">
+                  <widget class="QLineEdit" name="editDatPasswordHash"/>
+               </item>
+               <item row="7" column="0">
                   <widget class="QLabel" name="label_94">
                    <property name="toolTip">
                     <string notr="true"> Password salt used when EnabledPassword is set.
@@ -5524,11 +5818,22 @@ Third party drivers may introduce additional security (and performance) consider
                     <string>PasswordSalt</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="7" column="1" colspan="3">
                   <widget class="QLineEdit" name="editDatPasswordSalt"/>
-                 </item>
-                </layout>
+               </item>
+               <item row="8" column="0" colspan="4">
+                <spacer name="verticalSpacer_pi_60">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>

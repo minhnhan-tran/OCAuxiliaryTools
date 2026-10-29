@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.30.0] — 2026-10-29
+
+### Changed
+- Layout pass over the ACPI, Booter, Kernel and Misc tabs that had loose rows: ACPI Quirks, Booter Quirks, Kernel Emulate/Quirks/Scheme and Misc Boot/Debug/Security. Label and field rows are now aligned grids (labels share one column, fields fill the width), and the checkbox columns are packed at the top with even spacing instead of being stretched over the full height. Fixed widths on the moved dropdowns and fields were removed so they grow with the window. The table-only tabs (including DP and NVRAM) and the Preselection dropdowns are unchanged. No widget was renamed or removed.
+
 ## [1.29.1] — 2026-10-29
 
 ### Fixed
