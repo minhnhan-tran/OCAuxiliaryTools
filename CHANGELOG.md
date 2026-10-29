@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.29.0] — 2026-10-29
+
+### Changed
+- UEFI section tabs APFS, AppleInput, Audio, Input, Output, ProtocolOverrides and Quirks: the loose rows are now one aligned grid per tab (labels and fields share columns, fields fill the width), and the checkbox columns are packed at the top with even spacing instead of being stretched over the full height. The Drivers, ReservedMemory and Unload tables are unchanged. No widget was renamed or removed.
+
 ## [1.28.0] — 2026-10-29
 
 ### Changed

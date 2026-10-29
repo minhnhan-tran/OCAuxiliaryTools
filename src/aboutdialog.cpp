@@ -9,7 +9,7 @@ extern MainWindow* mw_one;
 extern QString strAppName, strIniFile;
 // Semantic version (MAJOR.MINOR.PATCH); keep in sync with the top entry of CHANGELOG.md
 // (checked by scripts/check_version.py).
-QString CurVersion = "1.28.0";
+QString CurVersion = "1.29.0";
 QString ocVer = "0.8.8";
 QString ocVerDev = "0.8.9";
 QString ocFrom, ocFromDev, strOCFrom, strOCFromDev;
