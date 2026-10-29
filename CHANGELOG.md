@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.27.3] — 2026-10-29
+
+### Fixed
+- PlatformInfo > Generic layout: the two spacers added in 1.27.2 were written as `Qt::Orientation::Vertical`, which Qt 5's uic reads as horizontal, so the fields and the SpoofVendor column were not packed at the top. They now use `Qt::Vertical`.
+
 ## [1.27.2] — 2026-10-29
 
 ### Changed
