@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.27.2] — 2026-10-29
+
+### Changed
+- PlatformInfo > Generic tab layout: the fields now sit in one aligned grid (labels, fields and Generate/Check buttons share columns) with even spacing, and grow with the window, instead of the four loose rows spread over the full height. SpoofVendor / MaxBIOSVersion / AdviseFeatures are packed at the top of the left column.
+
 ## [1.27.1] — 2026-10-29
 
 ### Fixed
