@@ -6880,10 +6880,26 @@ Note: On most newer firmwares these bits are already set, the option may be nece
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_65">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_83">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_verticalLayout_65" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_46">
                    <property name="toolTip">
                     <string notr="true">This value contains CPU ART frequency, also known as crystal clock frequency. Its existence is exclusive to Skylake generation and newer. 
@@ -6907,22 +6923,12 @@ Note: On Intel Skylake X ART frequency may be a little less (approx. 0.25%) than
                     <string>ARTFrequency</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntARTFrequency">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_84">
-                 <item>
+               <item row="0" column="1">
+                  <widget class="QLineEdit" name="editIntARTFrequency">
+                  </widget>
+               </item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_48">
                    <property name="toolTip">
                     <string notr="true"> Sets board-rev in gEfiMiscSubClassGuid. Value found on Macs seems to correspond to internal board revision (e.g. 01).
@@ -6939,15 +6945,11 @@ Note: On Intel Skylake X ART frequency may be a little less (approx. 0.25%) than
                     <string>BoardRevision</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatBoardRevision"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_85">
-                 <item>
+               <item row="1" column="1">
+                  <widget class="QLineEdit" name="editDatBoardRevision"/>
+               </item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_47">
                    <property name="toolTip">
                     <string notr="true"> Sets board-id in gEfiMiscSubClassGuid. Value found on Macs is equal to SMBIOS BoardProduct in ASCII.
@@ -6964,15 +6966,11 @@ Note: On Intel Skylake X ART frequency may be a little less (approx. 0.25%) than
                     <string>BoardProduct</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editBoardProduct"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_86">
-                 <item>
+               <item row="2" column="1">
+                  <widget class="QLineEdit" name="editBoardProduct"/>
+               </item>
+               <item row="3" column="0">
                   <widget class="QLabel" name="label_49">
                    <property name="toolTip">
                     <string notr="true">Sets DevicePathsSupported in gEfiMiscSubClassGuid. 
@@ -6992,15 +6990,11 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
                     <string>DevicePathsSupported</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntDevicePathsSupported"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_87">
-                 <item>
+               <item row="3" column="1">
+                  <widget class="QLineEdit" name="editIntDevicePathsSupported"/>
+               </item>
+               <item row="4" column="0">
                   <widget class="QLabel" name="label_50">
                    <property name="toolTip">
                     <string notr="true">Sets FSBFrequency in gEfiProcessorSubClassGuid.</string>
@@ -7012,15 +7006,11 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
                     <string>FSBFrequency</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntFSBFrequency"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_88">
-                 <item>
+               <item row="4" column="1">
+                  <widget class="QLineEdit" name="editIntFSBFrequency"/>
+               </item>
+               <item row="5" column="0">
                   <widget class="QLabel" name="label_51">
                    <property name="toolTip">
                     <string notr="true"> Sets InitialTSC in gEfiProcessorSubClassGuid. Sets initial TSC value, normally 0.</string>
@@ -7032,15 +7022,11 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
                     <string>InitialTSC</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntInitialTSC"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_89">
-                 <item>
+               <item row="5" column="1">
+                  <widget class="QLineEdit" name="editIntInitialTSC"/>
+               </item>
+               <item row="6" column="0">
                   <widget class="QLabel" name="label_52">
                    <property name="toolTip">
                     <string notr="true">Sets name in gEfiMiscSubClassGuid. Value found on Macs is platform in ASCII.</string>
@@ -7052,11 +7038,22 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
                     <string>PlatformName</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="6" column="1">
                   <widget class="QLineEdit" name="editPlatformName"/>
-                 </item>
-                </layout>
+               </item>
+               <item row="7" column="0">
+                <spacer name="verticalSpacer_pi_verticalLayout_65">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -7069,10 +7066,26 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_66">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_90">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_verticalLayout_66" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_53">
                    <property name="toolTip">
                     <string notr="true"> Sets RBr in gEfiMiscSubClassGuid. Custom property read by VirtualSMC or FakeSMC to generate SMC RBr key.
@@ -7089,15 +7102,11 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
                     <string>SmcBranch</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatSmcBranch"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_91">
-                 <item>
+               <item row="0" column="1">
+                  <widget class="QLineEdit" name="editDatSmcBranch"/>
+               </item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_54">
                    <property name="toolTip">
                     <string notr="true"> Sets RPlt in gEfiMiscSubClassGuid. Custom property read by VirtualSMC or FakeSMC to generate SMC RPlt key.
@@ -7114,15 +7123,11 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
                     <string>SmcPlatform</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatSmcPlatform"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_92">
-                 <item>
+               <item row="1" column="1">
+                  <widget class="QLineEdit" name="editDatSmcPlatform"/>
+               </item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_55">
                    <property name="toolTip">
                     <string notr="true"> Sets REV in gEfiMiscSubClassGuid. Custom property read by VirtualSMC or FakeSMC to generate SMC REV key.
@@ -7139,15 +7144,11 @@ AppleACPIPlatform.kext 必须设置为 1，以便将 SATA 设备路径附加到 
                     <string>SmcRevision</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatSmcRevision"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_93">
-                 <item>
+               <item row="2" column="1">
+                  <widget class="QLineEdit" name="editDatSmcRevision"/>
+               </item>
+               <item row="3" column="0">
                   <widget class="QLabel" name="label_56">
                    <property name="toolTip">
                     <string notr="true">Known bits read by X86PlatformPlugin.kext: 
@@ -7220,15 +7221,11 @@ X86PlatformPlugin.kext读取的已知位：
                     <string>StartupPowerEvents</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntStartupPowerEvents"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_94">
-                 <item>
+               <item row="3" column="1">
+                  <widget class="QLineEdit" name="editIntStartupPowerEvents"/>
+               </item>
+               <item row="4" column="0">
                   <widget class="QLabel" name="label_57">
                    <property name="toolTip">
                     <string notr="true"> Sets Model in gEfiMiscSubClassGuid. Value found on Macs is equal to SMBIOS SystemProductName in Unicode.
@@ -7245,15 +7242,11 @@ X86PlatformPlugin.kext读取的已知位：
                     <string>SystemProductName</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editSystemProductName"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_95">
-                 <item>
+               <item row="4" column="1">
+                  <widget class="QLineEdit" name="editSystemProductName"/>
+               </item>
+               <item row="5" column="0">
                   <widget class="QLabel" name="label_58">
                    <property name="toolTip">
                     <string notr="true">Sets SystemSerialNumber in gEfiMiscSubClassGuid. Value found on Macs is equal to SMBIOS SystemSerialNumber in Unicode.
@@ -7270,15 +7263,11 @@ X86PlatformPlugin.kext读取的已知位：
                     <string>SystemSerialNumber</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editSystemSerialNumber_data"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_96">
-                 <item>
+               <item row="5" column="1">
+                  <widget class="QLineEdit" name="editSystemSerialNumber_data"/>
+               </item>
+               <item row="6" column="0">
                   <widget class="QLabel" name="label_59">
                    <property name="toolTip">
                     <string notr="true">Sets system-id in gEfiMiscSubClassGuid. Value found on Macs is equal to SMBIOS SystemUUID.
@@ -7294,11 +7283,22 @@ X86PlatformPlugin.kext读取的已知位：
                     <string>SystemUUID</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="6" column="1">
                   <widget class="QLineEdit" name="editSystemUUID_DataHub"/>
-                 </item>
-                </layout>
+               </item>
+               <item row="7" column="0">
+                <spacer name="verticalSpacer_pi_verticalLayout_66">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -7318,22 +7318,26 @@ X86PlatformPlugin.kext读取的已知位：
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QGridLayout" name="gridLayout_32">
+              <layout class="QGridLayout" name="gridLayout_pi_gridLayout_32" columnstretch="0,1,0,1,0,1">
                <property name="leftMargin">
-                <number>0</number>
+                <number>12</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>12</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>12</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
                </property>
                <item row="0" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_9">
-                 <item>
                   <widget class="QLabel" name="label_105">
                    <property name="toolTip">
                     <string notr="true">Specifies the data width, in bits, of the memory. 
@@ -7354,15 +7358,11 @@ DataWidth为0，TotalWidth为8，表示该器件仅用于提供8个纠错位。<
                     <string notr="true">DataWidth</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntDataWidth"/>
-                 </item>
-                </layout>
                </item>
                <item row="0" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_12">
-                 <item>
+                  <widget class="QLineEdit" name="editIntDataWidth"/>
+               </item>
+               <item row="0" column="2">
                   <widget class="QLabel" name="label_102">
                    <property name="toolTip">
                     <string notr="true"> Specifies the primary hardware error correction or detection method supported by the memory.
@@ -7406,15 +7406,11 @@ DataWidth为0，TotalWidth为8，表示该器件仅用于提供8个纠错位。<
                     <string notr="true">ErrorCorrection</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntErrorCorrection"/>
-                 </item>
-                </layout>
                </item>
-               <item row="0" column="2">
-                <layout class="QHBoxLayout" name="horizontalLayout_40">
-                 <item>
+               <item row="0" column="3">
+                  <widget class="QLineEdit" name="editIntErrorCorrection"/>
+               </item>
+               <item row="0" column="4">
                   <widget class="QLabel" name="label_100">
                    <property name="toolTip">
                     <string notr="true"> Specifies the form factor of the memory. On Macs this should usually be DIMM or SODIMM.
@@ -7451,15 +7447,11 @@ When CustomMemory is false, this value is automatically set based on Mac product
                     <string notr="true">FormFactor</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="5">
                   <widget class="QLineEdit" name="editIntFormFactor"/>
-                 </item>
-                </layout>
                </item>
                <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_52">
-                 <item>
                   <widget class="QLabel" name="label_101">
                    <property name="toolTip">
                     <string notr="true"> Specifies the total width, in bits, of the memory, including any check or error-correction bits. 
@@ -7480,15 +7472,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">TotalWidth</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntTotalWidth"/>
-                 </item>
-                </layout>
                </item>
                <item row="1" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_53">
-                 <item>
+                  <widget class="QLineEdit" name="editIntTotalWidth"/>
+               </item>
+               <item row="1" column="2">
                   <widget class="QLabel" name="label_103">
                    <property name="toolTip">
                     <string notr="true">Description: Specifies the memory type. Commonly used types are listed below.
@@ -7531,15 +7519,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">Type</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntType"/>
-                 </item>
-                </layout>
                </item>
-               <item row="1" column="2">
-                <layout class="QHBoxLayout" name="horizontalLayout_54">
-                 <item>
+               <item row="1" column="3">
+                  <widget class="QLineEdit" name="editIntType"/>
+               </item>
+               <item row="1" column="4">
                   <widget class="QLabel" name="label_104">
                    <property name="toolTip">
                     <string notr="true"> Specifies additional memory type information.
@@ -7570,15 +7554,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">TypeDetail</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="5">
                   <widget class="QLineEdit" name="editIntTypeDetail"/>
-                 </item>
-                </layout>
                </item>
                <item row="2" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_55">
-                 <item>
                   <widget class="QLabel" name="label_99">
                    <property name="toolTip">
                     <string notr="true">Specifies the maximum amount of memory, in bytes, supported by the system.
@@ -7595,11 +7575,9 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">MaxCapacity</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="1">
                   <widget class="QLineEdit" name="editIntMaxCapacity"/>
-                 </item>
-                </layout>
                </item>
               </layout>
              </widget>
@@ -7710,10 +7688,26 @@ If there are no error-correction bits, this value should be equal to DataWidth.
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_67">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_97">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_verticalLayout_67" columnstretch="0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_60">
                    <property name="toolTip">
                     <string notr="true">Specifies the value of NVRAM variable 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:HW_BID.
@@ -7729,22 +7723,12 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">BID</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editBID">
-                   <property name="minimumSize">
-                    <size>
-                     <width>500</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_98">
-                 <item>
+               <item row="0" column="1">
+                  <widget class="QLineEdit" name="editBID">
+                  </widget>
+               </item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_61">
                    <property name="toolTip">
                     <string notr="true">Specifies the values of NVRAM variables:
@@ -7764,15 +7748,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">FirmwareFeatures</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatFirmwareFeatures"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_99">
-                 <item>
+               <item row="1" column="1">
+                  <widget class="QLineEdit" name="editDatFirmwareFeatures"/>
+               </item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_62">
                    <property name="toolTip">
                     <string notr="true"> Specifies the values of NVRAM variables:
@@ -7792,15 +7772,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">FirmwareFeaturesMask</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatFirmwareFeaturesMask"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_100">
-                 <item>
+               <item row="2" column="1">
+                  <widget class="QLineEdit" name="editDatFirmwareFeaturesMask"/>
+               </item>
+               <item row="3" column="0">
                   <widget class="QLabel" name="label_63">
                    <property name="toolTip">
                     <string notr="true"> Specifies the values of NVRAM variables 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:HW_MLB and 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:MLB.
@@ -7815,15 +7791,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">MLB</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editMLB_PNVRAM"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_101">
-                 <item>
+               <item row="3" column="1">
+                  <widget class="QLineEdit" name="editMLB_PNVRAM"/>
+               </item>
+               <item row="4" column="0">
                   <widget class="QLabel" name="label_64">
                    <property name="toolTip">
                     <string notr="true">Specifies the values of NVRAM variables 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:HW_ROM and 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:ROM.
@@ -7838,15 +7810,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">ROM</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatROM_PNVRAM"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_102">
-                 <item>
+               <item row="4" column="1">
+                  <widget class="QLineEdit" name="editDatROM_PNVRAM"/>
+               </item>
+               <item row="5" column="0">
                   <widget class="QLabel" name="label_109">
                    <property name="toolTip">
                     <string notr="true">Specifies the values of NVRAM variables 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:HW_SSN and  4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:SSN.
@@ -7861,8 +7829,8 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">SystemSerialNumber</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="5" column="1">
                   <widget class="QLineEdit" name="editSystemSerialNumber_PNVRAM">
                    <property name="toolTip">
                     <string/>
@@ -7871,12 +7839,8 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string/>
                    </property>
                   </widget>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_103">
-                 <item>
+               <item row="6" column="0">
                   <widget class="QLabel" name="label_106">
                    <property name="toolTip">
                     <string notr="true">Specifies the value of NVRAM variable 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14:system-id for boot services only. Value found on Macs is equal to SMBIOS SystemUUID.
@@ -7891,11 +7855,22 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string notr="true">SystemUUID</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="6" column="1">
                   <widget class="QLineEdit" name="editSystemUUID_PlatformNVRAM"/>
-                 </item>
-                </layout>
+               </item>
+               <item row="7" column="0">
+                <spacer name="verticalSpacer_pi_verticalLayout_67">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -7915,10 +7890,26 @@ If there are no error-correction bits, this value should be equal to DataWidth.
               <property name="frameShadow">
                <enum>QFrame::Shadow::Plain</enum>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_68">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_15">
-                 <item>
+              <layout class="QGridLayout" name="gridLayout_pi_verticalLayout_68" columnstretch="0,1,0,1,0,1">
+               <property name="leftMargin">
+                <number>12</number>
+               </property>
+               <property name="topMargin">
+                <number>12</number>
+               </property>
+               <property name="rightMargin">
+                <number>12</number>
+               </property>
+               <property name="bottomMargin">
+                <number>12</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>10</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>12</number>
+               </property>
+               <item row="0" column="0">
                   <widget class="QLabel" name="label_71">
                    <property name="toolTip">
                     <string notr="true">Asset tag number. Varies, may be empty or Type2 - Board Asset Tag.
@@ -7932,11 +7923,11 @@ If there are no error-correction bits, this value should be equal to DataWidth.
                     <string>BoardAssetTag</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="1">
                   <widget class="QLineEdit" name="editBoardAssetTag"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="2">
                   <widget class="QLabel" name="label_73">
                    <property name="toolTip">
                     <string notr="true">SMBIOS: Baseboard (or Module) Information (Type 2) — Location in Chassis
@@ -7956,11 +7947,11 @@ SMBIOS：底板（或模块）信息（类型2）--在机箱中的位置。
                     <string>BoardLocationInChassis</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="3">
                   <widget class="QLineEdit" name="editBoardLocationInChassis"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="4">
                   <widget class="QLabel" name="label_75">
                    <property name="toolTip">
                     <string notr="true"> Board manufacturer. All rules of SystemManufacturer do apply.
@@ -7976,11 +7967,11 @@ SMBIOS：底板（或模块）信息（类型2）--在机箱中的位置。
                     <string>BoardManufacturer</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="0" column="5">
                   <widget class="QLineEdit" name="editBoardManufacturer"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="0">
                   <widget class="QLabel" name="label_77">
                    <property name="toolTip">
                     <string notr="true">Mac Board ID (board-id). May look like Mac-7BA5B2D9E42DDD94 or Mac-F221BEC8 in older models.
@@ -7995,15 +7986,11 @@ Mac板ID（board-id）。可能看起来像Mac-7BA5B2D9E42DDD94或旧型号的Ma
                     <string>BoardProduct</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editBoardProduct_2"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_16">
-                 <item>
+               <item row="1" column="1">
+                  <widget class="QLineEdit" name="editBoardProduct_2"/>
+               </item>
+               <item row="1" column="2">
                   <widget class="QLabel" name="label_81">
                    <property name="toolTip">
                     <string notr="true"> Either 0xA (Motherboard (includes processor, memory, and I/O) or 0xB (Processor/Memory Module), refer to Table 15 – Baseboard: Board Type for more details.
@@ -8018,11 +8005,11 @@ Mac板ID（board-id）。可能看起来像Mac-7BA5B2D9E42DDD94或旧型号的Ma
                     <string>BoardType</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="3">
                   <widget class="QLineEdit" name="editIntBoardType"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="4">
                   <widget class="QLabel" name="label_83">
                    <property name="toolTip">
                     <string notr="true">Board version number. Varies, may match SystemProductName or SystemProductVersion.
@@ -8036,11 +8023,11 @@ Mac板ID（board-id）。可能看起来像Mac-7BA5B2D9E42DDD94或旧型号的Ma
                     <string>BoardVersion</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="1" column="5">
                   <widget class="QLineEdit" name="editBoardVersion"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="0">
                   <widget class="QLabel" name="label_65">
                    <property name="toolTip">
                     <string notr="true"> Firmware release date. Similar to BIOSVersion. May look like 12/08/2017.
@@ -8054,11 +8041,11 @@ Mac板ID（board-id）。可能看起来像Mac-7BA5B2D9E42DDD94或旧型号的Ma
                     <string>BIOSReleaseDate</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="1">
                   <widget class="QLineEdit" name="editBIOSReleaseDate"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="2">
                   <widget class="QLabel" name="label_67">
                    <property name="toolTip">
                     <string notr="true"> BIOS Vendor. All rules of SystemManufacturer do apply.
@@ -8072,15 +8059,11 @@ Mac板ID（board-id）。可能看起来像Mac-7BA5B2D9E42DDD94或旧型号的Ma
                     <string>BIOSVendor</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editBIOSVendor"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_17">
-                 <item>
+               <item row="2" column="3">
+                  <widget class="QLineEdit" name="editBIOSVendor"/>
+               </item>
+               <item row="2" column="4">
                   <widget class="QLabel" name="label_85">
                    <property name="toolTip">
                     <string notr="true">Chassis type name. Varies, could be empty or MacBook-Aluminum.
@@ -8094,11 +8077,11 @@ Mac板ID（board-id）。可能看起来像Mac-7BA5B2D9E42DDD94或旧型号的Ma
                     <string>ChassisAssetTag</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="2" column="5">
                   <widget class="QLineEdit" name="editChassisAssetTag"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="3" column="0">
                   <widget class="QLabel" name="label_87">
                    <property name="toolTip">
                     <string notr="true">SMBIOS: System Enclosure or Chassis (Type 3) — Manufacturer
@@ -8114,11 +8097,11 @@ SMBIOS：系统外壳或机箱(类型3)-制造商
                     <string>ChassisManufacturer</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="3" column="1">
                   <widget class="QLineEdit" name="editChassisManufacturer"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="3" column="2">
                   <widget class="QLabel" name="label_89">
                    <property name="toolTip">
                     <string notr="true">SMBIOS: System Enclosure or Chassis (Type 3) — Version
@@ -8136,11 +8119,11 @@ SMBIOS：系统外壳或机箱(类型3)----版本。
                     <string>ChassisSerialNumber</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="3" column="3">
                   <widget class="QLineEdit" name="editChassisSerialNumber"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="3" column="4">
                   <widget class="QLabel" name="label_91">
                    <property name="toolTip">
                     <string notr="true"> Chassis type, refer to Table 17 — System Enclosure or Chassis Types for more details.
@@ -8154,15 +8137,11 @@ SMBIOS：系统外壳或机箱(类型3)----版本。
                     <string>ChassisType</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editIntChassisType"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_18">
-                 <item>
+               <item row="3" column="5">
+                  <widget class="QLineEdit" name="editIntChassisType"/>
+               </item>
+               <item row="4" column="0">
                   <widget class="QLabel" name="label_84">
                    <property name="toolTip">
                     <string notr="true">Mac Board ID (board-id). May look like Mac-7BA5B2D9E42DDD94 or Mac-F221BEC8 in older models. Sometimes it can be just empty.
@@ -8176,11 +8155,11 @@ Mac板ID（board-id）。可能看起来像 Mac-7BA5B2D9E42DDD94 或旧型号的
                     <string>SystemSKUNumber</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="1">
                   <widget class="QLineEdit" name="editSystemSKUNumber"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="2">
                   <widget class="QLabel" name="label_78">
                    <property name="toolTip">
                     <string notr="true">Family name. May look like iMac Pro.
@@ -8194,11 +8173,11 @@ Mac板ID（board-id）。可能看起来像 Mac-7BA5B2D9E42DDD94 或旧型号的
                     <string>SystemFamily</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="3">
                   <widget class="QLineEdit" name="editSystemFamily"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="4">
                   <widget class="QLabel" name="label_82">
                    <property name="toolTip">
                     <string notr="true"> Preferred Mac model used to mark the device as supported by the operating system. 
@@ -8218,11 +8197,11 @@ Note: If SystemProductName is unknown, and related fields are unspecified, defau
                     <string>SystemProductName</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="4" column="5">
                   <widget class="QLineEdit" name="editSystemProductName_2"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="5" column="0">
                   <widget class="QLabel" name="label_80">
                    <property name="toolTip">
                     <string notr="true"> OEM manufacturer of the particular board. Shall not be specified unless strictly required. 
@@ -8246,15 +8225,11 @@ In addition it will also make some operating systems like Linux unbootable.
                     <string>SystemManufacturer</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editSystemManufacturer"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_19">
-                 <item>
+               <item row="5" column="1">
+                  <widget class="QLineEdit" name="editSystemManufacturer"/>
+               </item>
+               <item row="5" column="2">
                   <widget class="QLabel" name="label_88">
                    <property name="toolTip">
                     <string notr="true"> A UUID is an identifier that is designed to be unique across both time and space. It requires no central registration process.
@@ -8269,11 +8244,11 @@ UUID是一种标识符，设计为在时间和空间上都是唯一的。它不�
                     <string>SystemUUID</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="5" column="3">
                   <widget class="QLineEdit" name="editSystemUUID_SMBIOS"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="5" column="4">
                   <widget class="QLabel" name="label_68">
                    <property name="toolTip">
                     <string notr="true"> 64-bit firmware features bitmask. Refer to AppleFeatures.h for more details. Lower 32 bits match FirmwareFeatures. Upper 64 bits match ExtendedFirmwareFeatures.
@@ -8288,11 +8263,11 @@ UUID是一种标识符，设计为在时间和空间上都是唯一的。它不�
                     <string>FirmwareFeatures</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="5" column="5">
                   <widget class="QLineEdit" name="editDatFirmwareFeatures_SMBIOS"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="6" column="0">
                   <widget class="QLabel" name="label_90">
                    <property name="toolTip">
                     <string notr="true"> Product iteration version number. May look like 1.1.
@@ -8306,11 +8281,11 @@ UUID是一种标识符，设计为在时间和空间上都是唯一的。它不�
                     <string>SystemVersion</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="6" column="1">
                   <widget class="QLineEdit" name="editSystemVersion"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="6" column="2">
                   <widget class="QLabel" name="label_92">
                    <property name="toolTip">
                     <string notr="true"> Supported bits of extended firmware features bitmask. Refer to AppleFeatures.h for more details.
@@ -8329,15 +8304,11 @@ Lower 32 bits match FirmwareFeaturesMask. Upper 64 bits match ExtendedFirmwareFe
                     <string>FirmwareFeaturesMask</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editDatFirmwareFeaturesMask_SMBIOS"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_20">
-                 <item>
+               <item row="6" column="3">
+                  <widget class="QLineEdit" name="editDatFirmwareFeaturesMask_SMBIOS"/>
+               </item>
+               <item row="6" column="4">
                   <widget class="QLabel" name="label_74">
                    <property name="toolTip">
                     <string notr="true"> Combined of Processor Major and Minor types.
@@ -8351,11 +8322,11 @@ Lower 32 bits match FirmwareFeaturesMask. Upper 64 bits match ExtendedFirmwareFe
                     <string>ProcessorType</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="6" column="5">
                   <widget class="QLineEdit" name="editIntProcessorType"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="7" column="0">
                   <widget class="QLabel" name="label_76">
                    <property name="toolTip">
                     <string notr="true">ASCII string containing SMC version in upper case. Missing on T2 based Macs. Ignored when zero.
@@ -8370,11 +8341,11 @@ Lower 32 bits match FirmwareFeaturesMask. Upper 64 bits match ExtendedFirmwareFe
                     <string>SmcVersion</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="7" column="1">
                   <widget class="QLineEdit" name="editDatSmcVersion"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="7" column="2">
                   <widget class="QLabel" name="label_72">
                    <property name="toolTip">
                     <string notr="true"> Platform features bitmask. Refer to AppleFeatures.h for more details. Use 0xFFFFFFFF value to not provide this table.
@@ -8389,11 +8360,11 @@ Lower 32 bits match FirmwareFeaturesMask. Upper 64 bits match ExtendedFirmwareFe
                     <string>PlatformFeature</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="7" column="3">
                   <widget class="QLineEdit" name="editIntPlatformFeature"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="7" column="4">
                   <widget class="QLabel" name="label_86">
                    <property name="toolTip">
                     <string notr="true"> Product serial number in defined format. Known formats are described in macserial.
@@ -8407,15 +8378,11 @@ Lower 32 bits match FirmwareFeaturesMask. Upper 64 bits match ExtendedFirmwareFe
                     <string>SystemSerialNumber</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="editSystemSerialNumber_2"/>
-                 </item>
-                </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_21">
-                 <item>
+               <item row="7" column="5">
+                  <widget class="QLineEdit" name="editSystemSerialNumber_2"/>
+               </item>
+               <item row="8" column="0">
                   <widget class="QLabel" name="label_66">
                    <property name="toolTip">
                     <string notr="true"> Should match BoardProduct.
@@ -8429,11 +8396,11 @@ Lower 32 bits match FirmwareFeaturesMask. Upper 64 bits match ExtendedFirmwareFe
                     <string>ChassisVersion</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="8" column="1">
                   <widget class="QLineEdit" name="editChassisVersion"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="8" column="2">
                   <widget class="QLabel" name="label_69">
                    <property name="toolTip">
                     <string notr="true"> Firmware version. 
@@ -8453,11 +8420,11 @@ This value gets updated and takes part in update delivery configuration and macO
                     <string>BIOSVersion</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="8" column="3">
                   <widget class="QLineEdit" name="editBIOSVersion"/>
-                 </item>
-                 <item>
+               </item>
+               <item row="8" column="4">
                   <widget class="QLabel" name="label_79">
                    <property name="toolTip">
                     <string notr="true">Board serial number in defined format. Known formats are described in macserial.
@@ -8471,11 +8438,22 @@ This value gets updated and takes part in update delivery configuration and macO
                     <string>BoardSerialNumber</string>
                    </property>
                   </widget>
-                 </item>
-                 <item>
+               </item>
+               <item row="8" column="5">
                   <widget class="QLineEdit" name="editBoardSerialNumber"/>
-                 </item>
-                </layout>
+               </item>
+               <item row="9" column="0">
+                <spacer name="verticalSpacer_pi_verticalLayout_68">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>

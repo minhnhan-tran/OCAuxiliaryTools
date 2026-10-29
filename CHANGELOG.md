@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.28.0] — 2026-10-29
+
+### Changed
+- PlatformInfo tabs DataHub, Memory, PlatformNVRAM and SMBIOS (and the SMBIOS wide layout): label/field rows are now one aligned grid per tab with even spacing, so labels, fields and buttons line up and fields grow with the window. SMBIOS uses three label/field pairs per row (fields were 75 px wide, now about 160 px). Two fixed-width limits removed (ARTFrequency, BID). No widget was renamed or removed.
+
 ## [1.27.3] — 2026-10-29
 
 ### Fixed
