@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.29.1] — 2026-10-29
+
+### Fixed
+- UEFI > ProtocolOverrides: three checkbox layouts got a second, duplicate `spacing` property in 1.29.0 (the original one already won, so nothing changed on screen). Removed the duplicates. Also, ProtocolOverrides is only packed to the top; it was not converted to a grid.
+
 ## [1.29.0] — 2026-10-29
 
 ### Changed

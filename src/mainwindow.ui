@@ -10681,9 +10681,6 @@ Note 2 : When switching from manually specifified NVRAM variable to this prefere
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_26">
                <property name="spacing">
-                <number>14</number>
-               </property>
-               <property name="spacing">
                 <number>0</number>
                </property>
                <property name="leftMargin">
@@ -10871,9 +10868,6 @@ VoiceOver协议是直布罗陀机（T2）特有的，在macOS High Sierra（10.1
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_35">
                <property name="spacing">
-                <number>14</number>
-               </property>
-               <property name="spacing">
                 <number>0</number>
                </property>
                <property name="leftMargin">
@@ -11013,9 +11007,6 @@ VoiceOver协议是直布罗陀机（T2）特有的，在macOS High Sierra（10.1
                <enum>QFrame::Shadow::Plain</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_27">
-               <property name="spacing">
-                <number>14</number>
-               </property>
                <property name="spacing">
                 <number>0</number>
                </property>
