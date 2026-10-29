@@ -4,6 +4,17 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.27.0] — 2026-10-29
+
+### Added
+- Post-Install Check: new **Updates** group with five checks from Dortania's "Updating OpenCore and macOS" guide, to run before updating macOS:
+  - a Time Machine backup from the last 30 days exists (the guide's "some form of recovery"; other recovery methods can ignore it);
+  - OpenCore is the latest release (running version from `opencore-version`, compared with GitHub; needs internet);
+  - the loaded Acidanthera kexts (Lilu, WhateverGreen, AppleALC, VirtualSMC, RestrictEvents, NVMeFix, CPUFriend) are the latest releases (needs internet);
+  - macOS is not set to install updates by itself;
+  - at least 30 GB of free space.
+  Each skips or gives no verdict when it cannot tell (no OpenCore version, no network, no backup destination readable).
+
 ## [1.26.1] — 2026-10-27
 
 ### Fixed

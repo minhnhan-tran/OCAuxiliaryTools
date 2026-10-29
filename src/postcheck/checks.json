@@ -1020,6 +1020,125 @@
    "needsReport": false
   },
   {
+   "id": "update-backup",
+   "group": "Updates",
+   "title": "A recent Time Machine backup exists (a way back if an update breaks boot)",
+   "cmd": "dest=$(tmutil destinationinfo 2>/dev/null | grep -c '^Name'); lb=$(tmutil latestbackup 2>/dev/null | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}' | tail -1); if [ -n \"$lb\" ]; then d=${lb%-*}; t=$(date -j -f %Y-%m-%d \"$d\" +%s 2>/dev/null); age=$(( ( $(date +%s) - ${t:-0} ) / 86400 )); if [ \"$age\" -le 30 ]; then echo \"tm=recent age=$age\"; else echo \"tm=old age=$age\"; fi; elif [ \"$dest\" = 0 ]; then echo \"tm=none\"; else echo \"tm=unknown dest=$dest\"; fi",
+   "pass": "tm=recent\\b",
+   "fail": "tm=(none|old)\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/update.html",
+   "why": "Dortania: before updating macOS, 'have some form of recovery like TimeMachine or an older macOS installer with a known good EFI on it'. This looks for a Time Machine backup made in the last 30 days. If you use another recovery (a cloned disk, an installer USB with a working EFI), this check can fail and you can ignore it. 'unknown' means a backup destination exists but its latest backup could not be read (for example the drive is not connected).",
+   "fixes": [
+    {
+     "cmd": "tmutil destinationinfo; tmutil latestbackup",
+     "why": "Shows your Time Machine destinations and the latest backup. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "Back up the system with Time Machine, and copy your EFI folder somewhere safe (this app: File > Backup EFI), then update."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "update-opencore-current",
+   "group": "Updates",
+   "title": "OpenCore is up to date",
+   "cmd": "v=$(nvram 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102:opencore-version 2>/dev/null | cut -f2 | grep -oE '^[A-Z]{3}-[0-9]{3}' | cut -d- -f2); if [ -z \"$v\" ]; then echo \"oc=none\"; else cur=$(echo \"$v\" | sed -E 's/(.)(.)(.)/\\1.\\2.\\3/'); lat=$(curl -sIL -m 8 -o /dev/null -w '%{url_effective}' https://github.com/acidanthera/OpenCorePkg/releases/latest 2>/dev/null | sed 's:.*/::'); case \"$lat\" in [0-9]*.[0-9]*.[0-9]*) c=$(awk -v a=\"$cur\" -v b=\"$lat\" 'BEGIN{split(a,x,\".\");split(b,y,\".\");for(i=1;i<=3;i++){if(x[i]+0>y[i]+0){print 1;exit}if(x[i]+0<y[i]+0){print -1;exit}}print 0}'); if [ \"$c\" -lt 0 ]; then echo \"oc=old running=$cur latest=$lat\"; else echo \"oc=current running=$cur latest=$lat\"; fi;; *) echo \"oc=unknown running=$cur\";; esac; fi",
+   "skip": "oc=none\\b",
+   "skipWhy": "Not applicable: OpenCore did not report its version (this Mac was not started by OpenCore).",
+   "pass": "oc=current\\b",
+   "fail": "oc=old\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/update.html",
+   "why": "Dortania: OpenCore is released on the first Monday of each month, and new macOS versions often need the newest release. This compares the running OpenCore (from the opencore-version NVRAM variable) with the latest release on GitHub, so it needs the internet. An older OpenCore is not always a problem; read Differences.pdf before upgrading, run ocvalidate on the new config, and try the new version from a spare USB first.",
+   "fixes": [
+    {
+     "cmd": "open \"https://github.com/acidanthera/OpenCorePkg/releases/latest\"",
+     "why": "Opens the latest OpenCore release in your browser. Nothing is installed.",
+     "run": "user"
+    },
+    {
+     "note": "Update following the Dortania steps: download the release, back up the EFI, replace BOOTx64.efi, OpenCore.efi and the drivers, update the kexts, apply the Differences.pdf changes to config.plist, run ocvalidate, and test from a spare USB before using the internal disk. This app's Tools > Upgrade OC does the file part."
+    }
+   ],
+   "timeoutSec": 30,
+   "needsReport": false
+  },
+  {
+   "id": "update-kexts-current",
+   "group": "Updates",
+   "title": "Acidanthera kexts (Lilu, WhateverGreen, AppleALC...) are up to date",
+   "cmd": "ks=$(kmutil showloaded --list-only 2>/dev/null || kextstat 2>/dev/null); n=0; ok=0; old=\"\"; for repo in Lilu WhateverGreen AppleALC VirtualSMC RestrictEvents NVMeFix CPUFriend; do cur=$(printf '%s\\n' \"$ks\" | grep -E \"(as\\.vit9696|com\\.acidanthera)\\.$repo \\(\" | head -1 | sed -E 's/.*\\(([0-9.]+)\\).*/\\1/'); [ -z \"$cur\" ] && continue; n=$((n+1)); lat=$(curl -sIL -m 8 -o /dev/null -w '%{url_effective}' \"https://github.com/acidanthera/$repo/releases/latest\" 2>/dev/null | sed 's:.*/::'); case \"$lat\" in [0-9]*.[0-9]*) ;; *) continue;; esac; ok=$((ok+1)); c=$(awk -v a=\"$cur\" -v b=\"$lat\" 'BEGIN{split(a,x,\".\");split(b,y,\".\");for(i=1;i<=3;i++){if(x[i]+0>y[i]+0){print 1;exit}if(x[i]+0<y[i]+0){print -1;exit}}print 0}'); [ \"$c\" -lt 0 ] && old=\"$old $repo:$cur<$lat\"; done; if [ \"$n\" = 0 ]; then echo \"kexts=none\"; elif [ \"$ok\" = 0 ]; then echo \"kexts=unknown\"; elif [ -z \"$old\" ]; then echo \"kexts=current checked=$ok\"; else echo \"kexts=old [${old# }]\"; fi",
+   "skip": "kexts=(none|unknown)\\b",
+   "skipWhy": "Not applicable: no known Acidanthera kexts are loaded, or GitHub could not be reached.",
+   "pass": "kexts=current\\b",
+   "fail": "kexts=old\\b",
+   "severity": "warn",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/update.html",
+   "why": "Dortania: update kexts the same way as OpenCore, keeping a copy and testing from a spare USB. A new macOS often needs new Lilu/WhateverGreen/AppleALC versions. This compares the loaded Acidanthera kexts that this app knows (Lilu, WhateverGreen, AppleALC, VirtualSMC, RestrictEvents, NVMeFix, CPUFriend) with their latest GitHub releases, so it needs the internet. Other kexts are not checked.",
+   "fixes": [
+    {
+     "cmd": "open \"https://github.com/acidanthera/Lilu/releases/latest\"",
+     "why": "Opens the Lilu release page in your browser (the other kexts have their own pages). Nothing is installed.",
+     "run": "user"
+    },
+    {
+     "note": "Update the kexts in your EFI (Kernel > Add), keep the old copy, and test from a spare USB. Lilu and Friends or Kext Extractor, linked from the guide, can fetch them."
+    }
+   ],
+   "timeoutSec": 90,
+   "needsReport": false
+  },
+  {
+   "id": "update-auto-install",
+   "group": "Updates",
+   "title": "macOS does not install updates by itself",
+   "cmd": "v=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates 2>/dev/null); echo \"auto=${v:-0}\"",
+   "pass": "auto=0\\b",
+   "fail": "auto=1\\b",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/update.html",
+   "why": "Dortania: before a macOS update, check that your kexts and OpenCore support it and see whether others report problems. With 'Install macOS updates' switched on, the Mac can install a new version on its own, before you have done that. Turn it off in System Settings > General > Software Update (the info button next to Automatic updates) and update by hand.",
+   "fixes": [
+    {
+     "cmd": "open x-apple.systempreferences:com.apple.Software-Update-Settings.extension",
+     "why": "Opens the Software Update settings. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "Switch off 'Install macOS updates' (macOS 13 and later; older macOS: Software Update > Advanced > Install macOS updates)."
+    }
+   ],
+   "timeoutSec": 15,
+   "needsReport": false
+  },
+  {
+   "id": "update-free-space",
+   "group": "Updates",
+   "title": "Enough free disk space for a macOS update",
+   "cmd": "p=/System/Volumes/Data; [ -d \"$p\" ] || p=/; kb=$(df -k \"$p\" | awk 'NR==2{print $4}'); echo \"freegb=$((kb/1048576))\"",
+   "pass": "freegb=(\\d{3,}|[3-9]\\d)\\b",
+   "fail": "freegb=([0-9]|[12]\\d)\\b",
+   "severity": "info",
+   "guide": "https://dortania.github.io/OpenCore-Post-Install/universal/update.html",
+   "why": "A macOS update downloads the installer and needs room to unpack it; 30 GB free is a safe minimum (an upgrade to a new major version can need more). Less space makes the update fail partway, which on a hackintosh is a bad time to be unsure about recovery.",
+   "fixes": [
+    {
+     "cmd": "df -h /System/Volumes/Data",
+     "why": "Shows the free space on the data volume. Nothing is changed.",
+     "run": "user"
+    },
+    {
+     "note": "Free up space (empty the Trash, delete old Time Machine local snapshots with `tmutil deletelocalsnapshots`, remove unused apps) before updating."
+    }
+   ],
+   "timeoutSec": 15,
+   "needsReport": false
+  },
+  {
    "id": "rom-en0",
    "group": "iServices",
    "title": "NVRAM ROM matches the en0 MAC address",
