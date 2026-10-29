@@ -4,6 +4,13 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.27.1] — 2026-10-29
+
+### Fixed
+- Post-Install Check (Updates): the kext check now recognises NVMeFix (`org.acidanthera.NVMeFix`) and CPUFriend (`org.acidanthera.driver.CPUFriend`); their bundle ids did not match, so they were never compared with the latest release.
+- "macOS does not install updates by itself" gives no verdict when the setting was never changed (macOS then uses its default, which can be on) instead of passing.
+- Fix notes now name the real menu entries (Tools > Backup EFI to Desktop, Tools > Upgrade OpenCore and Kexts).
+
 ## [1.27.0] — 2026-10-29
 
 ### Added
