@@ -279,6 +279,9 @@ class MainWindow : public QMainWindow {
   void del_item(QTableWidget* table);
 
   void write_ini(QTableWidget* table, QTableWidget* mytable, int i);
+  // Sets (or adds) one NVRAM > Add value in the open config, the way the NVRAM tab does.
+  // type is the plist type shown in the table ("Data", "String", "Number"...).
+  bool setNvramAddValue(const QString& guid, const QString& key, const QString& type, const QString& value);
   void read_ini(QTableWidget* table, QTableWidget* mytable, int i);
 
   void init_key_class_value(QTableWidget* table, QTableWidget* subtable);
@@ -1039,6 +1042,7 @@ class MainWindow : public QMainWindow {
   void openPostCheck();
   void openUsbMap();
   void openMacOSInstaller();
+  void openSipCalc();
   QAction* actionBuildEfi = nullptr;
   QAction* actionPostCheck = nullptr;
   QAction* actionUsbMapBtn = nullptr;

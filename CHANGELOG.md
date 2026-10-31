@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.31.0] — 2026-10-31
+
+### Added
+- **Tools > SIP / csr-active-config Calculator...** (idea from Hackintool). Tick the SIP flags (names and bits from OpenCorePkg's AppleCsrConfig.h), or type a number / the 4-byte NVRAM Data, and the other forms update. Presets: enabled, OpenCore's default SIP-off value 0x27F, OCLP's root-patching value 0x803, all known flags. "Copy Data" copies the NVRAM value; "Apply to open config" sets csr-active-config under 7C436110-AB2A-4BBB-A880-FE41995C9F82 in NVRAM > Add (after a confirmation). Bits the dialog does not know are kept when you toggle others.
+
 ## [1.30.0] — 2026-10-29
 
 ### Changed

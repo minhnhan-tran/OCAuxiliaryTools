@@ -71,6 +71,7 @@ SOURCES += \
     src/dlgpostcheck.cpp \
     src/dlgusbmap.cpp \
     src/dlgmacosinstaller.cpp \
+    src/dlgsipcalc.cpp \
     src/macosinstaller/macosinstaller.cpp \
     src/macosinstaller/macosdownload.cpp \
     src/usbmap/usbmap.cpp \
@@ -115,6 +116,7 @@ HEADERS += \
     src/dlgpostcheck.h \
     src/dlgusbmap.h \
     src/dlgmacosinstaller.h \
+    src/dlgsipcalc.h \
     src/macosinstaller/macosinstaller.h \
     src/macosinstaller/macosdownload.h \
     src/usbmap/usbmap.h \

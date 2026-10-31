@@ -4,6 +4,7 @@
 #include "dlgpostcheck.h"
 #include "dlgusbmap.h"
 #include "dlgmacosinstaller.h"
+#include "dlgsipcalc.h"
 #include "iconset.h"
 #include "theme.h"
 
@@ -261,6 +262,54 @@ void MainWindow::openMacOSInstaller() {
   dlg.exec();
 }
 
+void MainWindow::openSipCalc() {
+  dlgSipCalc dlg(this);
+  dlg.exec();
+}
+
+bool MainWindow::setNvramAddValue(const QString& guid, const QString& key, const QString& type,
+                                  const QString& value) {
+  // Find (or create) the GUID row in the left table.
+  int row = -1;
+  for (int i = 0; i < ui->table_nv_add0->rowCount(); i++) {
+    QTableWidgetItem* it = ui->table_nv_add0->item(i, 0);
+    if (it && it->text().compare(guid, Qt::CaseInsensitive) == 0) { row = i; break; }
+  }
+  const bool newGuid = row < 0;
+  if (newGuid) {
+    // Same steps as the "+" button on the left table: the right table must start empty so the
+    // new GUID does not inherit the previous GUID's rows.
+    add_item(ui->table_nv_add0, 1);
+    ui->table_nv_add->setRowCount(0);
+    row = ui->table_nv_add0->rowCount() - 1;
+    ui->table_nv_add0->item(row, 0)->setText(guid);
+  } else {
+    ui->table_nv_add0->setCurrentCell(row, 0);
+    on_table_nv_add0_cellClicked(row, 0);  // fills the right table from the saved list
+  }
+
+  // Update the key if it exists, otherwise append it.
+  int r = -1;
+  for (int i = 0; i < ui->table_nv_add->rowCount(); i++) {
+    QTableWidgetItem* it = ui->table_nv_add->item(i, 0);
+    if (it && it->text() == key) { r = i; break; }
+  }
+  loading = true;
+  if (r < 0) {
+    add_item(ui->table_nv_add, 3);
+    r = ui->table_nv_add->rowCount() - 1;
+    ui->table_nv_add->item(r, 0)->setText(key);
+  }
+  ui->table_nv_add->item(r, 1)->setText(type);
+  ui->table_nv_add->item(r, 2)->setText(value);
+  loading = false;
+
+  write_ini(ui->table_nv_add0, ui->table_nv_add, ui->table_nv_add0->currentRow());
+  setWindowModified(true);
+  updateIconStatus();
+  return true;
+}
+
 void MainWindow::initRecentFilesForToolBar() {
   // One-time: add the OpCore-Simplify style EFI builder to the Tools menu.
   if (!ui->menuTools->findChild<QAction*>("actionEfiBuilder")) {
@@ -289,6 +338,12 @@ void MainWindow::initRecentFilesForToolBar() {
 #endif
     ui->menuTools->insertAction(ui->actionGenerateEFI, mi);
     connect(mi, &QAction::triggered, this, &MainWindow::openMacOSInstaller);
+  }
+  if (!ui->menuTools->findChild<QAction*>("actionSipCalc")) {
+    QAction* sip = new QAction(tr("SIP / csr-active-config Calculator..."), ui->menuTools);
+    sip->setObjectName("actionSipCalc");
+    ui->menuTools->insertAction(ui->actionGenerateEFI, sip);
+    connect(sip, &QAction::triggered, this, &MainWindow::openSipCalc);
   }
   if (!ui->menuHelp->findChild<QAction*>("actionPostInstall")) {
     QAction* post = new QAction(tr("OpenCore Post-Install Guide"), ui->menuHelp);
