@@ -72,6 +72,8 @@ SOURCES += \
     src/dlgusbmap.cpp \
     src/dlgmacosinstaller.cpp \
     src/dlgsipcalc.cpp \
+    src/startpage.cpp \
+    src/sysinfo.cpp \
     src/macosinstaller/macosinstaller.cpp \
     src/macosinstaller/macosdownload.cpp \
     src/usbmap/usbmap.cpp \
@@ -117,6 +119,8 @@ HEADERS += \
     src/dlgusbmap.h \
     src/dlgmacosinstaller.h \
     src/dlgsipcalc.h \
+    src/startpage.h \
+    src/sysinfo.h \
     src/macosinstaller/macosinstaller.h \
     src/macosinstaller/macosdownload.h \
     src/usbmap/usbmap.h \

@@ -1043,6 +1043,8 @@ class MainWindow : public QMainWindow {
   void openUsbMap();
   void openMacOSInstaller();
   void openSipCalc();
+  void showStartPage();
+  void hideStartPage();
   QAction* actionBuildEfi = nullptr;
   QAction* actionPostCheck = nullptr;
   QAction* actionUsbMapBtn = nullptr;
@@ -1088,6 +1090,9 @@ class MainWindow : public QMainWindow {
   void init_MainUI();
 
   void init_hardware_info();
+  class StartPage* startPage_ = nullptr;
+  QList<QWidget*> startPageHidden_;
+  bool startPageOn_ = false;
 
   bool closeSave = false;
 

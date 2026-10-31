@@ -5,6 +5,7 @@
 #include "dlgusbmap.h"
 #include "dlgmacosinstaller.h"
 #include "dlgsipcalc.h"
+#include "startpage.h"
 #include "iconset.h"
 #include "theme.h"
 
@@ -202,6 +203,7 @@ MainWindow::MainWindow(QWidget* parent)
   load_LastFile();
   loading = false;
   Initialization = false;
+  if (SaveFileName.isEmpty()) showStartPage();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -262,6 +264,42 @@ void MainWindow::openMacOSInstaller() {
   dlg.exec();
 }
 
+void MainWindow::showStartPage() {
+  QGridLayout* grid = qobject_cast<QGridLayout*>(centralWidget()->layout());
+  if (!grid) return;
+  if (!startPage_) {
+    startPage_ = new StartPage(centralWidget());
+    connect(startPage_, &StartPage::openRequested, this, [this] { on_btnOpen(); });
+    connect(startPage_, &StartPage::editorRequested, this, &MainWindow::hideStartPage);
+    grid->addWidget(startPage_, 0, 0, qMax(1, grid->rowCount()), qMax(1, grid->columnCount()));
+  }
+  if (startPageOn_) return;
+  // Cover the whole editor: the section lists and tabs go away while the page is up.
+  // Before the window is first shown Qt reports every child as hidden, so test for an explicit
+  // hide (both attributes) instead of isHidden(); isVisible() is false then too.
+  startPageHidden_.clear();
+  for (QWidget* w : {static_cast<QWidget*>(ui->listMain), static_cast<QWidget*>(ui->listSub),
+                     static_cast<QWidget*>(ui->tabTotal)}) {
+    const bool explicitlyHidden =
+        w->testAttribute(Qt::WA_WState_Hidden) && w->testAttribute(Qt::WA_WState_ExplicitShowHide);
+    if (!explicitlyHidden) {
+      startPageHidden_ << w;
+      w->setVisible(false);
+    }
+  }
+  startPageOn_ = true;
+  startPage_->setVisible(true);
+  startPage_->refresh();
+}
+
+void MainWindow::hideStartPage() {
+  if (!startPage_ || !startPageOn_) return;
+  startPageOn_ = false;
+  startPage_->setVisible(false);
+  for (QWidget* w : startPageHidden_) w->setVisible(true);
+  startPageHidden_.clear();
+}
+
 void MainWindow::openSipCalc() {
   dlgSipCalc dlg(this);
   dlg.exec();
@@ -269,6 +307,7 @@ void MainWindow::openSipCalc() {
 
 bool MainWindow::setNvramAddValue(const QString& guid, const QString& key, const QString& type,
                                   const QString& value) {
+  hideStartPage();
   // Find (or create) the GUID row in the left table.
   int row = -1;
   for (int i = 0; i < ui->table_nv_add0->rowCount(); i++) {
@@ -339,6 +378,12 @@ void MainWindow::initRecentFilesForToolBar() {
     ui->menuTools->insertAction(ui->actionGenerateEFI, mi);
     connect(mi, &QAction::triggered, this, &MainWindow::openMacOSInstaller);
   }
+  if (!ui->menuTools->findChild<QAction*>("actionStartPage")) {
+    QAction* sp = new QAction(tr("System Information"), ui->menuTools);
+    sp->setObjectName("actionStartPage");
+    ui->menuTools->insertAction(ui->actionGenerateEFI, sp);
+    connect(sp, &QAction::triggered, this, &MainWindow::showStartPage);
+  }
   if (!ui->menuTools->findChild<QAction*>("actionSipCalc")) {
     QAction* sip = new QAction(tr("SIP / csr-active-config Calculator..."), ui->menuTools);
     sip->setObjectName("actionSipCalc");
@@ -380,6 +425,7 @@ void MainWindow::openFile(QString PlistFileName) {
       QMessageBox::warning(this, "", tr("Invalid plist file."), tr("OK"));
       return;
     }
+    hideStartPage();
 
     mymethod->removeFileSystemWatch(SaveFileName);
     SaveFileName = PlistFileName;

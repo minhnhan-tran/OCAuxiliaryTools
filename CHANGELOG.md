@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.32.0] — 2026-10-31
+
+### Added
+- **Start page with system information** (like Hackintool's System tab). When the app starts with no config.plist open, the window shows this computer's model, OS, serial and board ID, CPU, memory, graphics cards (with PCI IDs) and boot facts (OpenCore version, SIP, csr-active-config, boot-args) instead of an empty editor. Opening a config hides it; **Tools > System Information** brings it back. The probes run in a background thread (`sysinfo.*`, `startpage.*`). macOS gets the full list; Windows and Linux show a shorter one.
+
 ## [1.31.0] — 2026-10-31
 
 ### Added
