@@ -12,6 +12,8 @@ class SysInfoCollector : public QThread {
  public:
   using QThread::QThread;
   static QVariantList collect();  // blocking; also used by tests
+  // `nvram` prints bytes as "%XX" only when unprintable and as a literal character otherwise.
+  static QString nvramBytesToHex(const QString& s);
 
  signals:
   void collected(const QVariantList& rows);

@@ -31,12 +31,12 @@ QString humanBytes(qulonglong b) {
   return gb >= 1 ? QString::number(gb, 'f', gb < 10 ? 1 : 0) + " GB" : QString::number(b / (1024 * 1024)) + " MB";
 }
 
-// "%03%08%00%00" (nvram's escaped bytes) -> "03080000"
-QString nvramBytesToHex(const QString& s) {
-  QString hex;
-  const QStringList parts = s.split('%', QString::SkipEmptyParts);
-  for (const QString& p : parts) hex += p.left(2);
-  return hex.toUpper();
+// SPDisplaysDataType gives the vendor as e.g. "sppci_vendor_amd", not as a PCI id.
+QString vendorId(const QString& v) {
+  if (v.contains("amd", Qt::CaseInsensitive) || v.contains("ati", Qt::CaseInsensitive)) return "0x1002";
+  if (v.contains("intel", Qt::CaseInsensitive)) return "0x8086";
+  if (v.contains("nvidia", Qt::CaseInsensitive)) return "0x10de";
+  return QString();
 }
 
 #ifdef Q_OS_MAC
@@ -77,7 +77,7 @@ void collectMac(QVariantList& o) {
     const QString label = QObject::tr("GPU %1").arg(++n);
     QString name = g["sppci_model"].toString();
     QString ids;
-    const QString vid = g["spdisplays_vendor-id"].toString(), did = g["spdisplays_device-id"].toString();
+    const QString vid = vendorId(g["spdisplays_vendor"].toString()), did = g["spdisplays_device-id"].toString();
     if (!did.isEmpty()) ids = (vid.isEmpty() ? QString() : vid + ":") + did;
     QString vram = g["spdisplays_vram"].toString();
     if (vram.isEmpty()) vram = g["spdisplays_vram_shared"].toString();
@@ -94,7 +94,7 @@ void collectMac(QVariantList& o) {
   // csrutil prints a multi-line report when SIP is partly off; the first line is the verdict.
   add(o, oc, QObject::tr("SIP"), sip.section('\n', 0, 0).section(':', 1).trimmed().remove(QRegularExpression("\\.$")));
   const QString csr = run("nvram", {"csr-active-config"});
-  if (csr.contains('\t')) add(o, oc, QObject::tr("csr-active-config"), nvramBytesToHex(csr.section('\t', 1).trimmed()));
+  if (csr.contains('\t')) add(o, oc, QObject::tr("csr-active-config"), SysInfoCollector::nvramBytesToHex(csr.section('\t', 1).trimmed()));
   const QString bootArgs = run("nvram", {"boot-args"});
   if (bootArgs.contains('\t')) add(o, oc, QObject::tr("boot-args"), bootArgs.section('\t', 1).trimmed());
 }
@@ -140,6 +140,18 @@ void collectWin(QVariantList& o) {
 #endif
 
 }  // namespace
+
+QString SysInfoCollector::nvramBytesToHex(const QString& s) {
+  QString hex;
+  const QByteArray b = s.toLatin1();
+  for (int i = 0; i < b.size(); i++) {
+    bool ok = false;
+    const int v = (b[i] == '%' && i + 2 < b.size()) ? b.mid(i + 1, 2).toInt(&ok, 16) : 0;
+    if (ok) { hex += QString("%1").arg(v, 2, 16, QChar('0')); i += 2; }
+    else hex += QString("%1").arg(static_cast<uchar>(b[i]), 2, 16, QChar('0'));
+  }
+  return hex.toUpper();
+}
 
 QVariantList SysInfoCollector::collect() {
   QVariantList o;

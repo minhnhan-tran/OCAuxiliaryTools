@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.32.1] — 2026-10-31
+
+### Fixed
+- System information page: `csr-active-config` was decoded wrongly when the value held printable bytes (`nvram` prints those as characters, not `%XX`), e.g. 0x67 showed as garbage. Both forms are decoded now.
+- System information page: the graphics card's PCI vendor ID was always missing because the wrong `system_profiler` key was read; it is now derived from the vendor name (AMD 0x1002, Intel 0x8086, NVIDIA 0x10de).
+
 ## [1.32.0] — 2026-10-31
 
 ### Added
