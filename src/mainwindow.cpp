@@ -289,6 +289,7 @@ void MainWindow::showStartPage() {
   }
   startPageOn_ = true;
   startPage_->setVisible(true);
+  startPage_->raise();
   startPage_->refresh();
 }
 

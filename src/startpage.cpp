@@ -10,6 +10,9 @@
 #include "sysinfo.h"
 
 StartPage::StartPage(QWidget* parent) : QWidget(parent) {
+  // The page sits over the editor's grid cells; without an opaque background the status bar's
+  // "V1.x.x" label (and anything else underneath) shows through the margins.
+  setAutoFillBackground(true);
   auto* top = new QVBoxLayout(this);
   top->setContentsMargins(24, 18, 24, 18);
 

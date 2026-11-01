@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.33.1] — 2026-11-01
+
+### Fixed
+- Start page: the status bar's version label ("V1.x.x") showed through the page's transparent margin at the bottom-left. The page now paints an opaque background and is raised above the status bar.
+
 ## [1.33.0] — 2026-11-01
 
 ### Added
