@@ -4,6 +4,14 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.33.0] — 2026-11-01
+
+### Added
+- Start page shows more (macOS): uptime; each memory module (size, type, speed, maker); connected displays with resolution and refresh rate; storage (NVMe and SATA drives, the boot volume with file system and bus, EFI partitions); network adapters with MAC address; the default audio output; FileVault and Gatekeeper status; and the loaded non-Apple kexts (Lilu, WhateverGreen, ...).
+
+### Changed
+- All `system_profiler` data types are now read in a single call, so the page still fills in about two seconds.
+
 ## [1.32.1] — 2026-10-31
 
 ### Fixed
