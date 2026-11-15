@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.4] — 2026-11-15
+
+### Changed
+- README screenshots of the start page, SIP calculator, macOS installer and Mount ESP are now real captures of the app instead of renders with sample data. The host name, serial number and MAC addresses on the start page, and the temporary download path in the installer, are blacked out. The update prompt is still a render, because it needs a newer release than the installed build to appear.
+
 ## [1.36.3] — 2026-11-15
 
 ### Changed
