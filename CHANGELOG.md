@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.2] — 2026-11-15
+
+### Fixed
+- Windows and Linux workflows could not attach their packages to a release: the repository's default token is read-only and, unlike the macOS workflows, they did not ask for `contents: write`. They do now.
+
 ## [1.36.1] — 2026-11-15
 
 ### Fixed

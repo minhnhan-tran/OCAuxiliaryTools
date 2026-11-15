@@ -12,6 +12,9 @@ on:
       - '*.pro'
       - '**'
       - '.github/workflows/ubuntu.yml' 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build

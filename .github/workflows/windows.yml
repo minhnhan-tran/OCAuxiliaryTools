@@ -11,6 +11,9 @@ on:
       - '*.pro'
       - '**'
       - '.github/workflows/windows.yml' 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build
