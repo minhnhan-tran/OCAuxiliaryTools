@@ -8522,6 +8522,32 @@ void MainWindow::tablePopMenu(QTableWidget* w, QAction* cutAction,
 // Widest an auto-sized column may grow, in pixels.
 static const int kMaxAutoColWidth = 480;
 
+// Qt only wraps cell text at spaces, so a long value without any (hex data,
+// a path) was silently clipped. While the view wraps, allow a line break after
+// every few characters of such a run. Display only: the item text is untouched.
+class WrapDelegate : public QStyledItemDelegate {
+ public:
+  using QStyledItemDelegate::QStyledItemDelegate;
+  void initStyleOption(QStyleOptionViewItem* option,
+                       const QModelIndex& index) const override {
+    QStyledItemDelegate::initStyleOption(option, index);
+    const QTableView* v = qobject_cast<const QTableView*>(option->widget);
+    if (!v || !v->wordWrap() || option->text.length() < 24) return;
+    QString out;
+    out.reserve(option->text.length() + option->text.length() / 8);
+    int run = 0;
+    for (const QChar ch : option->text) {
+      out += ch;
+      run = ch.isSpace() ? 0 : run + 1;
+      if (run == 8) {
+        out += QChar(0x200B);  // zero-width space: a break opportunity
+        run = 0;
+      }
+    }
+    option->text = out;
+  }
+};
+
 void MainWindow::set_AutoColWidth(QTableWidget* w, bool autoColWidth) {
   QStringList keyList;
   keyList = QStringList() << "Enabled"
@@ -8586,6 +8612,7 @@ void MainWindow::init_CopyPasteLine() {
     w->installEventFilter(this);
     // Hover tip with the full text of a cell that is elided (see eventFilter).
     w->viewport()->installEventFilter(this);
+    w->setItemDelegate(new WrapDelegate(w));
 
     // 拷贝当前列表头文本
     QAction* copyTableHeaderTextAction = new QAction(tr("CopyText"));

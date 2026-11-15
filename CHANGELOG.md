@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.8] — 2026-11-15
+
+### Fixed
+- Wrapped cells (1.36.7): a long value with no spaces, such as hex Data or a file path, was still cut off at the column edge, because Qt only breaks lines at spaces. Such text now also wraps, so the whole value is visible. Only the display changes: the cell text, the edit box, copy and save are untouched.
+
 ## [1.36.7] — 2026-11-15
 
 ### Changed
