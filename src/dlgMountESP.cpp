@@ -5,6 +5,9 @@
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QIcon>
+#include <QPainter>
+#include <QPixmap>
 #include <QProcess>
 #include <QUrl>
 
@@ -48,9 +51,64 @@ static QString mountPointOf(const QString& disk) {
   return QString();
 }
 
+static QString diskOfRow(const QListWidgetItem* it) {
+  return it ? it->text().simplified().section('|', 0, 0).trimmed() : QString();
+}
+
+static QIcon dotIcon(const QColor& c) {
+  QPixmap pm(24, 24);  // drawn at 2x so it stays sharp on Retina
+  pm.fill(Qt::transparent);
+  QPainter p(&pm);
+  p.setRenderHint(QPainter::Antialiasing);
+  p.setPen(Qt::NoPen);
+  p.setBrush(c);
+  p.drawEllipse(QRect(4, 4, 16, 16));
+  p.end();
+  pm.setDevicePixelRatio(2);
+  return QIcon(pm);
+}
+
+void dlgMountESP::refreshStates() {
+#ifdef Q_OS_MAC
+  static const QIcon on = dotIcon(QColor("#34c759")), off = dotIcon(QColor("#8e8e93"));
+  // Halfway between text and background: readable on light and dark themes alike (the style's
+  // own "disabled" grey is only ~1.9:1 on white).
+  const QPalette pal = ui->listWidget->palette();
+  const QColor fg = pal.color(QPalette::Text), bg = pal.color(QPalette::Base);
+  const QColor dim((fg.red() + bg.red()) / 2, (fg.green() + bg.green()) / 2, (fg.blue() + bg.blue()) / 2);
+  for (int i = 0; i < ui->listWidget->count(); i++) {
+    QListWidgetItem* it = ui->listWidget->item(i);
+    const QString mp = mountPointOf(diskOfRow(it));
+    it->setData(Qt::UserRole, mp);
+    QFont f = it->font();
+    f.setBold(!mp.isEmpty());
+    it->setFont(f);
+    it->setIcon(mp.isEmpty() ? off : on);
+    it->setForeground(mp.isEmpty() ? QBrush(dim) : QBrush());  // default brush = normal text colour
+    it->setToolTip(mp.isEmpty() ? tr("Not mounted") : tr("Mounted at %1").arg(mp));
+  }
+#endif
+  updateButtons();
+}
+
+// "Open EFI folder" only makes sense for a mounted partition (nothing to open otherwise).
+void dlgMountESP::updateButtons() {
+  const QListWidgetItem* it = ui->listWidget->currentItem();
+#ifdef Q_OS_MAC
+  const bool mounted = it && !it->data(Qt::UserRole).toString().isEmpty();
+  ui->btnOpenEfiFolder->setEnabled(mounted);
+  ui->btnOpenEfiFolder->setToolTip(mounted ? tr("Open the EFI folder of the selected partition")
+                                           : tr("The selected partition is not mounted. Use Mount first."));
+#else
+  ui->btnOpenEfiFolder->setEnabled(it != nullptr);
+#endif
+}
+
+void dlgMountESP::on_listWidget_currentRowChanged(int) { updateButtons(); }
+
 void dlgMountESP::on_btnOpenEfiFolder_clicked() {
   if (!ui->listWidget->currentItem()) return;
-  const QString disk = ui->listWidget->currentItem()->text().simplified().section('|', 0, 0).trimmed();
+  const QString disk = diskOfRow(ui->listWidget->currentItem());
   QString dirpath;
   const QString mp = mountPointOf(disk);
   if (!mp.isEmpty()) dirpath = QFileInfo(mp + "/EFI").isDir() ? mp + "/EFI/" : mp + "/";

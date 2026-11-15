@@ -4231,6 +4231,7 @@ void MainWindow::readResultDiskInfo() {
       dlgMESP->ui->listWidget->setCurrentRow(0);
   }
 
+  dlgMESP->refreshStates();
   if (!Initialization) dlgMESP->show();
 }
 

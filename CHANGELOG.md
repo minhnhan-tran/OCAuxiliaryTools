@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.35.0] — 2026-11-15
+
+### Added
+- Mount ESP partition dialog: each partition now shows whether it is mounted. Mounted rows get a green dot and bold text, with the mount point in the tooltip; unmounted rows get a grey dot and dimmed text ("Not mounted" tooltip). The row text is unchanged, because Mount parses it.
+- **Open EFI folder** is enabled only for a mounted partition, so it can no longer be clicked with nothing to open; its tooltip says to use Mount first.
+
 ## [1.34.3] — 2026-11-15
 
 ### Fixed
