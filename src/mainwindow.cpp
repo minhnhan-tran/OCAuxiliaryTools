@@ -640,20 +640,16 @@ void MainWindow::markColor(QTableWidget* table, QString path, int col) {
       QString strVer = getKextVersion(strKexts + table->item(i, 0)->text());
       QString text = table->item(i, 1)->text();
       const QString old = text;
-      if (text.trimmed().length() > 0) {
-        if (text.mid(0, 1) == "V") {
-          QStringList strList = text.split("|");
-          if (strList.count() >= 2) {
-            text.replace(strList.at(0), "");
-            text = "V" + strVer + " " + text;
-          } else
-            text = "V" + strVer;
-
-        } else
-          text = "V" + strVer + " | " + text;
-
-      } else
+      // Only "V<digit>..." is our own version stamp; a user comment such as "Vanilla patch"
+      // must not be taken for one and overwritten.
+      static const QRegularExpression stamp("^V\\d[^\\s|]*");
+      QRegularExpressionMatch sm = stamp.match(text);
+      if (text.trimmed().isEmpty())
         text = "V" + strVer;
+      else if (sm.hasMatch())
+        text = "V" + strVer + text.mid(sm.capturedLength());  // keeps " | user comment"
+      else
+        text = "V" + strVer + " | " + text;
       // Skip identical text: setItem fires itemChanged (marks the file modified, rewrites INI).
       if (text != old) table->setItem(i, 1, new QTableWidgetItem(text));
     }

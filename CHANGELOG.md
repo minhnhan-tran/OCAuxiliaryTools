@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.34.3] — 2026-11-15
+
+### Fixed
+- Kernel > Add: a comment that merely starts with the letter "V" (for example "Vanilla patch") was taken for a version stamp and replaced by the kext version, losing the text. Only "V" followed by a digit is treated as the version now; the rest of the comment is kept. This mattered more since 1.34.2, which re-checks the tables every time the app becomes active.
+
 ## [1.34.2] — 2026-11-15
 
 ### Fixed
