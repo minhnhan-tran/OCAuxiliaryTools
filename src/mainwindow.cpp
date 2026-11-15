@@ -282,9 +282,9 @@ void MainWindow::showStartPage() {
   QGridLayout* grid = qobject_cast<QGridLayout*>(centralWidget()->layout());
   if (!grid) return;
   if (!startPage_) {
-    startPage_ = new StartPage(centralWidget());
-    connect(startPage_, &StartPage::openRequested, this, [this] { on_btnOpen(); });
-    connect(startPage_, &StartPage::editorRequested, this, &MainWindow::hideStartPage);
+    startPage_ = new HomePage(centralWidget());
+    connect(startPage_, &HomePage::openRequested, this, [this] { on_btnOpen(); });
+    connect(startPage_, &HomePage::editorRequested, this, &MainWindow::hideStartPage);
     grid->addWidget(startPage_, 0, 0, qMax(1, grid->rowCount()), qMax(1, grid->columnCount()));
   }
   if (startPageOn_) return;

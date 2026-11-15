@@ -1091,7 +1091,7 @@ class MainWindow : public QMainWindow {
   void init_MainUI();
 
   void init_hardware_info();
-  class StartPage* startPage_ = nullptr;
+  class HomePage* startPage_ = nullptr;
   QList<QWidget*> startPageHidden_;
   bool startPageOn_ = false;
 

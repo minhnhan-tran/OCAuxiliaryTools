@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.35.1] — 2026-11-15
+
+### Fixed
+- Windows builds (MSVC and MinGW) failed to compile since 1.32.0: `<wingdi.h>` declares a function `StartPage()`, which hid the start page class of the same name (`mainwindow.cpp: error C2061: identifier 'StartPage'`). The class is now `HomePage`.
+- macOS 10.12 build (Qt 5.9.9) failed in `dlgefibuilder.cpp`: `QUuid::WithoutBraces` only exists since Qt 5.11. The braces are now stripped by hand.
+
 ## [1.35.0] — 2026-11-15
 
 ### Added

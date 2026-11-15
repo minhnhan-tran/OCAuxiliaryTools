@@ -59,7 +59,7 @@ bool applySerials(QVariantMap* config, const QString& model, const QString& dbDi
   QVariantMap gen = pi.value("Generic").toMap();
   gen["SystemSerialNumber"] = parts[0].trimmed();
   gen["MLB"] = parts[1].trimmed();
-  gen["SystemUUID"] = QUuid::createUuid().toString(QUuid::WithoutBraces).toUpper();
+  gen["SystemUUID"] = QUuid::createUuid().toString().mid(1, 36).toUpper();
   pi["Generic"] = gen;
   config->insert("PlatformInfo", pi);
   return true;

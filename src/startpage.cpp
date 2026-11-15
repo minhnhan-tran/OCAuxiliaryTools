@@ -9,7 +9,7 @@
 
 #include "sysinfo.h"
 
-StartPage::StartPage(QWidget* parent) : QWidget(parent) {
+HomePage::HomePage(QWidget* parent) : QWidget(parent) {
   // The page sits over the editor's grid cells; without an opaque background the status bar's
   // "V1.x.x" label (and anything else underneath) shows through the margins.
   setAutoFillBackground(true);
@@ -55,13 +55,13 @@ StartPage::StartPage(QWidget* parent) : QWidget(parent) {
   row->addWidget(btnRefresh_);
   top->addLayout(row);
 
-  connect(open, &QPushButton::clicked, this, &StartPage::openRequested);
-  connect(editor, &QPushButton::clicked, this, &StartPage::editorRequested);
+  connect(open, &QPushButton::clicked, this, &HomePage::openRequested);
+  connect(editor, &QPushButton::clicked, this, &HomePage::editorRequested);
   connect(copy, &QPushButton::clicked, this, [this] { QApplication::clipboard()->setText(asText()); });
-  connect(btnRefresh_, &QPushButton::clicked, this, &StartPage::refresh);
+  connect(btnRefresh_, &QPushButton::clicked, this, &HomePage::refresh);
 }
 
-StartPage::~StartPage() {
+HomePage::~HomePage() {
   if (worker_ && worker_->isRunning()) {
     worker_->disconnect(this);
     if (!worker_->wait(2000)) {  // a probe is stuck; the app is quitting anyway
@@ -71,17 +71,17 @@ StartPage::~StartPage() {
   }
 }
 
-void StartPage::refresh() {
+void HomePage::refresh() {
   if (worker_ && worker_->isRunning()) return;
   btnRefresh_->setEnabled(false);
   lblStatus_->setText(tr("Reading system information..."));
   delete worker_;
   worker_ = new SysInfoCollector(this);
-  connect(worker_, &SysInfoCollector::collected, this, &StartPage::fill, Qt::QueuedConnection);
+  connect(worker_, &SysInfoCollector::collected, this, &HomePage::fill, Qt::QueuedConnection);
   worker_->start();
 }
 
-void StartPage::fill(const QVariantList& rows) {
+void HomePage::fill(const QVariantList& rows) {
   tree_->clear();
   QTreeWidgetItem* cur = nullptr;
   QString curSec;
@@ -103,7 +103,7 @@ void StartPage::fill(const QVariantList& rows) {
   btnRefresh_->setEnabled(true);
 }
 
-QString StartPage::asText() const {
+QString HomePage::asText() const {
   QString t;
   for (int i = 0; i < tree_->topLevelItemCount(); i++) {
     const QTreeWidgetItem* s = tree_->topLevelItem(i);

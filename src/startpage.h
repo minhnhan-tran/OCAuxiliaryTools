@@ -8,13 +8,14 @@
 
 class SysInfoCollector;
 
+// Not called "StartPage": <wingdi.h> declares a function StartPage(), which hides the class on Windows.
 // Landing page shown when no config.plist is open: this computer's hardware and
 // boot facts (like Hackintool's System tab) plus shortcuts to open a config.
-class StartPage : public QWidget {
+class HomePage : public QWidget {
   Q_OBJECT
  public:
-  explicit StartPage(QWidget* parent = nullptr);
-  ~StartPage() override;
+  explicit HomePage(QWidget* parent = nullptr);
+  ~HomePage() override;
   void refresh();  // re-run the probes in a worker thread
 
  signals:
