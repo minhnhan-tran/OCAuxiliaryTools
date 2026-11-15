@@ -6,6 +6,8 @@
 #include "dlgmacosinstaller.h"
 #include "dlgsipcalc.h"
 #include "startpage.h"
+
+#include <QGuiApplication>
 #include "iconset.h"
 #include "theme.h"
 
@@ -204,6 +206,18 @@ MainWindow::MainWindow(QWidget* parent)
   loading = false;
   Initialization = false;
   if (SaveFileName.isEmpty()) showStartPage();
+
+  // A kext replaced in EFI/OC/Kexts (e.g. updated in Finder) changes no row, so nothing else
+  // re-reads its version; refresh the file marks and the "V<version>" comments when the user
+  // comes back to the app.
+  connect(qApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState st) {
+    if (st != Qt::ApplicationActive || Initialization || loading || SaveFileName.isEmpty()) return;
+    if (startPage_ && startPageOn_) return;
+    checkFiles(ui->table_acpi_add);
+    checkFiles(ui->table_kernel_add);
+    checkFiles(ui->tableTools);
+    checkFiles(ui->table_uefi_drivers);
+  });
 }
 
 MainWindow::~MainWindow() { delete ui; }

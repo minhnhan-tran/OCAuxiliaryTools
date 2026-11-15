@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.34.2] — 2026-11-15
+
+### Fixed
+- Kernel > Add: the "V<version>" in the Comment column did not follow a kext that was replaced with a newer build. It was refreshed only when a config was opened, rows were added or removed, or a kext appeared or disappeared; replacing the files in place did none of those. The ACPI, Kernel, Tools and Drivers tables (file marks and kext versions) are now re-checked whenever the app becomes active again.
+
 ## [1.34.1] — 2026-11-15
 
 ### Fixed
