@@ -8538,9 +8538,11 @@ void MainWindow::set_AutoColWidth(QTableWidget* w, bool autoColWidth) {
   if (autoColWidth) {
     // Cap content-sized columns: one very long value (e.g. boot-args) used to
     // widen its column past the window and scroll the other columns away.
-    // Longer text is elided with "..."; double-click opens the full text.
+    // Longer text wraps onto extra lines (rows grow to fit) so all of it
+    // stays readable.
     w->horizontalHeader()->setMaximumSectionSize(kMaxAutoColWidth);
-    w->setTextElideMode(Qt::ElideRight);
+    w->setWordWrap(true);
+    w->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     for (int y = 0; y < w->columnCount(); y++) {
       QString item = w->horizontalHeaderItem(y)->text();
       if (!keyList.removeOne(item)) {
@@ -8552,6 +8554,11 @@ void MainWindow::set_AutoColWidth(QTableWidget* w, bool autoColWidth) {
     // -1 restores Qt's own limit (1 << 20 is one over it and is rejected).
     w->horizontalHeader()->setMaximumSectionSize(-1);
     w->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    // Back to single-line rows of the default height.
+    w->setWordWrap(false);
+    w->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    const int rowH = w->verticalHeader()->defaultSectionSize();
+    for (int r = 0; r < w->rowCount(); r++) w->setRowHeight(r, rowH);
   }
 }
 
@@ -8906,7 +8913,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
     if (tw && tw->viewport() == obj) {
       QHelpEvent* he = static_cast<QHelpEvent*>(event);
       QTableWidgetItem* it = tw->itemAt(he->pos());
-      if (it && !it->text().isEmpty() &&
+      if (it && !tw->wordWrap() && !it->text().isEmpty() &&
           tw->fontMetrics().width(it->text()) + 12 >
               tw->columnWidth(it->column())) {
         // Rich text so that a long value wraps instead of running off screen.

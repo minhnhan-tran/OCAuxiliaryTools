@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.7] — 2026-11-15
+
+### Changed
+- Tables with auto column width: a long value (for example `boot-args`) now wraps onto extra lines inside its cell, and the row grows to fit, so the whole text is visible in the grid instead of being cut with "...". The 480 px column cap from 1.36.5 stays, so the Key and Data Type columns still never scroll out of view. Short rows keep their normal height. Turning "Auto Column Width" off goes back to single-line rows. The hover tooltip is now only used when wrapping is off.
+
 ## [1.36.6] — 2026-11-15
 
 ### Fixed
