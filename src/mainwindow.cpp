@@ -8519,6 +8519,9 @@ void MainWindow::tablePopMenu(QTableWidget* w, QAction* cutAction,
   });
 }
 
+// Widest an auto-sized column may grow, in pixels.
+static const int kMaxAutoColWidth = 480;
+
 void MainWindow::set_AutoColWidth(QTableWidget* w, bool autoColWidth) {
   QStringList keyList;
   keyList = QStringList() << "Enabled"
@@ -8533,6 +8536,11 @@ void MainWindow::set_AutoColWidth(QTableWidget* w, bool autoColWidth) {
                           << "Strategy";
 
   if (autoColWidth) {
+    // Cap content-sized columns: one very long value (e.g. boot-args) used to
+    // widen its column past the window and scroll the other columns away.
+    // Longer text is elided with "..."; double-click opens the full text.
+    w->horizontalHeader()->setMaximumSectionSize(kMaxAutoColWidth);
+    w->setTextElideMode(Qt::ElideRight);
     for (int y = 0; y < w->columnCount(); y++) {
       QString item = w->horizontalHeaderItem(y)->text();
       if (!keyList.removeOne(item)) {
@@ -8541,6 +8549,7 @@ void MainWindow::set_AutoColWidth(QTableWidget* w, bool autoColWidth) {
       }
     }
   } else {
+    w->horizontalHeader()->setMaximumSectionSize(1 << 20);
     w->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   }
 }
@@ -8567,6 +8576,8 @@ void MainWindow::init_CopyPasteLine() {
     w->setContextMenuPolicy(Qt::CustomContextMenu);
     w->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     w->installEventFilter(this);
+    // Hover tip with the full text of a cell that is elided (see eventFilter).
+    w->viewport()->installEventFilter(this);
 
     // 拷贝当前列表头文本
     QAction* copyTableHeaderTextAction = new QAction(tr("CopyText"));
@@ -8889,6 +8900,24 @@ void MainWindow::paintEvent(QPaintEvent* event) {
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
+  if (event->type() == QEvent::ToolTip) {
+    QTableWidget* tw = qobject_cast<QTableWidget*>(obj->parent());
+    if (tw && tw->viewport() == obj) {
+      QHelpEvent* he = static_cast<QHelpEvent*>(event);
+      QTableWidgetItem* it = tw->itemAt(he->pos());
+      if (it && !it->text().isEmpty() &&
+          tw->fontMetrics().width(it->text()) + 12 >
+              tw->columnWidth(it->column())) {
+        // Rich text so that a long value wraps instead of running off screen.
+        QToolTip::showText(he->globalPos(),
+                           "<p>" + it->text().toHtmlEscaped() + "</p>", tw);
+      } else {
+        QToolTip::hideText();
+      }
+      return true;
+    }
+  }
+
   if (obj->metaObject()->className() == QStringLiteral("QLabel") ||
       obj->metaObject()->className() == QStringLiteral("QCheckBox") ||
       obj->metaObject()->className() == QStringLiteral("QTableWidget")) {

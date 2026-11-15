@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.5] — 2026-11-15
+
+### Fixed
+- Tables with auto column width: one very long value (for example a long `boot-args` under NVRAM > Add) made its column wider than the window, so the table scrolled sideways and the Key and Data Type columns disappeared. Auto-sized columns are now capped at 480 px and longer text is cut with "...". Hovering a cut cell shows the whole text as a wrapped tooltip, and double-click still opens the full value for editing. Turning "Auto Column Width" off restores free resizing.
+
 ## [1.36.4] — 2026-11-15
 
 ### Changed
