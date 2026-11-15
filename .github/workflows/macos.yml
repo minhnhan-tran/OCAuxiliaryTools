@@ -10,6 +10,9 @@ on:
       - '*.pro'
       - '**'
       - '.github/workflows/macos.yml' 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build
@@ -41,40 +44,18 @@ jobs:
           qmake
           make
           
-      # 打包
+      # a release tag must equal the version compiled into the app, or the in-app updater rejects the download
+      - name: check tag matches version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VER=$(grep -o 'CurVersion = "[^"]*"' src/aboutdialog.cpp | cut -d'"' -f2)
+          [ "${GITHUB_REF_NAME}" = "v${VER}" ] || { echo "tag ${GITHUB_REF_NAME} != v${VER}"; exit 1; }
+
+      # package: bundle Qt + Database, ad-hoc sign, build the dmg (see scripts/package-macos.sh)
       - name: package
         run: |
-          # 拷贝依赖
-          cp -r Database bin/release/${targetName}.app/Contents/MacOS/Database
-          chmod +x bin/release/${targetName}.app/Contents/MacOS/Database/mac/macserial
-          chmod +x bin/release/${targetName}.app/Contents/MacOS/Database/mac/ocvalidate
-          chmod +x bin/release/${targetName}.app/Contents/MacOS/Database/mac/ocpasswordgen
-          
-          chmod +x bin/release/${targetName}.app/Contents/MacOS/Database/mac/CreateVault/create_vault.sh
-          chmod +x bin/release/${targetName}.app/Contents/MacOS/Database/mac/CreateVault/RsaTool
-          chmod +x bin/release/${targetName}.app/Contents/MacOS/Database/mac/CreateVault/sign.command
-          
-          #cp -r devDatabase bin/release/${targetName}.app/Contents/MacOS/devDatabase
-          #chmod +x bin/release/${targetName}.app/Contents/MacOS/devDatabase/mac/macserial
-          #chmod +x bin/release/${targetName}.app/Contents/MacOS/devDatabase/mac/ocvalidate
-          #chmod +x bin/release/${targetName}.app/Contents/MacOS/devDatabase/mac/ocpasswordgen
-          
-          #chmod +x bin/release/${targetName}.app/Contents/MacOS/devDatabase/mac/CreateVault/create_vault.sh
-          #chmod +x bin/release/${targetName}.app/Contents/MacOS/devDatabase/mac/CreateVault/RsaTool
-          #chmod +x bin/release/${targetName}.app/Contents/MacOS/devDatabase/mac/CreateVault/sign.command
-          
-          cp -f Info.plist bin/release/${targetName}.app/Contents/Info.plist
-          
-          cp -f Database/mac/aria2c bin/release/${targetName}.app/Contents/MacOS/aria2c
-          chmod +x bin/release/${targetName}.app/Contents/MacOS/aria2c
-          rm bin/release/${targetName}.app/Contents/MacOS/Database/mac/aria2c
-          
-          # macdeployqt bin/release/${targetName}.app -qmldir=. -verbose=1 -dmg
-          
-          cp -R -p -f bin/release/${targetName}.app ${targetName}.app
-          macdeployqt ${targetName}.app -qmldir=. -verbose=1 -dmg
-          cp ${targetName}.dmg bin/release/${targetName}.dmg 
-          
+          sh scripts/package-macos.sh bin/release/${targetName}.app bin/release/${targetName}.dmg
+
       # 上传artifacts          
       - uses: actions/upload-artifact@v4
         with:

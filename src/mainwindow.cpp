@@ -6,6 +6,7 @@
 #include "dlgmacosinstaller.h"
 #include "dlgsipcalc.h"
 #include "startpage.h"
+#include "selfupdate.h"
 
 #include <QGuiApplication>
 #include "iconset.h"
@@ -206,6 +207,7 @@ MainWindow::MainWindow(QWidget* parent)
   loading = false;
   Initialization = false;
   if (SaveFileName.isEmpty()) showStartPage();
+  SelfUpdate::cleanupStale();
 
   // A kext replaced in EFI/OC/Kexts (e.g. updated in Finder) changes no row, so nothing else
   // re-reads its version; refresh the file marks and the "V<version>" comments when the user
@@ -6157,7 +6159,7 @@ void MainWindow::on_table_Booter_patch_currentCellChanged(int currentRow,
 
 void MainWindow::on_btnCheckUpdate() {
   QNetworkRequest quest;
-  quest.setUrl(QUrl("https://api.github.com/repos/ic005k/" + strAppName +
+  quest.setUrl(QUrl(QString("https://api.github.com/repos/%1").arg(SelfUpdate::kRepo) +
                     "/releases/"
                     "latest"));
   quest.setHeader(QNetworkRequest::UserAgentHeader, "RT-Thread ART");
@@ -6173,20 +6175,25 @@ void MainWindow::replyFinished(QNetworkReply* reply) {
 QString MainWindow::getUrl(QVariantList list) {
   aboutDlg->listDownCount.clear();
   QString macUrl, winUrl, linuxUrl, osx1012Url;
+  QVariantMap macAsset, osx1012Asset;
   for (int i = 0; i < list.count(); i++) {
     QVariantMap map = list[i].toMap();
     QString fName = map["name"].toString();
 
-    if (fName.contains("OCAT_Mac.dmg"))
+    if (fName.contains("OCAT_Mac.dmg")) {
       macUrl = map["browser_download_url"].toString();
+      macAsset = map;
+    }
 
     if (fName.contains("Win")) winUrl = map["browser_download_url"].toString();
 
     if (fName.contains("Linux"))
       linuxUrl = map["browser_download_url"].toString();
 
-    if (fName.contains("below"))
+    if (fName.contains("below")) {
       osx1012Url = map["browser_download_url"].toString();
+      osx1012Asset = map;
+    }
 
     aboutDlg->listDownCount.append(map["download_count"].toString());
   }
@@ -6196,6 +6203,13 @@ QString MainWindow::getUrl(QVariantList list) {
   if (win) Url = winUrl;
   if (linuxOS) Url = linuxUrl;
   if (osx1012) Url = osx1012Url;
+
+  // In-place update (macOS): the asset with its published SHA-256 digest.
+  updateRel_ = SelfUpdate::Release();
+  if (osx1012)
+    SelfUpdate::fillFromAsset(osx1012Asset, &updateRel_);
+  else if (mac)
+    SelfUpdate::fillFromAsset(macAsset, &updateRel_);
 
   return Url;
 }
@@ -6233,6 +6247,9 @@ int MainWindow::parse_UpdateJSON(QString str) {
       else
         ReleaseNote = noteList.at(0) + noteList.at(2);
     }
+
+    updateRel_.version = Verison;
+    updateRel_.notes = ReleaseNote;
 
     if (isNewerVersion(Verison, CurVersion) && Url != "") {
       QString warningStr = tr("New version detected!") + "\n" +
@@ -9628,7 +9645,7 @@ void MainWindow::on_btnDown_UEFI_Drivers_clicked() {
 
 void MainWindow::on_actionLatest_Release_triggered() {
   QUrl url(
-      QString("https://github.com/ic005k/" + strAppName + "/releases/latest"));
+      QString("https://github.com/%1/releases/latest").arg(SelfUpdate::kRepo));
   QDesktopServices::openUrl(url);
 }
 
@@ -9638,6 +9655,11 @@ void MainWindow::on_actionOnline_Download_Updates_triggered() {
 
 void MainWindow::ShowAutoUpdateDlg(bool Database) {
   Q_UNUSED(Database);
+  if (mac || osx1012) {
+    if (!updateRel_.valid()) return;
+    (new SelfUpdater(this))->start(updateRel_);  // deletes itself when done
+    return;
+  }
   if (dlgAutoUpdate->strUrlOrg == "") return;
   if (dlgAutoUpdate->isVisible()) return;
 

@@ -73,6 +73,7 @@ SOURCES += \
     src/dlgmacosinstaller.cpp \
     src/dlgsipcalc.cpp \
     src/startpage.cpp \
+    src/selfupdate.cpp \
     src/sysinfo.cpp \
     src/macosinstaller/macosinstaller.cpp \
     src/macosinstaller/macosdownload.cpp \
@@ -120,6 +121,7 @@ HEADERS += \
     src/dlgmacosinstaller.h \
     src/dlgsipcalc.h \
     src/startpage.h \
+    src/selfupdate.h \
     src/sysinfo.h \
     src/macosinstaller/macosinstaller.h \
     src/macosinstaller/macosdownload.h \

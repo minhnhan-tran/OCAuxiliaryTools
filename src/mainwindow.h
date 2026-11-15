@@ -45,6 +45,7 @@
 
 #include "aboutdialog.h"
 #include "autoupdatedialog.h"
+#include "selfupdate.h"
 #include "dlgMountESP.h"
 #include "dlgOCValidate.h"
 #include "dlgParameters.h"
@@ -1049,6 +1050,7 @@ class MainWindow : public QMainWindow {
   QAction* actionPostCheck = nullptr;
   QAction* actionUsbMapBtn = nullptr;
   QAction* actionMacInstallBtn = nullptr;
+  SelfUpdate::Release updateRel_;  // the newest release found by the last update check
 
   QMenu* reFileMenu;
 

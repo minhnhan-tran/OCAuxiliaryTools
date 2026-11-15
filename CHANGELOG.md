@@ -4,6 +4,16 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.0] — 2026-11-15
+
+### Added
+- **Self-update from GitHub releases (macOS).** The update check now reads `minhnhan-tran/OCAuxiliaryTools` instead of the upstream repo. When a newer release is found, *Download* no longer opens the old downloader on macOS: `src/selfupdate.cpp` downloads the `.dmg`, checks it against the SHA-256 that GitHub publishes for the asset, mounts it and checks the app inside (same bundle id, the announced version, a valid code signature, same signing team as the running app), copies it next to the running app, and asks to restart. A small script swaps the two after the app has quit, puts the old app back if anything fails, and reopens the app. Any failed check leaves the installed app untouched and offers the release page instead. Refused up front: a release with no published checksum, a read-only or translocated install location, too little free disk space. A stalled download times out after 60 s. Leftovers of an earlier update are cleaned at startup.
+- `scripts/package-macos.sh`: bundles Qt and the Database, stamps the version, ad-hoc signs, and builds the `.dmg`. Both macOS workflows use it.
+
+### Changed
+- macOS workflows: a release tag must equal the app's version (`v<CurVersion>`), otherwise the build fails; the workflows get `contents: write` so they can publish the release.
+- Windows and Linux keep the existing downloader.
+
 ## [1.35.2] — 2026-11-15
 
 ### Fixed
