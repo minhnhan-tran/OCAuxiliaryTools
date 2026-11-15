@@ -60,6 +60,50 @@ Inspects the running Hackintosh against the [Dortania post-install guide](https:
 * A **Skipped** result for checks that do not apply. **Copy report** puts the results on the clipboard for forum help.
 * Optionally compares a Hardware Sniffer `Report.json` with what macOS reports (CPU name and core count).
 
+### Start page (Tools > System Information, macOS has the full list)
+
+![Start page](docs/screenshots/home.png)
+
+When the app starts with no config.plist open, the window shows this computer instead of an empty editor, like the System tab of Hackintool. Opening a config hides it; **Tools > System Information** brings it back.
+
+* Model, OS, kernel, firmware and uptime; CPU; each memory module; graphics cards; connected displays; storage (NVMe and SATA drives, boot volume, EFI partitions); network adapters; default audio output.
+* Boot facts: OpenCore version, SIP, `csr-active-config`, `boot-args`, FileVault, Gatekeeper and the loaded non-Apple kexts (Lilu, WhateverGreen, ...).
+* The probes run in a background thread. Windows and Linux show a shorter list.
+
+### SIP / csr-active-config Calculator (Tools > SIP / csr-active-config Calculator)
+
+![SIP calculator](docs/screenshots/sip.png)
+
+* Tick the SIP flags (names and bits from OpenCorePkg's `AppleCsrConfig.h`), or type a number or the 4-byte NVRAM Data, and the other forms update. Bits the dialog does not know are kept when you toggle others.
+* Presets: SIP enabled, OpenCore's default SIP-off value `0x27F`, OCLP's root-patching value `0x803`, and all known flags.
+* **Copy Data** copies the NVRAM value; **Apply to open config** sets `csr-active-config` under `7C436110-AB2A-4BBB-A880-FE41995C9F82` in NVRAM > Add, after a confirmation.
+
+### Create macOS installation (Tools > Create macOS installation, or the toolbar button; macOS only)
+
+![Create macOS installation](docs/screenshots/installer.png)
+
+Makes a bootable macOS installer USB with Apple's `createinstallmedia`, as in Dortania's OpenCore Legacy Patcher.
+
+* Lists the installers in Applications and the external disks, and shows the exact command before it runs it in Terminal.
+* Can also download an installer inside the app. It reads Apple's software-update catalog and lists every full installer (Tahoe back to Big Sur) with version, build and size, newest first; seed and beta builds stay hidden unless ticked.
+
+### Mount ESP
+
+![Mount ESP](docs/screenshots/esp.png)
+
+* Each partition shows whether it is mounted: a green dot and bold text with the mount point in the tooltip, or a grey dot and dimmed text.
+* **Open EFI folder** opens the `EFI` folder of the selected partition, wherever it is mounted, without an administrator password. It is enabled only while that partition is mounted.
+
+### Updating the app (Help > Update Check, macOS)
+
+![Update prompt](docs/screenshots/update.png)
+
+The update check reads this fork's [releases](https://github.com/minhnhan-tran/OCAuxiliaryTools/releases). On macOS, *Download* installs the new version in place:
+
+* It checks the download against the SHA-256 that GitHub publishes for the file, then checks the app inside: same bundle id, the announced version, a valid code signature and the same signing team.
+* The new app is copied next to the running one and swapped in after the app quits; the old app is put back if anything fails. Any failed check leaves the installed app untouched and offers the release page instead.
+* Windows and Linux keep the previous downloader.
+
 ### Themes and icons
 * **Material design theme** with light and dark variants (Preferences > Material design / Dark theme), applied live.
 * **Icon sets** (Preferences > Icon set, applies after a restart): **Classic**, or **Material Symbols** SVGs tinted at runtime to match the theme.
@@ -150,4 +194,4 @@ Created by [ic005k](https://github.com/ic005k/OCAuxiliaryTools) and contributors
 
 ---
 
-API: https://api.github.com/repos/ic005k/OCAuxiliaryTools/releases/latest
+API: https://api.github.com/repos/minhnhan-tran/OCAuxiliaryTools/releases/latest

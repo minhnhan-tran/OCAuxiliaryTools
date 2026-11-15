@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.3] — 2026-11-15
+
+### Changed
+- README, "What is new in this fork": added the start page, SIP / csr-active-config calculator, Create macOS installation, Mount ESP and in-app update, each with a screenshot (`docs/screenshots/`). The screenshots are the real dialogs rendered with sample data, so they show no serial number or disk of the machine they were made on. The update link at the bottom now points at this fork.
+
 ## [1.36.2] — 2026-11-15
 
 ### Fixed
