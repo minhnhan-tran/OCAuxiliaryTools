@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.34.1] — 2026-11-15
+
+### Fixed
+- Mount ESP > Open EFI folder: it guessed the path from the volume name (`/Volumes/<name>/EFI/`). With two EFI partitions, which are usually both called "EFI", the second one mounts as `/Volumes/EFI 1`, so the button could open the wrong disk's folder or say "not mounted". It now asks `diskutil` where the selected partition is mounted, and opens that.
+
 ## [1.34.0] — 2026-11-15
 
 ### Added

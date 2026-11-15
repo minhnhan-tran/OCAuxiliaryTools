@@ -5,6 +5,7 @@
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QProcess>
 #include <QUrl>
 
 #include "ui_dlgMountESP.h"
@@ -35,12 +36,27 @@ static QString efiDirOf(const QListWidget* list) {
   return name.isEmpty() ? QString() : "/Volumes/" + name + "/EFI/";
 }
 
+// Where `diskutil` says the partition is mounted, or empty when it is not mounted.
+// Volume names are not enough: two ESPs both called "EFI" mount as /Volumes/EFI and /Volumes/EFI 1.
+static QString mountPointOf(const QString& disk) {
+  QProcess p;
+  p.start("diskutil", {"info", disk});
+  if (!p.waitForStarted(2000) || !p.waitForFinished(8000)) return QString();
+  const QString out = QString::fromUtf8(p.readAllStandardOutput());
+  for (const QString& line : out.split('\n'))
+    if (line.trimmed().startsWith("Mount Point:")) return line.section(':', 1).trimmed();
+  return QString();
+}
+
 void dlgMountESP::on_btnOpenEfiFolder_clicked() {
-  const QString dirpath = efiDirOf(ui->listWidget);
-  if (dirpath.isEmpty()) return;
-  if (!QFileInfo(dirpath).isDir()) {
-    QMessageBox::information(this, windowTitle(),
-                             tr("%1 does not exist. Mount the partition first (Mount).").arg(dirpath));
+  if (!ui->listWidget->currentItem()) return;
+  const QString disk = ui->listWidget->currentItem()->text().simplified().section('|', 0, 0).trimmed();
+  QString dirpath;
+  const QString mp = mountPointOf(disk);
+  if (!mp.isEmpty()) dirpath = QFileInfo(mp + "/EFI").isDir() ? mp + "/EFI/" : mp + "/";
+  else dirpath = efiDirOf(ui->listWidget);  // no diskutil (not macOS): fall back to the volume name
+  if (dirpath.isEmpty() || !QFileInfo(dirpath).isDir()) {
+    QMessageBox::information(this, windowTitle(), tr("%1 is not mounted. Mount the partition first (Mount).").arg(disk));
     return;
   }
   QDesktopServices::openUrl(QUrl::fromLocalFile(dirpath));
