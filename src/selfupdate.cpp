@@ -361,6 +361,10 @@ void SelfUpdater::start(const SelfUpdate::Release& rel) {
   progress_->setWindowTitle(tr("Update to %1").arg(rel_.version));
   progress_->setWindowModality(Qt::WindowModal);
   progress_->setMinimumDuration(0);
+  // By default the dialog hides itself at 100%: the verification that follows would run with no dialog and no
+  // modality, and a second click on Download could start a second updater in the same temp folder.
+  progress_->setAutoReset(false);
+  progress_->setAutoClose(false);
   connect(progress_, &QProgressDialog::canceled, this, &SelfUpdater::cancel);
 
   connect(reply_, &QNetworkReply::readyRead, this, &SelfUpdater::onReadyRead);

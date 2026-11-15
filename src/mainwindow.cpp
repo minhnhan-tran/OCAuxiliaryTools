@@ -8,6 +8,8 @@
 #include "startpage.h"
 #include "selfupdate.h"
 
+#include <QPointer>
+
 #include <QGuiApplication>
 #include "iconset.h"
 #include "theme.h"
@@ -9656,8 +9658,19 @@ void MainWindow::on_actionOnline_Download_Updates_triggered() {
 void MainWindow::ShowAutoUpdateDlg(bool Database) {
   Q_UNUSED(Database);
   if (mac || osx1012) {
-    if (!updateRel_.valid()) return;
-    (new SelfUpdater(this))->start(updateRel_);  // deletes itself when done
+    static QPointer<SelfUpdater> active;  // one update at a time (they share a temp folder)
+    if (active) return;
+    if (!updateRel_.valid()) {
+      QMessageBox::information(this, "", tr("Check for updates first."));
+      return;
+    }
+    // The menu action can be used at any time: never reinstall the same version or go back to an older one.
+    if (!isNewerVersion(updateRel_.version, CurVersion)) {
+      QMessageBox::information(this, "", tr("You are currently using the latest version!"));
+      return;
+    }
+    active = new SelfUpdater(this);  // deletes itself when done
+    active->start(updateRel_);
     return;
   }
   if (dlgAutoUpdate->strUrlOrg == "") return;

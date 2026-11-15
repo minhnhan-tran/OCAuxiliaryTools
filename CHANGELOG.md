@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.1] — 2026-11-15
+
+### Fixed
+- Self-update: the progress dialog closed itself when the download reached 100%, so the verification that follows ran with no dialog and no modality, and a second click on *Download* could start a second updater in the same temp folder. The dialog now stays until the update is staged or fails, and only one update can run at a time.
+- Self-update: the *Online download updates* menu item could start an update at any time, including with no update check done, or for the version already installed (or an older one). It now says "check for updates first" or "you are using the latest version" instead.
+
 ## [1.36.0] — 2026-11-15
 
 ### Added
