@@ -35,6 +35,16 @@
      </property>
     </widget>
    </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="btnOpenEfiFolder">
+     <property name="toolTip">
+      <string>Open the EFI folder of the selected partition if it is already mounted (no password needed)</string>
+     </property>
+     <property name="text">
+      <string>Open EFI folder</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

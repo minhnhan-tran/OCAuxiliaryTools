@@ -21,6 +21,8 @@ class dlgMountESP : public QDialog {
 
   void on_btnMountOpenConfig_clicked();
 
+  void on_btnOpenEfiFolder_clicked();
+
  private:
 };
 

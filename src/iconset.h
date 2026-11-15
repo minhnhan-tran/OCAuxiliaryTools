@@ -53,6 +53,7 @@ inline const QHash<QString, Spec>& specs() {
       {"um", {"system_update_alt", nullptr}}, {"ov", {"verified", nullptr}},
       {"overror", {"error", "#e5534b"}},    {"efi", {"deployed_code", nullptr}},
       {"postcheck", {"fact_check", nullptr}}, {"usbmap", {"usb", nullptr}},
+      {"macosinstall", {"install_desktop", nullptr}},
       {"be", {"backup", nullptr}},          {"c", {"clear_all", nullptr}},
       {"rp", {"history", nullptr}},         {"ok", {"check_circle", "#3fb950"}},
       {"no", {"cancel", "#e5534b"}},        {"newver", {"new_releases", "#f0883e"}},

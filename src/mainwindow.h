@@ -1048,6 +1048,7 @@ class MainWindow : public QMainWindow {
   QAction* actionBuildEfi = nullptr;
   QAction* actionPostCheck = nullptr;
   QAction* actionUsbMapBtn = nullptr;
+  QAction* actionMacInstallBtn = nullptr;
 
   QMenu* reFileMenu;
 

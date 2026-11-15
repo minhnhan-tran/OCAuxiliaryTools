@@ -5081,6 +5081,7 @@ void MainWindow::init_ToolBarIcon() {
     if (actionBuildEfi) actionBuildEfi->setIcon(IconSet::icon(":/icon/efi0.png"));
     if (actionPostCheck) actionPostCheck->setIcon(IconSet::icon(":/icon/postcheck0.png"));
     if (actionUsbMapBtn) actionUsbMapBtn->setIcon(IconSet::icon(":/icon/usbmap0.png"));
+    if (actionMacInstallBtn) actionMacInstallBtn->setIcon(IconSet::icon(":/icon/macosinstall0.png"));
     ui->actionOpen_Directory->setIcon(IconSet::icon(":/icon/opendir0.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(IconSet::icon(":/icon/save0.png"));
     if (!blOCValidateError)
@@ -5099,6 +5100,7 @@ void MainWindow::init_ToolBarIcon() {
     if (actionBuildEfi) actionBuildEfi->setIcon(IconSet::icon(":/icon/efi.png"));
     if (actionPostCheck) actionPostCheck->setIcon(IconSet::icon(":/icon/postcheck.png"));
     if (actionUsbMapBtn) actionUsbMapBtn->setIcon(IconSet::icon(":/icon/usbmap.png"));
+    if (actionMacInstallBtn) actionMacInstallBtn->setIcon(IconSet::icon(":/icon/macosinstall.png"));
     ui->actionOpen_Directory->setIcon(IconSet::icon(":/icon/opendir.png"));
     if (!isWindowModified()) ui->actionSave->setIcon(IconSet::icon(":/icon/save.png"));
     if (!blOCValidateError)
@@ -5198,6 +5200,14 @@ void MainWindow::init_FileMenu() {
   actionUsbMapBtn->setIconVisibleInMenu(false);
   connect(actionUsbMapBtn, &QAction::triggered, this, &MainWindow::openUsbMap);
   ui->toolBar->addAction(actionUsbMapBtn);
+
+  // Create macOS installation (right after USB Mapping)
+  actionMacInstallBtn = new QAction(tr("Create macOS installation"), this);
+  actionMacInstallBtn->setToolTip(tr("Create macOS installation"));
+  actionMacInstallBtn->setIcon(IconSet::icon(Theme::icon("macosinstall", red)));
+  actionMacInstallBtn->setIconVisibleInMenu(false);
+  connect(actionMacInstallBtn, &QAction::triggered, this, &MainWindow::openMacOSInstaller);
+  ui->toolBar->addAction(actionMacInstallBtn);
 
   // Open Dir
   if (mac || osx1012) ui->actionOpen_Directory->setIconVisibleInMenu(false);

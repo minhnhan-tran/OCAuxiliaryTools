@@ -4,6 +4,12 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.34.0] — 2026-11-15
+
+### Added
+- Toolbar button **Create macOS installation**, right after USB Mapping. It opens the same dialog as Tools > Create macOS installation. Icon: Material Symbols "install_desktop" (Apache-2.0, in `icon-material/`), rendered for the light and dark themes.
+- Mount ESP partition dialog: new **Open EFI folder** button. It opens `/Volumes/<name>/EFI/` of the selected partition when it is already mounted, so no administrator password is needed; if it is not mounted it says so.
+
 ## [1.33.1] — 2026-11-01
 
 ### Fixed

@@ -2,6 +2,11 @@
 
 #include "Method.h"
 #include "mainwindow.h"
+#include <QDesktopServices>
+#include <QFileInfo>
+#include <QMessageBox>
+#include <QUrl>
+
 #include "ui_dlgMountESP.h"
 
 extern MainWindow* mw_one;
@@ -19,6 +24,27 @@ dlgMountESP::~dlgMountESP() { delete ui; }
 void dlgMountESP::on_btnMount_clicked() { mountESP(false); }
 
 void dlgMountESP::on_btnMountOpenConfig_clicked() { mountESP(true); }
+
+// "/Volumes/<name>/EFI/" for the selected list row, or empty when nothing is selected.
+// The list item is "<disk> | <volume name> | ...".
+static QString efiDirOf(const QListWidget* list) {
+  if (!list->currentItem()) return QString();
+  const QStringList parts = list->currentItem()->text().trimmed().simplified().split("|");
+  if (parts.count() < 2) return QString();
+  const QString name = parts.at(1).toLatin1().replace("?", "").trimmed();
+  return name.isEmpty() ? QString() : "/Volumes/" + name + "/EFI/";
+}
+
+void dlgMountESP::on_btnOpenEfiFolder_clicked() {
+  const QString dirpath = efiDirOf(ui->listWidget);
+  if (dirpath.isEmpty()) return;
+  if (!QFileInfo(dirpath).isDir()) {
+    QMessageBox::information(this, windowTitle(),
+                             tr("%1 does not exist. Mount the partition first (Mount).").arg(dirpath));
+    return;
+  }
+  QDesktopServices::openUrl(QUrl::fromLocalFile(dirpath));
+}
 
 void dlgMountESP::mountESP(bool openConfig) {
   if (ui->listWidget->count() == 0) return;
