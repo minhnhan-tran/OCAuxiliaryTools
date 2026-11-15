@@ -8549,7 +8549,8 @@ void MainWindow::set_AutoColWidth(QTableWidget* w, bool autoColWidth) {
       }
     }
   } else {
-    w->horizontalHeader()->setMaximumSectionSize(1 << 20);
+    // -1 restores Qt's own limit (1 << 20 is one over it and is rejected).
+    w->horizontalHeader()->setMaximumSectionSize(-1);
     w->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   }
 }

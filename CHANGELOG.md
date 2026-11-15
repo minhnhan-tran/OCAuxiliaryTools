@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.36.6] — 2026-11-15
+
+### Fixed
+- Turning "Auto Column Width" off kept the 480 px column cap added in 1.36.5: the call that lifts the limit used a value one above Qt's maximum, which Qt ignores. It now passes -1, so columns can be resized freely again.
+
 ## [1.36.5] — 2026-11-15
 
 ### Fixed
