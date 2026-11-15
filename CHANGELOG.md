@@ -4,6 +4,11 @@ The version follows Semantic Versioning (`MAJOR.MINOR.PATCH`). The single source
 of truth is `CurVersion` in `src/aboutdialog.cpp`; the top entry below must match
 it (`python3 scripts/check_version.py`).
 
+## [1.35.2] — 2026-11-15
+
+### Fixed
+- macOS 10.12 build (Qt 5.9.9): `qEnvironmentVariable()` only exists since Qt 5.10; `postcheck.cpp` and `efibuilder.cpp` now use `QString::fromLocal8Bit(qgetenv(...))`.
+
 ## [1.35.1] — 2026-11-15
 
 ### Fixed

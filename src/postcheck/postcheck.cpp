@@ -21,7 +21,7 @@ bool supported() {
 QList<Check> loadChecks() {
   QFile f(":/postcheck/checks.json");
   if (!f.open(QIODevice::ReadOnly)) {
-    f.setFileName(qEnvironmentVariable("POSTCHECK_PATH"));  // test harness
+    f.setFileName(QString::fromLocal8Bit(qgetenv("POSTCHECK_PATH")));  // test harness
     if (!f.open(QIODevice::ReadOnly)) return {};
   }
   QList<Check> out;

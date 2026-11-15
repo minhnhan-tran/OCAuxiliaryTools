@@ -19,7 +19,7 @@ const QJsonObject& data() {
     QFile f(":/efibuilder/efidata.json");
     // Standalone tests may point at a checkout of the JSON instead.
     if (!f.open(QIODevice::ReadOnly)) {
-      f.setFileName(qEnvironmentVariable("EFIDATA_PATH"));
+      f.setFileName(QString::fromLocal8Bit(qgetenv("EFIDATA_PATH")));
       f.open(QIODevice::ReadOnly);
     }
     return QJsonDocument::fromJson(f.readAll()).object();
@@ -498,7 +498,7 @@ const QJsonObject& postData() {
   static QJsonObject d = [] {
     QFile f(":/efibuilder/postinstall.json");
     if (!f.open(QIODevice::ReadOnly)) {
-      f.setFileName(qEnvironmentVariable("POSTINSTALL_PATH"));
+      f.setFileName(QString::fromLocal8Bit(qgetenv("POSTINSTALL_PATH")));
       f.open(QIODevice::ReadOnly);
     }
     return QJsonDocument::fromJson(f.readAll()).object();
